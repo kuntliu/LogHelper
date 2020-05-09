@@ -37,13 +37,12 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -103,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 File file_Sdcard = new File(path_SdcardRoot);
                 File[] ArrFile_SdcardRoot = file_Sdcard.listFiles();
                 for (File obb: ArrFile_SdcardRoot){
-                    if (obb.getName().endsWith("obb")){
+                    if (obb.getName().endsWith(".obb")){
                         ObbFile.add(obb.getName());
                     }
                 }
@@ -245,13 +244,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (f.isFile()) {
                     if (f.length() >= Math.pow(2, 30)){
                         double fileSize = f.length()/Math.pow(2, 30);
-                        fileSize_str = fileSize + " GB";
+                        fileSize_str = String.format("%.2f", fileSize) + " GB";
                     }else if (f.length() >= Math.pow(2, 20) && f.length() < Math.pow(2, 30)){
                         double fileSize = f.length()/Math.pow(2, 20);
-                        fileSize_str = fileSize + " MB";
+                        fileSize_str = String.format("%.2f", fileSize) + " MB";
                     }else if(f.length() >= Math.pow(2, 10) && f.length() < Math.pow(2, 20)){
                         double fileSize = f.length()/Math.pow(2, 10);
-                        fileSize_str = fileSize + " KB";
+                        fileSize_str = String.format("%.2f", fileSize) + " KB";
                     }else {
                         double fileSize = f.length();
                         fileSize_str = fileSize + " B";
@@ -284,8 +283,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 case R.id.menu_delete:
                                     if (SelectedFile != null && SelectedFile.exists()) {
                                         boolean isSuccessDeleteFile = SelectedFile.delete();           //删除文件
-                                        loglist.remove(loglist.get(position));              //删除loglist对应的对象并且刷新适配器
-                                        madapter.notifyDataSetChanged();
+                                        loglist.remove(loglist.get(position));              //删除loglist对应的数据源
+                                        madapter.notifyDataSetChanged();                    //刷新适配器
                                         Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
                                         break;
                                     }else {
@@ -347,27 +346,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (position){
             case 1:
                 try {
-                    GetAllFile(path_west);
+                    GetAllFile(path_garena);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
             case 2:
                 try {
-                    GetAllFile(path_garena);
+                    GetAllFile(path_korea);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
             case 3:
                 try {
-                    GetAllFile(path_korea);
+                    GetAllFile(path_SdcardRoot);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
             default:
                 try {
-                    GetAllFile(path_SdcardRoot);
+                    GetAllFile(path_west);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

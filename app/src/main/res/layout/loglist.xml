@@ -26,10 +26,10 @@
         android:layout_height="match_parent"
         android:divider="#E0E0E0"
         android:dividerHeight="0.8dp"></ListView>
-    <Button
-        android:id="@+id/obbButton"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/obb_text">
-    </Button>
+<!--    <Button-->
+<!--        android:id="@+id/obbButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:text="@string/obb_text">-->
+<!--    </Button>-->
 </LinearLayout>
