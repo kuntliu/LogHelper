@@ -333,6 +333,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             inputChannel = new FileInputStream(source).getChannel();
             outputChannel = new FileOutputStream(desc).getChannel();
         } finally {
+            assert inputChannel != null;
+            assert outputChannel != null;
             inputChannel.close();
             outputChannel.close();
         }
