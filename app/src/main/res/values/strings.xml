@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">LogHelper</string>
+    <string name="action_settings">Settings</string>
+    <string name="spinner_text">当前选择的目录</string>
+    <string name="obb_text">一键放置OBB</string>
+    <string name="action_delete">删除</string>
+    <string name="action_share">通过QQ发送至我的电脑</string>
+    <string name="action_detail">详细信息</string>
+    <string-array name="arr_path">
+        <item>根目录</item>
+        <item>Log目录：西方版本</item>
+        <item>Log目录：Garena版本</item>
+        <item>Log目录：韩国版本</item>
+    </string-array>
+</resources>
