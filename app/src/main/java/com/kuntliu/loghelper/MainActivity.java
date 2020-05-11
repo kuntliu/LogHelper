@@ -1,6 +1,7 @@
 package com.kuntliu.loghelper;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -74,15 +74,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             requestPermission();
         }
@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //用户选择“允许”
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
                     Log.d(permissions[i], "onRequestPermissionsResult:ture ");
-                    madapter.notifyDataSetChanged();
                 }if(grantResults[i] == PackageManager.PERMISSION_DENIED){
                     hasRejectPermission = true;
                 }
@@ -230,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("DefaultLocale")
     public void GetAllFile(final String path) throws IOException {
 
         mylistview = findViewById(R.id.log_list);
@@ -343,36 +343,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 //        int itemId_selected = parent.getSelectedItemPosition();
-        switch (position){
-            case 1:
-                try {
-                    GetAllFile(path_garena);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case 2:
-                try {
-                    GetAllFile(path_korea);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case 3:
-                try {
-                    GetAllFile(path_SdcardRoot);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                try {
-                    GetAllFile(path_west);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-        }
+            switch (position){
+                case 1:
+                    try {
+                        GetAllFile(path_garena);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
+                    try {
+                        GetAllFile(path_korea);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 3:
+                    try {
+                        GetAllFile(path_SdcardRoot);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    try {
+                        GetAllFile(path_west);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
         Log.d("ItemSelected",  parent.getSelectedItem().toString());
         Log.d("ItemSelectedPosition", String.valueOf(position));
     }
