@@ -94,20 +94,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
-        Button button = (Button)findViewById(R.id.obbButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<String> ObbFile = new ArrayList<>();
-                File file_Sdcard = new File(path_SdcardRoot);
-                File[] ArrFile_SdcardRoot = file_Sdcard.listFiles();
-                for (File obb: ArrFile_SdcardRoot){
-                    if (obb.getName().endsWith(".obb")){
-                        ObbFile.add(obb.getName());
-                    }
-                }
-            }
-        });
+//        Button button = (Button)findViewById(R.id.obbButton);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                List<String> ObbFile = new ArrayList<>();
+//                File file_Sdcard = new File(path_SdcardRoot);
+//                File[] ArrFile_SdcardRoot = file_Sdcard.listFiles();
+//                for (File obb: ArrFile_SdcardRoot){
+//                    if (obb.getName().endsWith(".obb")){
+//                        ObbFile.add(obb.getName());
+//                    }
+//                }
+//            }
+//        });
 
     }
 
