@@ -4,11 +4,13 @@ public class LogFile {
     private int file_image;
     private String file_name;
     private String file_size;
+    private String file_time_create;
 
-    public LogFile(int file_image, String file_name, String file_size) {
+    public LogFile(int file_image, String file_name, String file_size, String file_time_create) {
         this.file_image = file_image;
         this.file_name = file_name;
         this.file_size = file_size;
+        this.file_time_create = file_time_create;
     }
 
     public int getFile_image() {
@@ -35,6 +37,12 @@ public class LogFile {
         this.file_size = file_size;
     }
 
+    public String getFile_time_create() {
+        return file_time_create;
+    }
 
+    public void setFile_time_create(String file_time_create) {
+        this.file_time_create = file_time_create;
+    }
 
 }

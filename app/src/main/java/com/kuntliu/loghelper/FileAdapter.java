@@ -47,12 +47,14 @@ public class FileAdapter extends BaseAdapter {
         ImageView logImage = layout.findViewById(R.id.file_image);
         TextView logName = layout.findViewById(R.id.file_name);
         TextView logSize = layout.findViewById(R.id.file_size);
+        TextView logCreateTime = layout.findViewById(R.id.file_time_create);
 
         LogFile log = list.get(position);
         assert log != null;
         logImage.setImageResource(log.getFile_image());
         logName.setText(log.getFile_name());
         logSize.setText(log.getFile_size());
+        logCreateTime.setText(log.getFile_time_create());
         return layout;
     }
 }

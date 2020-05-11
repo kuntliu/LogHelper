@@ -41,7 +41,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.Collator;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -255,11 +260,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         double fileSize = f.length();
                         fileSize_str = fileSize + " B";
                     }
-                    LogFile log = new LogFile(logiconID, f.getName(), fileSize_str);
+                    LogFile log = new LogFile(logiconID, f.getName(), fileSize_str, new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(f.lastModified()));
                     Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                     loglist.add(log);
                 }
             }
+            Collections.sort(loglist, new Comparator<LogFile>() {
+                @Override
+                public int compare(LogFile f1, LogFile f2) {
+                    if (f1.getFile_name().compareTo(f2.getFile_name()) == 0){
+                        return 0;
+                    }else
+                        return f1.getFile_name().compareTo(f2.getFile_name());
+                    }
+                });
             madapter = new FileAdapter(MainActivity.this, loglist);
             mylistview.setAdapter(madapter);
             mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
