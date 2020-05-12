@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int PERMISSION_CODE = 1000;
     int SETTING_CODE = 1001;
     File file;
+
+    List<LogFile> loglist = null;
     File[] LogFiles = null;
     FileAdapter madapter;
     ListView mylistview;
@@ -239,12 +241,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void GetAllFile(final String path) throws IOException {
 
         mylistview = findViewById(R.id.log_list);
-        final List<LogFile> loglist = new ArrayList<>();   //初始化数据
+        loglist = new ArrayList<>();   //初始化数据
         Log.d("filepath", path);
         file = new File(path);
         LogFiles =  file.listFiles();
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
-        if(LogFiles != null){
+        if(LogFiles != null ){
             for(File f : LogFiles) {
                 Log.d("Filelist", f.toString());
                 if (f.isFile()) {
@@ -331,10 +333,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             });
         }else {
+            loglist.clear();
+            madapter = new FileAdapter(MainActivity.this, loglist);
+            mylistview.setAdapter(madapter);
+            Toast.makeText(MainActivity.this, "当前目录不存在或者目录为空", Toast.LENGTH_SHORT).show();
             Log.d("IsNofile", "ture");
-         }
-
-
+        }
     }
     private void fileSizeTransform(){
 
