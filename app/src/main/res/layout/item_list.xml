@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout android:orientation="horizontal"
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -32,11 +33,19 @@
                 android:id="@+id/file_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:textSize="15sp"/>
             <TextView
                 android:id="@+id/file_time_create"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_toRightOf="@id/file_size"
+                android:gravity="end"
+                android:layout_toEndOf="@id/file_size"
+                android:paddingEnd="8dp"
+                android:paddingRight="8dp"
+                tools:ignore="RtlSymmetry" />
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

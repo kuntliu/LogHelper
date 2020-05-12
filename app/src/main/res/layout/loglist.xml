@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="当前选择的目录"
-        android:textAlignment="center">
+        android:gravity="center_horizontal">
     </TextView>
     <Spinner
         android:id="@+id/spinner_item"
@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="#E0E0E0"
-        android:dividerHeight="0.8dp"></ListView>
+        android:dividerHeight="0.8dp"/>
 <!--    <Button-->
 <!--        android:id="@+id/obbButton"-->
 <!--        android:layout_width="match_parent"-->

@@ -227,7 +227,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_about) {
+            Toast.makeText(MainActivity.this, "Current Version:1.0 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
             return true;
         }
 
@@ -260,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         double fileSize = f.length();
                         fileSize_str = fileSize + " B";
                     }
-                    LogFile log = new LogFile(logiconID, f.getName(), fileSize_str, new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(f.lastModified()));
+                    LogFile log = new LogFile(logiconID, f.getName(), fileSize_str, new SimpleDateFormat("yyyy年MM月dd日 hh:mm").format(f.lastModified()));
                     Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                     loglist.add(log);
                 }
