@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     FileAdapter madapter;
     ListView mylistview;
     PopupMenu popup;
-    String fileSize_str;
+    String FileSize_str;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,20 +101,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
-//        Button button = (Button)findViewById(R.id.obbButton);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                List<String> ObbFile = new ArrayList<>();
-//                File file_Sdcard = new File(path_SdcardRoot);
-//                File[] ArrFile_SdcardRoot = file_Sdcard.listFiles();
-//                for (File obb: ArrFile_SdcardRoot){
-//                    if (obb.getName().endsWith(".obb")){
-//                        ObbFile.add(obb.getName());
-//                    }
-//                }
-//            }
-//        });
+        mylistview = findViewById(R.id.log_list);
+
+        Button button = (Button)findViewById(R.id.obbButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ObbActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -237,33 +233,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressLint("DefaultLocale")
     public void GetAllFile(final String path) throws IOException {
 
-        mylistview = findViewById(R.id.log_list);
         loglist = new ArrayList<>();   //初始化数据
         Log.d("filepath", path);
         file = new File(path);
         LogFiles =  file.listFiles();
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
-        if(LogFiles != null ){
+        if(LogFiles != null && file.exists()){
             for(File f : LogFiles) {
                 Log.d("Filelist", f.toString());
-                if (f.isFile()) {
-                    if (f.length() >= Math.pow(2, 30)){
-                        double fileSize = f.length()/Math.pow(2, 30);
-                        fileSize_str = String.format("%.2f", fileSize) + " GB";
-                    }else if (f.length() >= Math.pow(2, 20) && f.length() < Math.pow(2, 30)){
-                        double fileSize = f.length()/Math.pow(2, 20);
-                        fileSize_str = String.format("%.2f", fileSize) + " MB";
-                    }else if(f.length() >= Math.pow(2, 10) && f.length() < Math.pow(2, 20)){
-                        double fileSize = f.length()/Math.pow(2, 10);
-                        fileSize_str = String.format("%.2f", fileSize) + " KB";
-                    }else {
-                        double fileSize = f.length();
-                        fileSize_str = fileSize + " B";
-                    }
-                    LogFile log = new LogFile(logiconID, f.getName(), fileSize_str, new SimpleDateFormat("yyyy年MM月dd日 hh:mm").format(f.lastModified()));
+                if (f == null){
+                    Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
+                }
+                if (f.isFile() && !f.getName().startsWith(".")) {    //只需要文件并且过滤“.”开头的隐藏文件
+                    FileSizeTransform fs = new FileSizeTransform();
+                    FileSize_str= fs.Tansform(f.length());      //文件大小单位转换
+                    LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, new SimpleDateFormat("yyyy/M/d H:m").format(f.lastModified()));
                     Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                     loglist.add(log);
                 }
@@ -294,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             for (File f : LogFiles){
                                 if (f.getName().equals(fileNameClicked)){
                                     SelectedFile = f;
+                                    break;
                                 }
                             }
                             switch (item.getItemId()){
@@ -336,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             loglist.clear();
             madapter = new FileAdapter(MainActivity.this, loglist);
             mylistview.setAdapter(madapter);
-            Toast.makeText(MainActivity.this, "当前目录不存在或者目录为空", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "当前目录不存在", Toast.LENGTH_SHORT).show();
             Log.d("IsNofile", "ture");
         }
     }

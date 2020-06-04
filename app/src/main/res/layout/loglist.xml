@@ -19,17 +19,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </Spinner>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <ListView
         android:id="@+id/log_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="#E0E0E0"
-        android:dividerHeight="0.8dp"/>
-<!--    <Button-->
-<!--        android:id="@+id/obbButton"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:text="@string/obb_text">-->
-<!--    </Button>-->
+        android:layout_weight="9"
+        android:dividerHeight="0.8dp" />
+    <Button
+        android:id="@+id/obbButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/obb_text"
+        android:layout_weight="1"/>
+    </LinearLayout>
 </LinearLayout>

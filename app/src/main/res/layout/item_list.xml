@@ -33,13 +33,13 @@
                 android:id="@+id/file_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:textSize="15sp"/>
+                android:layout_marginBottom="5dp"
+                android:textSize="12sp"/>
             <TextView
                 android:id="@+id/file_time_create"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:layout_toRightOf="@id/file_size"
                 android:gravity="end"
                 android:layout_toEndOf="@id/file_size"
