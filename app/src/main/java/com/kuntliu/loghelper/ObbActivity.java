@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,7 +25,14 @@ public class ObbActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_obb);
         obblistview = findViewById(R.id.item_obb);
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         List<LogFile> ObbFiles = new ArrayList<>();
         File file = new File(path_SdcardRoot);
