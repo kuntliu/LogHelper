@@ -31,10 +31,11 @@
         android:layout_below="@id/spinner_item"/>
     <Button
         android:id="@+id/obbButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:padding="5dp"
         android:text="@string/obb_text"
         android:textColor="@color/white"
         android:background="@drawable/btn_selector"/>

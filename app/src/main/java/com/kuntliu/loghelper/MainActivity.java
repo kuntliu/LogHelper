@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     File file;
 
     List<LogFile> loglist = null;
-    File[] LogFiles = null;
+    File[] Arr_Files = null;
     FileAdapter madapter;
     ListView mylistview;
     PopupMenu popup;
@@ -225,10 +225,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         loglist = new ArrayList<>();   //初始化数据
         Log.d("filepath", path);
         file = new File(path);
-        LogFiles =  file.listFiles();
+        Arr_Files =  file.listFiles();
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
-        if(LogFiles != null && file.exists()){
-            for(File f : LogFiles) {
+        if(Arr_Files != null && file.exists()){
+            for(File f : Arr_Files) {
                 Log.d("Filelist", f.toString());
                 if (f == null){
                     Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
@@ -262,41 +262,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            //获取选择的文件
-                            File SelectedFile = null;
-                            for (File f : LogFiles){
-                                if (f.getName().equals(fileNameClicked)){
-                                    SelectedFile = f;
-                                    break;
-                                }
-                            }
+                            File SelectedFile = searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
                             switch (item.getItemId()){
                                 case R.id.menu_delete:
-                                    if (SelectedFile != null && SelectedFile.exists()) {
-                                        boolean isSuccessDeleteFile = SelectedFile.delete();           //删除文件
-                                        loglist.remove(loglist.get(position));              //删除loglist对应的数据源
-                                        madapter.notifyDataSetChanged();                    //刷新适配器
-                                        Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
-                                        break;
-                                    }else {
-                                        Toast.makeText(MainActivity.this ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
-                                    }
+                                    deleteFile(SelectedFile, position);
+                                    break;
                                 case R.id.menu_detail:
                                     Toast.makeText(MainActivity.this, "功能正在开发中", Toast.LENGTH_LONG).show();
                                     break;
                                 case R.id.menu_share:
-                                    Intent intent = new Intent(Intent.ACTION_SEND);
-                                    intent.setType("text/plain");
-                                    intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//传给我的电脑
-                                    //适配7.0版本以下的Android系统
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(MainActivity.this, "com.kuntliu.loghelper.fileprovider", SelectedFile));
-                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        startActivity(intent);
-                                    }else {
-                                        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(SelectedFile));
-                                        startActivity(intent);
-                                    }
+                                    shareFile(SelectedFile);
                                     break;
                             }
                             return false;
@@ -315,6 +290,43 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+
+    private File searchSelectedFile(File[] Arr_Files, String fileNameClicked){
+        //获取选择的文件
+        File SelectedFile = null;
+        for (File f : Arr_Files){
+            if (f.getName().equals(fileNameClicked)){
+                SelectedFile = f;
+                break;
+            }
+        }
+        return SelectedFile;
+    }
+    private void deleteFile(File file, int position){
+        if (file != null && file.exists()) {
+            boolean isSuccessDeleteFile = file.delete();           //删除文件
+            loglist.remove(loglist.get(position));              //删除loglist对应的数据源
+            madapter.notifyDataSetChanged();                    //刷新适配器
+            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
+
+        }else {
+            Toast.makeText(MainActivity.this ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
+        }
+    }
+    private void shareFile(File SelectedFile) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//传给我的电脑
+        //适配7.0版本以下的Android系统
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(MainActivity.this, "com.kuntliu.loghelper.fileprovider", SelectedFile));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
+        }else {
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(SelectedFile));
+            startActivity(intent);
+        }
+    }
     private static void copyFile(File source, File desc)throws IOException{
         FileChannel inputChannel = null;
         FileChannel outputChannel = null;
