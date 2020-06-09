@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LogHelper</string>
+    <string name="text_choose">当前选择的目录</string>
     <string name="action_settings">设置</string>
-    <string name="spinner_text">当前选择显示的目录</string>
     <string name="obb_text">一键放置OBB</string>
     <string name="action_delete">删除</string>
     <string name="action_share">通过QQ发送至我的电脑</string>

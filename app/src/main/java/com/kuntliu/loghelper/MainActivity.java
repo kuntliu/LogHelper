@@ -2,6 +2,7 @@ package com.kuntliu.loghelper;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -188,21 +189,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             alertDialog.show();
         }
     }
-    private void showDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("提示")
-                .setMessage("缺少权限")
-                .setPositiveButton("去允许", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                        ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
-                    }
-                });
-        alertDialog = builder.create();
-        alertDialog.setCanceledOnTouchOutside(false);
-        alertDialog.show();
-    }
 
     private void gotoSetting(){
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -327,9 +313,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Toast.makeText(MainActivity.this, "当前目录不存在", Toast.LENGTH_SHORT).show();
             Log.d("IsNofile", "ture");
         }
-    }
-    private void fileSizeTransform(){
-
     }
 
     private static void copyFile(File source, File desc)throws IOException{
