@@ -42,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.Time;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
     String path_korea = Environment.getExternalStorageDirectory().getAbsolutePath()+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+    String path_vng = Environment.getExternalStorageDirectory().getAbsolutePath()+
+            File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
     private AlertDialog alertDialog;
     String[] permissions = new String[]
             {Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ListView mylistview;
     PopupMenu popup;
     String FileSize_str;
+    String Time_str;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,7 +230,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Log.d("filepath", path);
         file = new File(path);
         Arr_Files =  file.listFiles();
+
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
+
+
+        FileSizeTransform fs = new FileSizeTransform();
+
+        MySimpleDateFormat msd = new MySimpleDateFormat();
+
         if(Arr_Files != null && file.exists()){
             for(File f : Arr_Files) {
                 Log.d("Filelist", f.toString());
@@ -234,9 +245,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
                 }
                 if (f.isFile() && !f.getName().startsWith(".")) {    //只需要文件并且过滤“.”开头的隐藏文件
-                    FileSizeTransform fs = new FileSizeTransform();
                     FileSize_str= fs.Tansform(f.length());      //文件大小单位转换
-                    LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, new SimpleDateFormat("yyyy/M/d H:m").format(f.lastModified()));
+                    Time_str = msd.transFormTime(f.lastModified());    //时间格式转换
+
+                    LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
                     Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                     loglist.add(log);
                 }
@@ -255,23 +267,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                    final String fileNameClicked = String.valueOf(loglist.get(position).getFile_name());   //通过item的id使用getFile_name()获取要操作的文件名
+                    final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
                     Log.d("ItemClicked", fileNameClicked);
                     popup = new PopupMenu(MainActivity.this, view);
                     getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            File SelectedFile = searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
+                            FileToOperate fto = new FileToOperate();
+                            File SelectedFile = fto.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
                             switch (item.getItemId()){
                                 case R.id.menu_delete:
-                                    deleteFile(SelectedFile, position);
+                                    fto.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
                                     break;
                                 case R.id.menu_detail:
                                     Toast.makeText(MainActivity.this, "功能正在开发中", Toast.LENGTH_LONG).show();
                                     break;
                                 case R.id.menu_share:
-                                    shareFile(SelectedFile);
+                                    fto.shareFile(SelectedFile, MainActivity.this);
                                     break;
                             }
                             return false;
@@ -291,55 +304,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    private File searchSelectedFile(File[] Arr_Files, String fileNameClicked){
-        //获取选择的文件
-        File SelectedFile = null;
-        for (File f : Arr_Files){
-            if (f.getName().equals(fileNameClicked)){
-                SelectedFile = f;
-                break;
-            }
-        }
-        return SelectedFile;
-    }
-    private void deleteFile(File file, int position){
-        if (file != null && file.exists()) {
-            boolean isSuccessDeleteFile = file.delete();           //删除文件
-            loglist.remove(loglist.get(position));              //删除loglist对应的数据源
-            madapter.notifyDataSetChanged();                    //刷新适配器
-            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
-
-        }else {
-            Toast.makeText(MainActivity.this ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
-        }
-    }
-    private void shareFile(File SelectedFile) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//传给我的电脑
-        //适配7.0版本以下的Android系统
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(MainActivity.this, "com.kuntliu.loghelper.fileprovider", SelectedFile));
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(intent);
-        }else {
-            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(SelectedFile));
-            startActivity(intent);
-        }
-    }
-    private static void copyFile(File source, File desc)throws IOException{
-        FileChannel inputChannel = null;
-        FileChannel outputChannel = null;
-        try {
-            inputChannel = new FileInputStream(source).getChannel();
-            outputChannel = new FileOutputStream(desc).getChannel();
-        } finally {
-            assert inputChannel != null;
-            assert outputChannel != null;
-            inputChannel.close();
-            outputChannel.close();
-        }
-    }
 
 
     @Override
@@ -362,6 +326,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     break;
                 case 3:
                     try {
+                        GetAllFile(path_vng);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 4:
+                    try {
                         GetAllFile(path_SdcardRoot);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -380,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
 }

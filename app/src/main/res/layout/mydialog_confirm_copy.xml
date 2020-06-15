@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_filename"
+        android:textSize="13sp"
+        android:textColor="@color/middleBlack"
+        android:maxLines="2"/>
+    <TextView
+        android:id="@+id/comfirm_copyFileName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_filesize"
+        android:textSize="13sp"
+        android:textColor="@color/middleBlack"/>
+    <TextView
+        android:id="@+id/comfirm_copyFileSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_filepath"
+        android:textSize="13sp"
+        android:textColor="@color/middleBlack"
+        android:maxLines="2"/>
+    <TextView
+        android:id="@+id/comfirm_copyFilePath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/parent_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/btn_cancle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text_cancel"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:layout_weight="2"
+            android:background="@drawable/btn_confirm"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:layout_weight="3"/>
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text_confirm"
+            android:textSize="13sp"
+            android:layout_weight="2"
+            android:background="@drawable/btn_confirm"/>
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:visibility="gone"/>-->
+<!--        <androidx.core.widget.ContentLoadingProgressBar-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
+    </LinearLayout>
+</LinearLayout>
