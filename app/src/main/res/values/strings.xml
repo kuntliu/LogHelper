@@ -2,7 +2,7 @@
     <string name="app_name">LogHelper</string>
     <string name="text_choose">当前选择的目录</string>
     <string name="action_settings">设置</string>
-    <string name="obb_text">一键放置OBB</string>
+    <string name="obb_text">一键放置obb文件</string>
     <string name="action_delete">删除</string>
     <string name="action_share">通过QQ发送至我的电脑</string>
     <string name="action_detail">详细信息</string>
@@ -10,7 +10,7 @@
     <string name="text_copy">请选择要复制的obb文件</string>
     <string name="text_filename">文件名</string>
     <string name="text_filesize">文件大小</string>
-    <string name="text_filepath">目标路径</string>
+    <string name="text_filepath">复制的目标路径</string>
     <string name="text_cancel">取消</string>
     <string name="text_confirm">确认复制</string>
     <string-array name="arr_path">

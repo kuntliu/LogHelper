@@ -159,12 +159,17 @@ public class ObbActivity extends AppCompatActivity {
     //判断复制的目标文件是否已存在
     private boolean Existed_CopeDescFile(File file, String FileNameClicked){
         boolean isExisted = false;
+        File[] obbDirfile = null;
         String path = GetSelectedObbFileDescPath(file);
         file = new File(path);
-        File[] obbDirfile = file.listFiles();
+        obbDirfile = file.listFiles();
+        Log.d("2323233", "isExisted: "+isExisted);
         if (obbDirfile != null) {
             for (File f : obbDirfile) {
-                isExisted = f.getName().equals(FileNameClicked);
+                if (f.getName().equals(FileNameClicked)){
+                    isExisted = true;
+                }
+
             }
         }
         return isExisted;

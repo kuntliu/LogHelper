@@ -17,7 +17,8 @@
         android:id="@+id/comfirm_copyFileName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp"
+        android:textColor="@color/black"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -29,7 +30,8 @@
         android:id="@+id/comfirm_copyFileSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp"
+        android:textColor="@color/black"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -42,7 +44,8 @@
         android:id="@+id/comfirm_copyFilePath"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp"
+        android:textColor="@color/black"/>
 
     <LinearLayout
         android:id="@+id/parent_btn"
@@ -78,8 +81,13 @@
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:visibility="gone"/>-->
-<!--        <androidx.core.widget.ContentLoadingProgressBar-->
+<!--        <ProgressBar-->
 <!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"/>-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:indeterminate="true"-->
+<!--            android:max="100"-->
+<!--            android:progress="0"-->
+<!--            android:layout_gravity="center"-->
+<!--            style="@android:style/Widget.ProgressBar.Horizontal" />-->
     </LinearLayout>
 </LinearLayout>
