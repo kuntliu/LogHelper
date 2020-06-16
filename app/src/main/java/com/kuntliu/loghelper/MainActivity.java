@@ -281,7 +281,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     fto.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
                                     break;
                                 case R.id.menu_detail:
-                                    Toast.makeText(MainActivity.this, "功能正在开发中", Toast.LENGTH_LONG).show();
+                                    FileSizeTransform fst = new FileSizeTransform();
+                                    String FileSize = fst.Tansform(SelectedFile.length());
+                                    MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath());
                                     break;
                                 case R.id.menu_share:
                                     fto.shareFile(SelectedFile, MainActivity.this);

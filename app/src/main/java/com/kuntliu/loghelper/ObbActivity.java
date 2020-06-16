@@ -92,7 +92,7 @@ public class ObbActivity extends AppCompatActivity {
                         FileSizeTransform fst = new FileSizeTransform();
                         String copyFileSize = fst.Tansform(SelectedObbFile.length());
 
-                        MyConfirmCopyDialog.showConfirmCoptDialog(ObbActivity.this, SelectedObbFile.getName(), copyFileSize, CopyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
+                        MyConfirmCopyDialog.showConfirmCopyDialog(ObbActivity.this, SelectedObbFile.getName(), copyFileSize, CopyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
                             @Override
                             public void clickCancel() {
                             }
@@ -102,8 +102,7 @@ public class ObbActivity extends AppCompatActivity {
 //                                ProgressBar pb = new ProgressBar(ObbActivity.this);
 //
 //                                pb.setMax(100);
-//                                Thread thread = new Thread();
-//                                thread.
+
                                 try {
                                     FileToOperate.copyObbFile(SelectedObbFile, descFile);         //通过通道复制文件
                                 } catch (IOException e) {

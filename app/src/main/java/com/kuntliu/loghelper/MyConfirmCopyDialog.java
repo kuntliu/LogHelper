@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 class MyConfirmCopyDialog {
 
-    static void showConfirmCoptDialog(Context context, String filename, String filesize, String filepath, final AlertDialogBtnClickListener
+    static void showConfirmCopyDialog(Context context, String filename, String filesize, String filepath, final AlertDialogBtnClickListener
             alertDialogBtnClickListener){
         View view = LayoutInflater.from(context).inflate(R.layout.mydialog_confirm_copy, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -43,7 +43,9 @@ class MyConfirmCopyDialog {
             }
         });
         Window window = dialog.getWindow();
-        window.setWindowAnimations(R.style.Dialog_Anim);
+        if (window != null) {
+            window.setWindowAnimations(R.style.Dialog_Anim);
+        }
 //        if (dialog.getWindow() != null) {
 //            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 //        }

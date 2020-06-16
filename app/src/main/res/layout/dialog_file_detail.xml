@@ -14,7 +14,7 @@
         android:textColor="@color/middleBlack"
         android:maxLines="2"/>
     <TextView
-        android:id="@+id/comfirm_copyFileName"
+        android:id="@+id/detail_filename"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
@@ -27,7 +27,7 @@
         android:textSize="13sp"
         android:textColor="@color/middleBlack"/>
     <TextView
-        android:id="@+id/comfirm_copyFileSize"
+        android:id="@+id/detail_filesize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
@@ -41,10 +41,10 @@
         android:textColor="@color/middleBlack"
         android:maxLines="2"/>
     <TextView
-        android:id="@+id/comfirm_copyFilePath"
+        android:id="@+id/detail_filepath"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
         android:textColor="@color/black"/>
-    <include layout="@layout/btn_cancel_and_confirm"/>
+    <include layout="@layout/btn_comfirm"/>
 </LinearLayout>

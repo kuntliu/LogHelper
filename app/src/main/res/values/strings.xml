@@ -13,6 +13,7 @@
     <string name="text_filepath">复制的目标路径</string>
     <string name="text_cancel">取消</string>
     <string name="text_confirm">确认复制</string>
+    <string name="text_comfirm">确定</string>
     <string-array name="arr_path">
         <item>Log目录：西方版本</item>
         <item>Log目录：Garena版本</item>

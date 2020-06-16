@@ -60,6 +60,7 @@ class FileToOperate {
     static void copyObbFile(File source, File desc)throws IOException {
         FileChannel inputChannel = null;
         FileChannel outputChannel = null;
+
         try {
             inputChannel = new FileInputStream(source).getChannel();
             outputChannel = new FileOutputStream(desc).getChannel();
