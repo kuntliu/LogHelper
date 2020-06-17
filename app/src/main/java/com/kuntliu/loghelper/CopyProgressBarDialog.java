@@ -11,12 +11,10 @@ class CopyProgressBarDialog {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
 
-        TextView tv_copyRate = view.findViewById(R.id.CopyRate);
-        TextView tv_copyPrecent = view.findViewById(R.id.CopyPrecent);
 
         AlertDialog dialog = builder.create();
         dialog.setTitle("正在复制");
-
+        dialog.show();
 
     }
 }

@@ -72,8 +72,11 @@ class FileToOperate {
             Log.d("inputChannel", String.valueOf(inputChannel.size()));
             Log.d("outputChannel", String.valueOf(outputChannel.size()));
         } finally {
-            inputChannel.close();
-            outputChannel.close();
+            if (inputChannel != null){
+                inputChannel.close();
+            }else if (outputChannel != null){
+                outputChannel.close();
+            }
         }
     }
 }

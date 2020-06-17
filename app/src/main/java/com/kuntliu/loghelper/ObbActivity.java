@@ -130,8 +130,6 @@ public class ObbActivity extends AppCompatActivity {
 
       public static class CopyTask extends AsyncTask<Void, Integer, Boolean> {
 
-
-
           @Override                                     //学习记录
         protected void onPreExecute() {             //线程的准备，一般用于弹出UI对话框(实例化还是要在Activity的onCreate进行)
 
