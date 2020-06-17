@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -11,7 +12,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +52,8 @@ public class ObbActivity extends AppCompatActivity {
         });
 
 
+        TextView tv_CopyRate = findViewById(R.id.CopyRate);
+        TextView tv_CopyPrecent = findViewById(R.id.CopyPrecent);
 
         ObbFiles = new ArrayList<>();
         File file = new File(path_SdcardRoot);
@@ -119,6 +125,38 @@ public class ObbActivity extends AppCompatActivity {
             Toast.makeText(this, "根目录没有obb文件", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
+      public static class CopyTask extends AsyncTask<Void, Integer, Boolean> {
+
+
+
+          @Override                                     //学习记录
+        protected void onPreExecute() {             //线程的准备，一般用于弹出UI对话框(实例化还是要在Activity的onCreate进行)
+
+        }
+
+
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {       //线程的执行
+
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {        //线程的执行进度,需要在doInBackground中使用publishProgress(Progress... values)来执行此方法
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {          //线程的执行结果
+            super.onPostExecute(result);
+        }
+    }
+
 
     //判断目录是否存在
     private boolean isExisted_DirCopyFileDescPath(String path){

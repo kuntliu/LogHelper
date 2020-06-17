@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 case R.id.menu_detail:
                                     FileSizeTransform fst = new FileSizeTransform();
                                     String FileSize = fst.Tansform(SelectedFile.length());
-                                    MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath());
+                                    MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(),""));
                                     break;
                                 case R.id.menu_share:
                                     fto.shareFile(SelectedFile, MainActivity.this);

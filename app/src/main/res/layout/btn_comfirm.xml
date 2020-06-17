@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:text="@string/text_comfirm"
         android:textSize="13sp"
+        android:textColor="@color/white"
         android:layout_gravity="center"
         android:background="@drawable/btn_confirm"/>
 </LinearLayout>

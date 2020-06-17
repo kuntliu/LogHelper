@@ -42,6 +42,7 @@ class MyConfirmCopyDialog {
 
             }
         });
+        //给dialog的弹框添加动画
         Window window = dialog.getWindow();
         if (window != null) {
             window.setWindowAnimations(R.style.Dialog_Anim);
