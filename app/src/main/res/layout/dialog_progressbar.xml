@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:max="100"
+        android:paddingHorizontal="10dp"
+        android:max="1"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
     <TextView
         android:id="@+id/CopyRate"
@@ -17,7 +18,8 @@
         android:layout_below="@id/progressbar"
         android:layout_alignLeft="@id/progressbar"
         android:textSize="13sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:layout_alignStart="@id/progressbar" />
     <TextView
         android:id="@+id/CopyPrecent"
         android:layout_width="wrap_content"
@@ -25,5 +27,6 @@
         android:layout_below="@id/progressbar"
         android:layout_alignRight="@id/progressbar"
         android:textSize="13sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:layout_alignEnd="@id/progressbar" />
 </RelativeLayout>

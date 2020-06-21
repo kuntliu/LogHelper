@@ -1,5 +1,6 @@
 package com.kuntliu.loghelper;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -7,6 +8,8 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,11 +21,20 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.SNIHostName;
 
 public class ObbActivity extends AppCompatActivity {
     String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -36,6 +48,10 @@ public class ObbActivity extends AppCompatActivity {
 
     File SelectedObbFile;
     String CopyFileDescPath;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +68,13 @@ public class ObbActivity extends AppCompatActivity {
         });
 
 
-        TextView tv_CopyRate = findViewById(R.id.CopyRate);
-        TextView tv_CopyPrecent = findViewById(R.id.CopyPrecent);
+//        TextView tv_CopyRate = findViewById(R.id.CopyRate);
+//        final TextView tv_CopyPrecent = findViewById(R.id.CopyPrecent);
 
         ObbFiles = new ArrayList<>();
         File file = new File(path_SdcardRoot);
         obbfiles = file.listFiles();
-        int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
+        final int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
 
         FileSizeTransform fileSizeTransform = new FileSizeTransform();
         MySimpleDateFormat sdf = new MySimpleDateFormat();
@@ -105,15 +121,66 @@ public class ObbActivity extends AppCompatActivity {
 
                             @Override
                             public void clickConfirm() {
-//                                ProgressBar pb = new ProgressBar(ObbActivity.this);
-//
-//                                pb.setMax(100);
 
-                                try {
-                                    FileToOperate.copyObbFile(SelectedObbFile, descFile);         //通过通道复制文件
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                View view = CopyProgressBarDialog.showCopyPrigressBar(ObbActivity.this);
+                                final TextView tv_precent = (TextView)view.findViewById(R.id.CopyPrecent);
+                                final Handler handler = new Handler();
+
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        long TansforSize = 0;
+                                        int Progress = 0;
+                                        FileChannel inputChannel = null;
+                                        FileChannel outputChannel = null;
+                                        try {
+                                            inputChannel = new FileInputStream(SelectedObbFile).getChannel();
+                                            outputChannel = new FileOutputStream(descFile).getChannel();
+
+                                            Log.d("inputChannel11", String.valueOf(inputChannel.size()));
+                                            Log.d("outputChannel11", String.valueOf(outputChannel.size()));
+
+                                            ByteBuffer buff = ByteBuffer.allocate(4096);
+
+                                            while (inputChannel.read(buff) != -1){
+                                                buff.flip();
+                                                TansforSize += outputChannel.write(buff);
+                                                Progress = (int)(TansforSize * 100/SelectedObbFile.length());
+                                                Log.d("jisuan", "fixxxx"+Progress);
+                                                final int finalProgress = Progress;
+                                                handler.post(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        tv_precent.setText(finalProgress);
+                                                    }
+                                                });
+                                                buff.clear();
+                                            }
+
+                                            Log.d("inputChannel22", String.valueOf(inputChannel.size()));
+                                            Log.d("outputChannel22", String.valueOf(outputChannel.size()));
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } finally {
+                                            if (inputChannel != null){
+                                                try {
+                                                    inputChannel.close();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }else if (outputChannel != null){
+                                                try {
+                                                    outputChannel.close();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }).start();
                             }
                         });
                     }else {
@@ -128,33 +195,6 @@ public class ObbActivity extends AppCompatActivity {
 
 
 
-      public static class CopyTask extends AsyncTask<Void, Integer, Boolean> {
-
-          @Override                                     //学习记录
-        protected void onPreExecute() {             //线程的准备，一般用于弹出UI对话框(实例化还是要在Activity的onCreate进行)
-
-        }
-
-
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {       //线程的执行
-
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {        //线程的执行进度,需要在doInBackground中使用publishProgress(Progress... values)来执行此方法
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {          //线程的执行结果
-            super.onPostExecute(result);
-        }
-    }
-
 
     //判断目录是否存在
     private boolean isExisted_DirCopyFileDescPath(String path){
@@ -167,7 +207,6 @@ public class ObbActivity extends AppCompatActivity {
         File file = new File(path);
         if (!Dir_Existed) {
             boolean isSuccess = file.mkdirs();
-            Log.d("", "mkCopyFileDirs:" + isSuccess);
         }
     }
     //获取已选择的obb文件要复制的目标路径
@@ -194,17 +233,15 @@ public class ObbActivity extends AppCompatActivity {
     //判断复制的目标文件是否已存在
     private boolean Existed_CopeDescFile(File file, String FileNameClicked){
         boolean isExisted = false;
-        File[] obbDirfile = null;
+        File[] obbDirfile;
         String path = GetSelectedObbFileDescPath(file);
         file = new File(path);
         obbDirfile = file.listFiles();
-        Log.d("2323233", "isExisted: "+isExisted);
         if (obbDirfile != null) {
             for (File f : obbDirfile) {
                 if (f.getName().equals(FileNameClicked)){
                     isExisted = true;
                 }
-
             }
         }
         return isExisted;

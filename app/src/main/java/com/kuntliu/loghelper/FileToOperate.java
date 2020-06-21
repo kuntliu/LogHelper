@@ -4,10 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,20 +63,24 @@ class FileToOperate {
             context.startActivity(intent);
         }
     }
-    static void copyObbFile(File source, File desc)throws IOException {
+     void copyObbFile(File source, File desc)throws IOException {
         FileChannel inputChannel = null;
         FileChannel outputChannel = null;
+
+
+
 
         try {
             inputChannel = new FileInputStream(source).getChannel();
             outputChannel = new FileOutputStream(desc).getChannel();
 
-            Log.d("inputChannel", String.valueOf(inputChannel.size()));
-            Log.d("outputChannel", String.valueOf(outputChannel.size()));
+
+            Log.d("inputChannel11", String.valueOf(inputChannel.size()));
+            Log.d("outputChannel11", String.valueOf(outputChannel.size()));
             outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
 
-            Log.d("inputChannel", String.valueOf(inputChannel.size()));
-            Log.d("outputChannel", String.valueOf(outputChannel.size()));
+            Log.d("inputChannel22", String.valueOf(inputChannel.size()));
+            Log.d("outputChannel22", String.valueOf(outputChannel.size()));
         } finally {
             if (inputChannel != null){
                 inputChannel.close();
