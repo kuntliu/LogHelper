@@ -11,8 +11,6 @@ import android.widget.TextView;
 class MyFileDetailInfoDialog {
     static void showFileDetailInfoDialog(Context context, String FileName, String FileSize, String FilePath){
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_file_detail, null);
-
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
 

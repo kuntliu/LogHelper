@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -122,10 +123,10 @@ public class ObbActivity extends AppCompatActivity {
                             @Override
                             public void clickConfirm() {
 
-                                View view = CopyProgressBarDialog.showCopyPrigressBar(ObbActivity.this);
-                                final TextView tv_precent = (TextView)view.findViewById(R.id.CopyPrecent);
+                                View view = CopyProgressBarDialog.showCopyProgressBar(ObbActivity.this);
+                                final TextView tv_precent = view.findViewById(R.id.CopyPrecent);
+                                final ProgressBar progressBar = view.findViewById(R.id.CopyProgressbar);
                                 final Handler handler = new Handler();
-
 
                                 new Thread(new Runnable() {
                                     @Override
@@ -138,28 +139,25 @@ public class ObbActivity extends AppCompatActivity {
                                             inputChannel = new FileInputStream(SelectedObbFile).getChannel();
                                             outputChannel = new FileOutputStream(descFile).getChannel();
 
-                                            Log.d("inputChannel11", String.valueOf(inputChannel.size()));
-                                            Log.d("outputChannel11", String.valueOf(outputChannel.size()));
+                                            ByteBuffer buffer = ByteBuffer.allocate(4096);
 
-                                            ByteBuffer buff = ByteBuffer.allocate(4096);
-
-                                            while (inputChannel.read(buff) != -1){
-                                                buff.flip();
-                                                TansforSize += outputChannel.write(buff);
+                                            while (inputChannel.read(buffer) != -1){
+                                                buffer.flip();
+                                                TansforSize += outputChannel.write(buffer);
                                                 Progress = (int)(TansforSize * 100/SelectedObbFile.length());
-                                                Log.d("jisuan", "fixxxx"+Progress);
+
+
+//                                                Log.d("CopyProgress", "CopyProgress"+Progress);
                                                 final int finalProgress = Progress;
                                                 handler.post(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        tv_precent.setText(finalProgress);
+                                                        tv_precent.setText(String.valueOf(finalProgress));
+                                                        progressBar.setProgress(finalProgress);
                                                     }
                                                 });
-                                                buff.clear();
+                                                buffer.clear();
                                             }
-
-                                            Log.d("inputChannel22", String.valueOf(inputChannel.size()));
-                                            Log.d("outputChannel22", String.valueOf(outputChannel.size()));
                                         } catch (FileNotFoundException e) {
                                             e.printStackTrace();
                                         } catch (IOException e) {
@@ -179,6 +177,7 @@ public class ObbActivity extends AppCompatActivity {
                                                 }
                                             }
                                         }
+                                        CopyProgressBarDialog.dismissCopyProGressBar();
                                     }
                                 }).start();
                             }
@@ -207,6 +206,7 @@ public class ObbActivity extends AppCompatActivity {
         File file = new File(path);
         if (!Dir_Existed) {
             boolean isSuccess = file.mkdirs();
+//            Log.d("DirisSuccess", "DirisSuccess"+isSuccess);
         }
     }
     //获取已选择的obb文件要复制的目标路径
