@@ -227,29 +227,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void GetAllFile(final String path) throws IOException {
 
         loglist = new ArrayList<>();   //初始化数据
-        Log.d("filepath", path);
         file = new File(path);
         Arr_Files =  file.listFiles();
 
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
 
 
-        FileSizeTransform fs = new FileSizeTransform();
-
-        MySimpleDateFormat msd = new MySimpleDateFormat();
-
         if(Arr_Files != null && file.exists()){
             for(File f : Arr_Files) {
-                Log.d("Filelist", f.toString());
+//                Log.d("Filelist", f.toString());
                 if (f == null){
                     Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
                 }
                 if (f.isFile() && !f.getName().startsWith(".")) {    //只需要文件并且过滤“.”开头的隐藏文件
-                    FileSize_str= fs.Tansform(f.length());      //文件大小单位转换
-                    Time_str = msd.transFormTime(f.lastModified());    //时间格式转换
+                    FileSize_str= FileSizeTransform.Tansform(f.length());      //文件大小单位转换
+                    Time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //时间格式转换
 
                     LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
-                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
+//                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                     loglist.add(log);
                 }
             }
@@ -281,8 +276,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     fto.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
                                     break;
                                 case R.id.menu_detail:
-                                    FileSizeTransform fst = new FileSizeTransform();
-                                    String FileSize = fst.Tansform(SelectedFile.length());
+                                    String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
                                     MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(),""));
                                     break;
                                 case R.id.menu_share:
@@ -301,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             madapter = new FileAdapter(MainActivity.this, loglist);
             mylistview.setAdapter(madapter);
             Toast.makeText(MainActivity.this, "当前目录不存在", Toast.LENGTH_SHORT).show();
-            Log.d("IsNofile", "ture");
+//            Log.d("IsNofile", "ture");
         }
     }
 
@@ -348,8 +342,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     break;
             }
-        Log.d("ItemSelected",  parent.getSelectedItem().toString());
-        Log.d("ItemSelectedPosition", String.valueOf(position));
+//        Log.d("ItemSelected",  parent.getSelectedItem().toString());
+//        Log.d("ItemSelectedPosition", String.valueOf(position));
     }
 
     @Override

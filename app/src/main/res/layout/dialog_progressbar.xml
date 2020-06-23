@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp">
+    <TextView
+        android:id="@+id/CopyingFilename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="@color/black" />
     <ProgressBar
         android:id="@+id/CopyProgressbar"
         android:layout_width="match_parent"
@@ -13,23 +19,14 @@
         android:layout_gravity="center"
         android:max="100"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
-    <TextView
-        android:id="@+id/CopyRate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="@color/black" />
+
     <TextView
         android:id="@+id/CopyPrecent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="13sp"
         android:textColor="@color/black"
         android:layout_gravity="end"
         android:textAlignment="textEnd"
         tools:ignore="RtlSymmetry" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_precent"/>
 </LinearLayout>

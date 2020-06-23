@@ -1,6 +1,5 @@
 package com.kuntliu.loghelper;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,7 @@ public class FileAdapter extends BaseAdapter {
     private List<LogFile>  list;
     private LayoutInflater mInflater;
 
-    public FileAdapter(Context context, List<LogFile> list){
+    FileAdapter(Context context, List<LogFile> list){
         this.list = list;
         mInflater = LayoutInflater.from(context);
     }
@@ -42,19 +41,21 @@ public class FileAdapter extends BaseAdapter {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        @SuppressLint({"ViewHolder", "InflateParams"}) View layout = mInflater.inflate(R.layout.item_list, null);
-
-        ImageView logImage = layout.findViewById(R.id.file_image);
-        TextView logName = layout.findViewById(R.id.file_name);
-        TextView logSize = layout.findViewById(R.id.file_size);
-        TextView logCreateTime = layout.findViewById(R.id.file_time_create);
-
+        View view;
+        if (convertView == null) {
+            view = mInflater.inflate(R.layout.item_list, parent, false);
+        }else {
+            view = convertView;
+        }
+        ImageView logImage = view.findViewById(R.id.file_image);
+        TextView logName = view.findViewById(R.id.file_name);
+        TextView logSize = view.findViewById(R.id.file_size);
+        TextView logCreateTime = view.findViewById(R.id.file_time_create);
         LogFile log = list.get(position);
-        assert log != null;
         logImage.setImageResource(log.getFile_image());
         logName.setText(log.getFile_name());
         logSize.setText(log.getFile_size());
         logCreateTime.setText(log.getFile_time_create());
-        return layout;
+        return view;
     }
 }

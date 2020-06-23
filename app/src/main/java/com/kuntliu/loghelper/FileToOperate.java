@@ -63,30 +63,4 @@ class FileToOperate {
             context.startActivity(intent);
         }
     }
-     void copyObbFile(File source, File desc)throws IOException {
-        FileChannel inputChannel = null;
-        FileChannel outputChannel = null;
-
-
-
-
-        try {
-            inputChannel = new FileInputStream(source).getChannel();
-            outputChannel = new FileOutputStream(desc).getChannel();
-
-
-            Log.d("inputChannel11", String.valueOf(inputChannel.size()));
-            Log.d("outputChannel11", String.valueOf(outputChannel.size()));
-            outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
-
-            Log.d("inputChannel22", String.valueOf(inputChannel.size()));
-            Log.d("outputChannel22", String.valueOf(outputChannel.size()));
-        } finally {
-            if (inputChannel != null){
-                inputChannel.close();
-            }else if (outputChannel != null){
-                outputChannel.close();
-            }
-        }
-    }
 }

@@ -12,13 +12,15 @@ import org.w3c.dom.Text;
 
 class MyConfirmCopyDialog {
 
+    private static AlertDialog dialog;
+
     static void showConfirmCopyDialog(Context context, String filename, String filesize, String filepath, final AlertDialogBtnClickListener
             alertDialogBtnClickListener){
         View view = LayoutInflater.from(context).inflate(R.layout.mydialog_confirm_copy, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
         builder.setCancelable(true);
-        final AlertDialog dialog = builder.create();
+        dialog = builder.create();
 
         TextView tv_filename = view.findViewById(R.id.comfirm_copyFileName);
         TextView tv_filesize = view.findViewById(R.id.comfirm_copyFileSize);
@@ -57,7 +59,11 @@ class MyConfirmCopyDialog {
         dialog.show();
     }
 
-
+    static void dismissConfirmCopyDialog(){
+        if (dialog.isShowing()){
+            dialog.dismiss();
+        }
+    }
 
     interface AlertDialogBtnClickListener {
         void clickCancel();
