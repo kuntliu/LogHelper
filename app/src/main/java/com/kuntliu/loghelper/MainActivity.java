@@ -1,8 +1,6 @@
 package com.kuntliu.loghelper;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,9 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -21,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.os.Environment;
 import android.provider.Settings;
@@ -38,15 +32,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.sql.Time;
-import java.text.Collator;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -103,13 +89,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Resources resources = getResources();
         String[] arr_path = resources.getStringArray(R.array.arr_path);
         //踩坑描述：android.R.layout.simple_list_item_1是系统提供的下拉列表样式，也可以自定义
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1 , arr_path);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, arr_path);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
         mylistview = findViewById(R.id.log_list);
 
-        Button button = (Button)findViewById(R.id.obbButton);
+        Button button = findViewById(R.id.obbButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void requestPermission() {
         permissions_rejected.clear();
         //判断是否有权限
-        for (int i = 0; i < permissions.length; i++){
-            if (ContextCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
-                permissions_rejected.add(permissions[i]);
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissions_rejected.add(permission);
                 Log.d("Permissions_rejected", permissions_rejected.toString());
             }
         }
@@ -224,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-    public void GetAllFile(final String path) throws IOException {
+    public void GetAllFile(final String path)  {
 
         loglist = new ArrayList<>();   //初始化数据
         file = new File(path);
@@ -308,39 +294,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        int itemId_selected = parent.getSelectedItemPosition();
             switch (position){
                 case 1:
-                    try {
-                        GetAllFile(path_garena);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    GetAllFile(path_garena);
                     break;
                 case 2:
-                    try {
-                        GetAllFile(path_korea);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    GetAllFile(path_korea);
                     break;
                 case 3:
-                    try {
-                        GetAllFile(path_vng);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    GetAllFile(path_vng);
+
                     break;
                 case 4:
-                    try {
-                        GetAllFile(path_SdcardRoot);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    GetAllFile(path_SdcardRoot);
                     break;
                 default:
-                    try {
-                        GetAllFile(path_west);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    GetAllFile(path_west);
                     break;
             }
 //        Log.d("ItemSelected",  parent.getSelectedItem().toString());

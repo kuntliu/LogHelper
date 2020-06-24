@@ -8,8 +8,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 class MyConfirmCopyDialog {
 
     private static AlertDialog dialog;
