@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     File file;
 
     List<LogFile> loglist = null;
-    File[] Arr_Files = null;
+    File[] Arr_Files;
     FileAdapter madapter;
     ListView mylistview;
     PopupMenu popup;
@@ -216,11 +216,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         loglist = new ArrayList<>();   //初始化数据
         file = new File(path);
         Arr_Files =  file.listFiles();
-
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
         //判断path目录是否存在
         if (file.exists()){
-            if (Arr_Files == null){
+            if (Arr_Files == null || Arr_Files.length == 0){  //踩坑描述：要先判断Arr_Files是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
                 loglist.clear();
                 madapter = new FileAdapter(MainActivity.this, loglist);
                 mylistview.setAdapter(madapter);

@@ -72,7 +72,6 @@ public class ObbActivity extends AppCompatActivity {
                 if (f.isFile() && f.getName().endsWith(".obb")) {
                     FileSize_str = FileSizeTransform.Tansform(f.length());
                     Time_str = MySimpleDateFormat.transFormTime(f.lastModified());
-
                     LogFile obbfile = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
                     ObbFiles.add(obbfile);
                 }
