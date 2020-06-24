@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             for (int i = 0; i < grantResults.length; i++){
                 //用户选择“允许”
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
+                    GetAllFile(path_west);
                     Log.d(permissions[i], "onRequestPermissionsResult:ture ");
                 }if(grantResults[i] == PackageManager.PERMISSION_DENIED){
                     hasRejectPermission = true;
@@ -219,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
         //判断path目录是否存在
         if (file.exists()){
-            if (Arr_Files.length == 0){
+            if (Arr_Files == null){
                 loglist.clear();
                 madapter = new FileAdapter(MainActivity.this, loglist);
                 mylistview.setAdapter(madapter);
