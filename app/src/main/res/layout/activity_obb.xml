@@ -24,8 +24,9 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/text_copy"
-        android:gravity="center_horizontal" />
+        android:text="@string/text_choice_copy"
+        android:gravity="center_horizontal"
+        android:paddingVertical="8dp"/>
     <ListView
         android:id="@+id/item_obb"
         android:layout_width="match_parent"

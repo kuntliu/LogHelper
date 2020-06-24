@@ -25,7 +25,7 @@ import java.util.List;
 class FileToOperate {
 
 
-    File searchSelectedFile(File[] Arr_Files, String fileNameClicked){
+    static File searchSelectedFile(File[] Arr_Files, String fileNameClicked){
         //获取选择的文件
         File SelectedFile = null;
         for (File f : Arr_Files){
@@ -38,18 +38,18 @@ class FileToOperate {
     }
 
 //    根据position删除对应的数据源
-    void deleteFile(File file, List<LogFile> loglist, int position, FileAdapter madapter, Context context){
+    static void deleteFile(File file, List<LogFile> loglist, int position, FileAdapter madapter, Context context){
         if (file != null && file.exists()) {
             boolean isSuccessDeleteFile = file.delete();           //删除文件
             loglist.remove(loglist.get(position));              //删除loglist对应的数据源
             madapter.notifyDataSetChanged();                    //刷新适配器
-            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
+//            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
 
         }else {
             Toast.makeText(context ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
         }
     }
-    void shareFile(File SelectedFile, Context context) {
+    static void shareFile(File SelectedFile, Context context) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑

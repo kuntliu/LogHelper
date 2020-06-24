@@ -1,41 +1,31 @@
 package com.kuntliu.loghelper;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.net.ssl.SNIHostName;
 
 public class ObbActivity extends AppCompatActivity {
     String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -80,8 +70,8 @@ public class ObbActivity extends AppCompatActivity {
 
         if(obbfiles != null) {
             for (File f : obbfiles) {
+                //过滤掉文件夹，并且找到obb文件
                 if (f.isFile() && f.getName().endsWith(".obb")) {
-
                     FileSize_str = FileSizeTransform.Tansform(f.length());
                     Time_str = MySimpleDateFormat.transFormTime(f.lastModified());
 
@@ -89,22 +79,47 @@ public class ObbActivity extends AppCompatActivity {
                     ObbFiles.add(obbfile);
                 }
             }
-
-
-            final FileToOperate fto = new FileToOperate();
+            if (ObbFiles.size() == 0){
+                Toast.makeText(ObbActivity.this, "根目录无obb文件", Toast.LENGTH_SHORT).show();
+            }
             madapter = new FileAdapter(ObbActivity.this, ObbFiles);
             obblistview.setAdapter(madapter);
+            obblistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                    String ObbFileNameCilcked = ObbFiles.get(position).getFile_name();
+                    SelectedObbFile = FileToOperate.searchSelectedFile(obbfiles, ObbFileNameCilcked);
+
+                    final PopupMenu popup = new PopupMenu(ObbActivity.this, view);
+                    getMenuInflater().inflate(R.menu.menu_delete_obb, popup.getMenu());
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.action_delete_obb) {
+                                FileToOperate.deleteFile(SelectedObbFile, ObbFiles, position, madapter, ObbActivity.this);
+                            }
+                            return false;
+                        }
+                    });
+                    popup.show();
+                    return true;
+                }
+            });
+
+
+
             obblistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     String ObbFileNameCilcked = ObbFiles.get(i).getFile_name();
-                    SelectedObbFile = fto.searchSelectedFile(obbfiles, ObbFileNameCilcked);
+                    SelectedObbFile = FileToOperate.searchSelectedFile(obbfiles, ObbFileNameCilcked);
 
                     CopyFileDescPath = GetSelectedObbFileDescPath(SelectedObbFile);  //获取已选择的obb文件要复制的目标路径
                     final File descFile = new File(CopyFileDescPath + SelectedObbFile.getName());  //完整的目标文件对象
 
-                    boolean Existed = isExisted_DirCopyFileDescPath(CopyFileDescPath);
-                    if (!Existed) {
+
+                    if (!isExisted_DirCopyFileDescPath(CopyFileDescPath)) {
                         //如果复制的目标目录不存在就先创建目录
                         mkCopyFileDirs(CopyFileDescPath);
                     }
@@ -179,7 +194,7 @@ public class ObbActivity extends AppCompatActivity {
                                     }).start();
                                 }else {
                                     MyConfirmCopyDialog.dismissConfirmCopyDialog();
-                                    Toast.makeText(ObbActivity.this, "存储空间不足，请清理后尝试", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ObbActivity.this, "存储空间不足，请清理后尝试", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -188,12 +203,10 @@ public class ObbActivity extends AppCompatActivity {
                     }
                 }
             });
-        }else {
-            Toast.makeText(this, "根目录没有obb文件", Toast.LENGTH_SHORT).show();
         }
     }
 
-    //获取剩余空间
+    //获取存储的剩余空间
     private static long GetFreespace(){
         //        Log.d("GetFreespace", "GetFreespace: "+FileSizeTransform.Tansform(Freespace));
         return Environment.getExternalStorageDirectory().getFreeSpace();

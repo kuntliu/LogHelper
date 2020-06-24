@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
-            Toast.makeText(MainActivity.this, "Current Version:1.0 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Current Version:1.1 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
             return true;
         }
 
@@ -231,65 +231,66 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Arr_Files =  file.listFiles();
 
         int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
-
-
-        if(Arr_Files != null && file.exists()){
-            for(File f : Arr_Files) {
-//                Log.d("Filelist", f.toString());
-                if (f == null){
-                    Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
-                }
-                if (f.isFile() && !f.getName().startsWith(".")) {    //只需要文件并且过滤“.”开头的隐藏文件
-                    FileSize_str= FileSizeTransform.Tansform(f.length());      //文件大小单位转换
-                    Time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //时间格式转换
-
-                    LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
+        //判断path目录是否存在
+        if (file.exists()){
+            if (Arr_Files.length == 0){
+                loglist.clear();
+                madapter = new FileAdapter(MainActivity.this, loglist);
+                mylistview.setAdapter(madapter);
+                Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
+            }else {
+                for (File f : Arr_Files) {
+//                Log.d("FileList", f.toString());
+                    if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
+                        FileSize_str = FileSizeTransform.Tansform(f.length());      //文件大小单位转换
+                        Time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //时间格式转换
+                        LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
-                    loglist.add(log);
+                        loglist.add(log);
+                    }
                 }
-            }
-            Collections.sort(loglist, new Comparator<LogFile>() {
-                @Override
-                public int compare(LogFile f1, LogFile f2) {
-                    if (f1.getFile_name().compareTo(f2.getFile_name()) == 0){
-                        return 0;
-                    }else
-                        return f1.getFile_name().compareTo(f2.getFile_name());
+                Collections.sort(loglist, new Comparator<LogFile>() {
+                    @Override
+                    public int compare(LogFile f1, LogFile f2) {
+                        if (f1.getFile_name().compareTo(f2.getFile_name()) == 0) {
+                            return 0;
+                        } else
+                            return f1.getFile_name().compareTo(f2.getFile_name());
                     }
                 });
-            madapter = new FileAdapter(MainActivity.this, loglist);
-            mylistview.setAdapter(madapter);
-            mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                    final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
-                    Log.d("ItemClicked", fileNameClicked);
-                    popup = new PopupMenu(MainActivity.this, view);
-                    getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            FileToOperate fto = new FileToOperate();
-                            File SelectedFile = fto.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
-                            switch (item.getItemId()){
-                                case R.id.menu_delete:
-                                    fto.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
-                                    break;
-                                case R.id.menu_detail:
-                                    String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
-                                    MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(),""));
-                                    break;
-                                case R.id.menu_share:
-                                    fto.shareFile(SelectedFile, MainActivity.this);
-                                    break;
+                madapter = new FileAdapter(MainActivity.this, loglist);
+                mylistview.setAdapter(madapter);
+                mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
+                        Log.d("ItemClicked", fileNameClicked);
+                        popup = new PopupMenu(MainActivity.this, view);
+                        getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                File SelectedFile = FileToOperate.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
+                                switch (item.getItemId()) {
+                                    case R.id.menu_delete:
+                                        FileToOperate.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
+                                        break;
+                                    case R.id.menu_detail:
+                                        String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
+                                        MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(), ""));
+                                        break;
+                                    case R.id.menu_share:
+                                        FileToOperate.shareFile(SelectedFile, MainActivity.this);
+                                        break;
+                                }
+                                return false;
                             }
-                            return false;
-                        }
-                    });
-                    popup.show();
-                    return false;
-                }
-            });
+                        });
+                        popup.show();
+                        return false;
+                    }
+                });
+            }
         }else {
             loglist.clear();
             madapter = new FileAdapter(MainActivity.this, loglist);

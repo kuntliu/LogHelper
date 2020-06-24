@@ -25,18 +25,19 @@ class CopyProgressBarDialog {
         builder.setView(view);
         dialog = builder.create();
         dialog.setTitle("正在复制...");
-        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        //总结：默认情况下，setCancelable和setCanceledOnTouchOutside都是可以取消掉dialog的，如果设置setCancelable为false，这个时候急救都不可以取消dialog
 
         Window window = dialog.getWindow();
         if (window != null){
             window.setWindowAnimations(R.style.Dialog_Anim);
             window.setGravity(Gravity.BOTTOM);
         }
-
-
         dialog.show();
         return view;
     }
+
+
     static void dismissCopyProgressBar(){
         if (dialog.isShowing()) {
             dialog.dismiss();

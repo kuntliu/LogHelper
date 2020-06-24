@@ -54,7 +54,6 @@ class MyConfirmCopyDialog {
 //        if (dialog.getWindow() != null) {
 //            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 //        }
-        dialog.setCanceledOnTouchOutside(true);
         dialog.setTitle("目标文件");
         dialog.show();
     }
@@ -64,6 +63,7 @@ class MyConfirmCopyDialog {
             dialog.dismiss();
         }
     }
+
 
     interface AlertDialogBtnClickListener {
         void clickCancel();
