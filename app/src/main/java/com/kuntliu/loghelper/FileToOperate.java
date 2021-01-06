@@ -40,7 +40,7 @@ class FileToOperate {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
-        //适配7.0版本以下的Android系统
+        //适配7.0版本以下的Android系统,需要使用内容提供器
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", SelectedFile));
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

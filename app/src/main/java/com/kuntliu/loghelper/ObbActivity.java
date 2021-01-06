@@ -2,10 +2,15 @@ package com.kuntliu.loghelper;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -69,7 +74,7 @@ public class ObbActivity extends AppCompatActivity {
         if(obbfiles != null) {
             for (File f : obbfiles) {
                 //过滤掉文件夹，并且找到obb文件
-                if (f.isFile() && f.getName().endsWith(".obb")) {
+                if (f.isFile() && f.getName().endsWith(".obb") || f.getName().endsWith("apk")) {
                     FileSize_str = FileSizeTransform.Tansform(f.length());
                     Time_str = MySimpleDateFormat.transFormTime(f.lastModified());
                     LogFile obbfile = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
@@ -77,7 +82,7 @@ public class ObbActivity extends AppCompatActivity {
                 }
             }
             if (ObbFiles.size() == 0){
-                Toast.makeText(ObbActivity.this, "根目录无obb文件", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ObbActivity.this, "根目录无obb和apk文件", Toast.LENGTH_SHORT).show();
             }
             madapter = new FileAdapter(ObbActivity.this, ObbFiles);
             obblistview.setAdapter(madapter);
@@ -112,91 +117,98 @@ public class ObbActivity extends AppCompatActivity {
                     String ObbFileNameCilcked = ObbFiles.get(i).getFile_name();
                     SelectedObbFile = FileToOperate.searchSelectedFile(obbfiles, ObbFileNameCilcked);
 
-                    CopyFileDescPath = GetSelectedObbFileDescPath(SelectedObbFile);  //获取已选择的obb文件要复制的目标路径
-                    final File descFile = new File(CopyFileDescPath + SelectedObbFile.getName());  //完整的目标文件对象
+                    //如果点击的是APK文件则调用安装器进行安装
+                    InstallAPK(SelectedObbFile);
+
+                    //如果点击的是obb文件则进入复制文件流程
+                    if (SelectedObbFile.getName().endsWith(".obb")) {
+                        CopyFileDescPath = GetSelectedObbFileDescPath(SelectedObbFile);  //获取已选择的obb文件要复制的目标路径
+                        if (CopyFileDescPath != null) {
+                            final File descFile = new File(CopyFileDescPath + SelectedObbFile.getName());  //完整的目标文件对象
 
 
-                    if (!isExisted_DirCopyFileDescPath(CopyFileDescPath)) {
-                        //如果复制的目标目录不存在就先创建目录
-                        mkCopyFileDirs(CopyFileDescPath);
-                    }
-                    //执行复制操作前需要判断目标目录的文件是否已存在
-                    if (!Existed_CopeDescFile(SelectedObbFile, ObbFileNameCilcked)){
-                        String copyFileSize = FileSizeTransform.Tansform(SelectedObbFile.length());
-
-                        MyConfirmCopyDialog.showConfirmCopyDialog(ObbActivity.this, SelectedObbFile.getName(), copyFileSize, CopyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
-                            @Override
-                            public void clickCancel() {
-                                GetFreespace();
+                            if (!isExisted_DirCopyFileDescPath(CopyFileDescPath)) {
+                                //如果复制的目标目录不存在就先创建目录
+                                mkCopyFileDirs(CopyFileDescPath);
                             }
+                            //执行复制操作前需要判断目标目录的文件是否已存在
+                            if (!Existed_CopeDescFile(SelectedObbFile, ObbFileNameCilcked)) {
+                                String copyFileSize = FileSizeTransform.Tansform(SelectedObbFile.length());
 
-                            @Override
-                            public void clickConfirm() {
-                                //复制文件前先判断剩余空间是否足够，为了保险，继续预留300M的空间来进行判断
-                                if (GetFreespace() - 300 * 1024 *1024 > SelectedObbFile.length()) {
-                                    View view = CopyProgressBarDialog.showCopyProgressBar(ObbActivity.this, SelectedObbFile.getName());
-                                    final TextView tv_precent = view.findViewById(R.id.CopyPrecent);
-                                    final ProgressBar progressBar = view.findViewById(R.id.CopyProgressbar);
-                                    final Handler handler = new Handler();
+                                MyConfirmCopyDialog.showConfirmCopyDialog(ObbActivity.this, SelectedObbFile.getName(), copyFileSize, CopyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
+                                    @Override
+                                    public void clickCancel() {
+                                    }
 
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            long TansforSize = 0;
-                                            int Progress;
-                                            FileChannel inputChannel = null;
-                                            FileChannel outputChannel = null;
-                                            try {
-                                                inputChannel = new FileInputStream(SelectedObbFile).getChannel();
-                                                outputChannel = new FileOutputStream(descFile).getChannel();
+                                    @Override
+                                    public void clickConfirm() {
+                                        //复制文件前先判断剩余空间是否足够，为了保险，继续预留300M的空间来进行判断
+                                        if (GetFreespace() - 300 * 1024 * 1024 > SelectedObbFile.length()) {
+                                            View view = CopyProgressBarDialog.showCopyProgressBar(ObbActivity.this, SelectedObbFile.getName());
+                                            final TextView tv_precent = view.findViewById(R.id.CopyPrecent);
+                                            final ProgressBar progressBar = view.findViewById(R.id.CopyProgressbar);
+                                            final Handler handler = new Handler();
 
-                                                ByteBuffer buffer = ByteBuffer.allocate(4096);
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    long TansforSize = 0;
+                                                    int Progress;
+                                                    FileChannel inputChannel = null;
+                                                    FileChannel outputChannel = null;
+                                                    try {
+                                                        inputChannel = new FileInputStream(SelectedObbFile).getChannel();
+                                                        outputChannel = new FileOutputStream(descFile).getChannel();
 
-                                                while (inputChannel.read(buffer) != -1) {
-                                                    buffer.flip();
-                                                    TansforSize += outputChannel.write(buffer);
-                                                    Progress = (int) (TansforSize * 100 / SelectedObbFile.length());
+                                                        ByteBuffer buffer = ByteBuffer.allocate(4096);
+
+                                                        while (inputChannel.read(buffer) != -1) {
+                                                            buffer.flip();
+                                                            TansforSize += outputChannel.write(buffer);
+                                                            Progress = (int) (TansforSize * 100 / SelectedObbFile.length());
 //                                                Log.d("CopyProgress", "CopyProgress"+Progress);
-                                                    final int finalProgress = Progress;
-                                                    handler.post(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            tv_precent.setText(String.format(finalProgress + "%s", getResources().getString(R.string.text_precent)));
-                                                            progressBar.setProgress(finalProgress);
+                                                            final int finalProgress = Progress;
+                                                            handler.post(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    tv_precent.setText(String.format(finalProgress + "%s", getResources().getString(R.string.text_precent)));
+                                                                    progressBar.setProgress(finalProgress);
+                                                                }
+                                                            });
+                                                            buffer.clear();
                                                         }
-                                                    });
-                                                    buffer.clear();
-                                                }
-                                            } catch (FileNotFoundException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            } finally {
-                                                if (inputChannel != null) {
-                                                    try {
-                                                        inputChannel.close();
+                                                    } catch (FileNotFoundException e) {
+                                                        e.printStackTrace();
                                                     } catch (IOException e) {
                                                         e.printStackTrace();
+                                                    } finally {
+                                                        if (inputChannel != null) {
+                                                            try {
+                                                                inputChannel.close();
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        } else if (outputChannel != null) {
+                                                            try {
+                                                                outputChannel.close();
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
                                                     }
-                                                } else if (outputChannel != null) {
-                                                    try {
-                                                        outputChannel.close();
-                                                    } catch (IOException e) {
-                                                        e.printStackTrace();
-                                                    }
+                                                    CopyProgressBarDialog.dismissCopyProgressBar();
                                                 }
-                                            }
-                                            CopyProgressBarDialog.dismissCopyProgressBar();
+                                            }).start();
+                                        } else {
+                                            MyConfirmCopyDialog.dismissConfirmCopyDialog();
+                                            Toast.makeText(ObbActivity.this, "存储空间不足，请清理后尝试", Toast.LENGTH_SHORT).show();
                                         }
-                                    }).start();
-                                }else {
-                                    MyConfirmCopyDialog.dismissConfirmCopyDialog();
-                                    Toast.makeText(ObbActivity.this, "存储空间不足，请清理后尝试", Toast.LENGTH_SHORT).show();
-                                }
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(ObbActivity.this, "目标目录已存在该obb文件", Toast.LENGTH_SHORT).show();
                             }
-                        });
-                    }else {
-                        Toast.makeText(ObbActivity.this, "目标目录已存在该obb文件", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             });
@@ -226,7 +238,7 @@ public class ObbActivity extends AppCompatActivity {
 
     //获取已选择的obb文件要复制的目标路径
     private String GetSelectedObbFileDescPath(File file) {
-        String CopyFileDescPath = "";
+        String CopyFileDescPath = null;
         if (file != null) {
             if (file.getName().contains("com.activision.callofduty.shooter")) {
                 CopyFileDescPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
@@ -240,6 +252,8 @@ public class ObbActivity extends AppCompatActivity {
             } else if (file.getName().contains("com.vng.codmvn")) {
                 CopyFileDescPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
                         File.separator + "Android" + File.separator + "obb" + File.separator + "com.vng.codmvn" + File.separator;
+            } else {
+                Toast.makeText(ObbActivity.this, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
             }
         }
         return CopyFileDescPath;
@@ -261,6 +275,25 @@ public class ObbActivity extends AppCompatActivity {
         }
         return isExisted;
     }
+
+    private void InstallAPK(File file){
+        if (file.getName().endsWith(".apk")){
+            Log.d("ObbActivity", "InstallAPK: here");
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Uri uri = FileProvider.getUriForFile(ObbActivity.this, "com.kuntliu.loghelper.fileprovider", file);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+            }else {
+                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+            }
+            ObbActivity.this.startActivity(intent);
+        }
+    }
+
 }
 
 

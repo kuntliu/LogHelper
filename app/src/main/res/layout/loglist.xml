@@ -22,14 +22,23 @@
         android:layout_below="@id/text_choose">
     </Spinner>
 
-    <ListView
-        android:id="@+id/log_list"
+<!--    <ListView-->
+<!--        android:id="@+id/log_list"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:divider="#E0E0E0"-->
+<!--        android:dividerHeight="0.8dp"-->
+<!--        android:layout_above="@id/obbButton"-->
+<!--        android:layout_below="@id/spinner_item"/>-->
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_file_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="#E0E0E0"
-        android:dividerHeight="0.8dp"
         android:layout_above="@id/obbButton"
         android:layout_below="@id/spinner_item"/>
+
     <Button
         android:id="@+id/obbButton"
         android:layout_width="match_parent"

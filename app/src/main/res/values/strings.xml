@@ -7,7 +7,7 @@
     <string name="action_share">通过QQ发送至我的电脑</string>
     <string name="action_detail">详细信息</string>
     <string name="action_about">关于</string>
-    <string name="text_choice_copy">仅检索根目录obb文件,点击进行复制</string>
+    <string name="text_choice_copy">仅检索根目录的apk和obb文件,点击进行安装或者复制</string>
     <string name="text_filename">文件名</string>
     <string name="text_filesize">文件大小</string>
     <string name="text_filepath">复制的目标路径</string>

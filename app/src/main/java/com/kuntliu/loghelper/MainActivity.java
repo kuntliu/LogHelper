@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.provider.Settings;
@@ -26,6 +28,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
@@ -40,8 +43,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
+//    String path_west = Environment.getExternalStorageDirectory().getAbsolutePath()+
+//            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+
     String path_west = Environment.getExternalStorageDirectory().getAbsolutePath()+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator ;
+
     String path_garena = Environment.getExternalStorageDirectory().getAbsolutePath()+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
     String path_korea = Environment.getExternalStorageDirectory().getAbsolutePath()+
@@ -61,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     File[] Arr_Files;
     FileAdapter madapter;
     ListView mylistview;
+
+    RecyclerView recycleview;
+
     PopupMenu popup;
     String FileSize_str;
     String Time_str;
@@ -93,7 +103,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
-        mylistview = findViewById(R.id.log_list);
+//        mylistview = findViewById(R.id.log_list);
+        recycleview = findViewById(R.id.rv_file_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
+        recycleview.setLayoutManager(linearLayoutManager);
+
+
 
         Button button = findViewById(R.id.obbButton);
         button.setOnClickListener(new View.OnClickListener() {
@@ -221,8 +236,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (file.exists()){
             if (Arr_Files == null || Arr_Files.length == 0){  //踩坑描述：要先判断Arr_Files是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
                 loglist.clear();
-                madapter = new FileAdapter(MainActivity.this, loglist);
-                mylistview.setAdapter(madapter);
+//                madapter = new FileAdapter(MainActivity.this, loglist);
+//                mylistview.setAdapter(madapter);
+
+                MyRecycleViewApater adapter = new MyRecycleViewApater(loglist, this);
+                recycleview.setAdapter(adapter);
+
                 Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
             }else {
                 for (File f : Arr_Files) {
@@ -244,38 +263,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             return f1.getFile_name().compareTo(f2.getFile_name());
                     }
                 });
-                madapter = new FileAdapter(MainActivity.this, loglist);
-                mylistview.setAdapter(madapter);
-                mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                        final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
-                        Log.d("ItemClicked", fileNameClicked);
-                        popup = new PopupMenu(MainActivity.this, view);
-                        getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
-                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                File SelectedFile = FileToOperate.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
-                                switch (item.getItemId()) {
-                                    case R.id.menu_delete:
-                                        FileToOperate.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
-                                        break;
-                                    case R.id.menu_detail:
-                                        String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
-                                        MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(), ""));
-                                        break;
-                                    case R.id.menu_share:
-                                        FileToOperate.shareFile(SelectedFile, MainActivity.this);
-                                        break;
-                                }
-                                return false;
-                            }
-                        });
-                        popup.show();
-                        return false;
-                    }
-                });
+
+
+                MyRecycleViewApater adapter = new MyRecycleViewApater(loglist, this);
+                recycleview.setAdapter(adapter);
+//                madapter = new FileAdapter(MainActivity.this, loglist);
+//                mylistview.setAdapter(madapter);
+//                mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//                    @Override
+//                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+//                        final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
+//                        Log.d("ItemClicked", fileNameClicked);
+//                        popup = new PopupMenu(MainActivity.this, view);
+//                        getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
+//                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+//                            @Override
+//                            public boolean onMenuItemClick(MenuItem item) {
+//                                File SelectedFile = FileToOperate.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
+//                                switch (item.getItemId()) {
+//                                    case R.id.menu_delete:
+//                                        FileToOperate.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
+//                                        break;
+//                                    case R.id.menu_detail:
+//                                        String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
+//                                        MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(), ""));
+//                                        break;
+//                                    case R.id.menu_share:
+//                                        FileToOperate.shareFile(SelectedFile, MainActivity.this);
+//                                        break;
+//                                }
+//                                return false;
+//                            }
+//                        });
+//                        popup.show();
+//                        return false;
+//                    }
+//                });
             }
         }else {
             loglist.clear();
