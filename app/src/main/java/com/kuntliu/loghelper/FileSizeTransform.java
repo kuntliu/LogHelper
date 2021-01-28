@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 
 import java.util.Locale;
 
-class FileSizeTransform {
-    static String Tansform(long FileSize){
+public class FileSizeTransform {
+    public static String Tansform(long FileSize){
         String FileSize_str;
         double FileSize_db;
         if (FileSize >= Math.pow(2, 30)){

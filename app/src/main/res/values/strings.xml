@@ -1,13 +1,11 @@
 <resources>
     <string name="app_name">LogHelper</string>
-    <string name="text_choose">当前选择的目录</string>
     <string name="action_settings">设置</string>
     <string name="obb_text">一键放置obb文件</string>
     <string name="action_delete">删除</string>
     <string name="action_share">通过QQ发送至我的电脑</string>
     <string name="action_detail">详细信息</string>
     <string name="action_about">关于</string>
-    <string name="text_choice_copy">仅检索根目录的apk和obb文件,点击进行安装或者复制</string>
     <string name="text_filename">文件名</string>
     <string name="text_filesize">文件大小</string>
     <string name="text_filepath">复制的目标路径</string>
@@ -17,11 +15,4 @@
     <string name="text_path">位置</string>
     <string name="text_copy">复制</string>
     <string name="text_precent">%</string>
-    <string-array name="arr_path">
-        <item>Log目录：西方版本</item>
-        <item>Log目录：Garena版本</item>
-        <item>Log目录：韩国版本</item>
-        <item>Log目录：VNG版本</item>
-        <item>根目录</item>
-    </string-array>
 </resources>

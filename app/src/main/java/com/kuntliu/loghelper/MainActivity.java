@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,8 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.os.Environment;
 import android.provider.Settings;
@@ -25,36 +23,37 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.tabs.TabLayout;
+import com.kuntliu.loghelper.myadapter.FragmentAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
     String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-//    String path_west = Environment.getExternalStorageDirectory().getAbsolutePath()+
-//            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+    String path_west = path_SdcardRoot+
+            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
 
-    String path_west = Environment.getExternalStorageDirectory().getAbsolutePath()+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator ;
-
-    String path_garena = Environment.getExternalStorageDirectory().getAbsolutePath()+
+    String path_cn = path_SdcardRoot+
+            File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+    String path_garena = path_SdcardRoot+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-    String path_korea = Environment.getExternalStorageDirectory().getAbsolutePath()+
+    String path_korea = path_SdcardRoot+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-    String path_vng = Environment.getExternalStorageDirectory().getAbsolutePath()+
+    String path_vng = path_SdcardRoot+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+
+    private String[] myTab = {"西方", "国服", "GARENA", "韩国", "VNG", "根目录"};
+    private String[] myPath = {path_west, path_cn, path_garena, path_korea, path_vng, path_SdcardRoot};
+    private List<TabFragment> tabFragmentList = new ArrayList<>();
+
     private AlertDialog alertDialog;
     String[] permissions = new String[]
             {Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -62,26 +61,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     List<String> permissions_rejected = new ArrayList<>();//保存未授予权限
     int PERMISSION_CODE = 1000;
     int SETTING_CODE = 1001;
-    File file;
 
-    List<LogFile> loglist = null;
-    File[] Arr_Files;
-    FileAdapter madapter;
-    ListView mylistview;
 
-    RecyclerView recycleview;
+    TabLayout tab_version;
+    ViewPager viewPager;
+
+    TextView tv_empty_tips;
 
     PopupMenu popup;
-    String FileSize_str;
-    String Time_str;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
+        initView();
+        initData();
+        FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab, tabFragmentList);
+        viewPager.setAdapter(adapter);
+        tab_version.setupWithViewPager(viewPager,false);
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -92,21 +90,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //                        .setAction("Action", null).show();
 //            }
 //        });
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             requestPermission();
         }
-        Spinner spinner = findViewById(R.id.spinner_item);
-        Resources resources = getResources();
-        String[] arr_path = resources.getStringArray(R.array.arr_path);
-        //踩坑描述：android.R.layout.simple_list_item_1是系统提供的下拉列表样式，也可以自定义
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, arr_path);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
 
-//        mylistview = findViewById(R.id.log_list);
-        recycleview = findViewById(R.id.rv_file_list);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
-        recycleview.setLayoutManager(linearLayoutManager);
+//已弃用，改用tab
+//        Spinner spinner = findViewById(R.id.spinner_item);
+//        Resources resources = getResources();
+//        String[] arr_path = resources.getStringArray(R.array.arr_path);
+//        //踩坑描述：android.R.layout.simple_list_item_1是系统提供的下拉列表样式，也可以自定义
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, arr_path);
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener(this);
+
+
 
 
 
@@ -119,6 +118,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+    }
+
+
+    private void initView(){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        tab_version = findViewById(R.id.tab_version);
+        viewPager = findViewById(R.id.viewPage_file);
+        tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
+    }
+
+
+    private void initData() {
+        for (int i = 0; i < myTab.length; i++) {
+            tab_version.addTab(tab_version.newTab().setText(myTab[i]));
+            tabFragmentList.add(TabFragment.newInstance(myTab[i], myPath[i]));
+        }
     }
 
     //申请权限
@@ -148,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             for (int i = 0; i < grantResults.length; i++){
                 //用户选择“允许”
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
-                    GetAllFile(path_west);
+//                    getAllFile(path_west);
                     Log.d(permissions[i], "onRequestPermissionsResult:ture ");
                 }if(grantResults[i] == PackageManager.PERMISSION_DENIED){
                     hasRejectPermission = true;
@@ -221,124 +238,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (id == R.id.action_about) {
             Toast.makeText(MainActivity.this, "Current Version:1.1 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
             return true;
+        }else if (id == R.id.action_add_version) {
+            Toast.makeText(MainActivity.this, "这里是添加逻辑", Toast.LENGTH_LONG).show();
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void GetAllFile(final String path)  {
-
-        loglist = new ArrayList<>();   //初始化数据
-        file = new File(path);
-        Arr_Files =  file.listFiles();
-        int logiconID = getResources().getIdentifier("icon_file","drawable","com.kuntliu.loghelper");//需要传入资源id
-        //判断path目录是否存在
-        if (file.exists()){
-            if (Arr_Files == null || Arr_Files.length == 0){  //踩坑描述：要先判断Arr_Files是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
-                loglist.clear();
-//                madapter = new FileAdapter(MainActivity.this, loglist);
-//                mylistview.setAdapter(madapter);
-
-                MyRecycleViewApater adapter = new MyRecycleViewApater(loglist, this);
-                recycleview.setAdapter(adapter);
-
-                Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
-            }else {
-                for (File f : Arr_Files) {
-//                Log.d("FileList", f.toString());
-                    if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
-                        FileSize_str = FileSizeTransform.Tansform(f.length());      //文件大小单位转换
-                        Time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //时间格式转换
-                        LogFile log = new LogFile(logiconID, f.getName(), FileSize_str, Time_str);
-//                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
-                        loglist.add(log);
-                    }
-                }
-                Collections.sort(loglist, new Comparator<LogFile>() {
-                    @Override
-                    public int compare(LogFile f1, LogFile f2) {
-                        if (f1.getFile_name().compareTo(f2.getFile_name()) == 0) {
-                            return 0;
-                        } else
-                            return f1.getFile_name().compareTo(f2.getFile_name());
-                    }
-                });
-
-
-                MyRecycleViewApater adapter = new MyRecycleViewApater(loglist, this);
-                recycleview.setAdapter(adapter);
-//                madapter = new FileAdapter(MainActivity.this, loglist);
-//                mylistview.setAdapter(madapter);
-//                mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//                    @Override
-//                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-//                        final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
-//                        Log.d("ItemClicked", fileNameClicked);
-//                        popup = new PopupMenu(MainActivity.this, view);
-//                        getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
-//                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//                            @Override
-//                            public boolean onMenuItemClick(MenuItem item) {
-//                                File SelectedFile = FileToOperate.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
-//                                switch (item.getItemId()) {
-//                                    case R.id.menu_delete:
-//                                        FileToOperate.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
-//                                        break;
-//                                    case R.id.menu_detail:
-//                                        String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
-//                                        MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(), ""));
-//                                        break;
-//                                    case R.id.menu_share:
-//                                        FileToOperate.shareFile(SelectedFile, MainActivity.this);
-//                                        break;
-//                                }
-//                                return false;
-//                            }
-//                        });
-//                        popup.show();
-//                        return false;
-//                    }
-//                });
-            }
-        }else {
-            loglist.clear();
-            madapter = new FileAdapter(MainActivity.this, loglist);
-            mylistview.setAdapter(madapter);
-            Toast.makeText(MainActivity.this, "当前目录不存在", Toast.LENGTH_SHORT).show();
-//            Log.d("IsNofile", "ture");
-        }
-    }
-
-
-
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        int itemId_selected = parent.getSelectedItemPosition();
-            switch (position){
-                case 1:
-                    GetAllFile(path_garena);
-                    break;
-                case 2:
-                    GetAllFile(path_korea);
-                    break;
-                case 3:
-                    GetAllFile(path_vng);
-
-                    break;
-                case 4:
-                    GetAllFile(path_SdcardRoot);
-                    break;
-                default:
-                    GetAllFile(path_west);
-                    break;
-            }
-//        Log.d("ItemSelected",  parent.getSelectedItem().toString());
-//        Log.d("ItemSelectedPosition", String.valueOf(position));
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
     }
 }

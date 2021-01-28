@@ -19,18 +19,26 @@
             app:navigationIcon="@drawable/abc_vector_test"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             tools:ignore="PrivateResource" />
-
     </com.google.android.material.appbar.AppBarLayout>
-    <TextView
+
+
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/text_choice_copy"-->
+<!--        android:gravity="center_horizontal"-->
+<!--        android:paddingVertical="8dp"/>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_obb_file"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/text_choice_copy"
-        android:gravity="center_horizontal"
-        android:paddingVertical="8dp"/>
-    <ListView
-        android:id="@+id/item_obb"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="#E0E0E0"
-        android:dividerHeight="0.8dp"/>
+        android:layout_height="match_parent"/>
+
+<!--    <ListView-->
+<!--        android:id="@+id/item_obb"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:divider="#E0E0E0"-->
+<!--        android:dividerHeight="0.8dp"/>-->
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.kuntliu.loghelper;
+package com.kuntliu.loghelper.mydialog;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.Gravity;
@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
+
+import com.kuntliu.loghelper.R;
 
 import org.w3c.dom.Text;
 
@@ -26,7 +28,13 @@ class CopyProgressBarDialog {
         dialog = builder.create();
         dialog.setTitle("正在复制...");
         dialog.setCancelable(false);
-        //总结：默认情况下，setCancelable和setCanceledOnTouchOutside都是可以取消掉dialog的，如果设置setCancelable为false，这个时候急救都不可以取消dialog
+        //dialog.setCancelable(false);
+        //
+        //dialog弹出后会点击屏幕或物理返回键，dialog不消失
+        //
+        //
+        //dialog.setCanceledOnTouchOutside(false);
+        //dialog弹出后，点击屏幕dialog不消失；点击物理返回键dialog消失
 
         Window window = dialog.getWindow();
         if (window != null){
