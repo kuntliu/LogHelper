@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Button
@@ -10,12 +11,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-
         android:drawableTop="@drawable/ic_file_obb"
-        android:text="通过QQ发送我的电脑"
+        android:text="@string/action_share"
+
+        app:layout_constraintRight_toLeftOf="@id/btn_delete"
+
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintWidth_percent="0.333"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintVertical_weight="1"/>
 
     <Button
         android:id="@+id/btn_delete"
@@ -23,11 +28,14 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:drawableTop="@drawable/ic_file_obb"
-        android:text="删除"
+        android:text="@string/action_delete"
         app:layout_constraintLeft_toRightOf="@id/btn_sent"
         app:layout_constraintRight_toLeftOf="@id/btn_detail"
-        app:layout_constraintWidth_percent="0.333"
-        tools:ignore="MissingConstraints" />
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintVertical_weight="1"/>
 
     <Button
         android:id="@+id/btn_detail"
@@ -35,11 +43,15 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:drawableTop="@drawable/ic_file_obb"
-        android:text="detail"
+        android:text="@string/action_detail"
+
         app:layout_constraintLeft_toRightOf="@id/btn_delete"
+
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintWidth_percent="0.333"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintVertical_weight="1"/>
 
 
 

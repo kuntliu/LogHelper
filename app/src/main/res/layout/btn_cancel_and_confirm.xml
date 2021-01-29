@@ -6,32 +6,37 @@
 
     <Button
         android:id="@+id/btn_cancel"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:text="@string/text_cancel"
         android:textColor="@color/deepOrange"
-        android:background="@drawable/btn_selector"
-        tools:ignore="MissingConstraints" />
+        android:background="@drawable/btn_selector" />
 
     <TextView
         android:id="@+id/line"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="|"
-        android:textColor="@color/middleBlack"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btn_confirm"
         app:layout_constraintLeft_toRightOf="@id/btn_cancel"
-        tools:ignore="MissingConstraints" />
+        android:text=" | "
+        android:textColor="@color/middleBlack" />
 
     <Button
         android:id="@+id/btn_confirm"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@id/line"
-        app:layout_constraintRight_toLeftOf="parent"
+        android:background="@drawable/btn_selector"
         android:text="@string/text_comfirm_copy"
         android:textColor="@color/deepOrange"
-        android:background="@drawable/btn_selector"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/line" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

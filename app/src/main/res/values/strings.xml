@@ -3,7 +3,7 @@
     <string name="action_settings">设置</string>
     <string name="obb_text">一键放置obb文件</string>
     <string name="action_delete">删除</string>
-    <string name="action_share">通过QQ发送至我的电脑</string>
+    <string name="action_share">发送</string>
     <string name="action_detail">详细信息</string>
     <string name="action_about">关于</string>
     <string name="text_filename">文件名</string>
