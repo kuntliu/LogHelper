@@ -29,7 +29,7 @@ class MyConfirmCopyDialog {
         tv_filesize.setText(filesize);
         tv_filepath.setText(filepath);
 
-        Button btn_cancel = view.findViewById(R.id.btn_cancle);
+        Button btn_cancel = view.findViewById(R.id.btn_cancel);
         Button btn_confirm = view.findViewById(R.id.btn_confirm);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override

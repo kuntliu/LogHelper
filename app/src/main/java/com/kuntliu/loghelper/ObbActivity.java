@@ -70,7 +70,7 @@ public class ObbActivity extends AppCompatActivity {
                 if (f.isFile() && f.getName().endsWith(".obb") || f.getName().endsWith("apk")) {
                     fileSize_str = FileSizeTransform.Tansform(f.length());
                     fileTime_str = MySimpleDateFormat.transFormTime(f.lastModified());
-                    String fileType_str = FileToOperate.getFileSuffix(f);//获取文件后缀，string类型
+                    fileType_str = FileToOperate.getFileSuffix(f);//获取文件后缀，string类型
                     int iconResourcesId = FileToOperate.getFileIconResourceId(fileType_str, ObbActivity.this);//根据文件后缀去使用icon图标
 
                     LogFile obbfile = new LogFile(iconResourcesId, f.getName(), fileSize_str, fileTime_str);

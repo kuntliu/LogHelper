@@ -1,32 +1,37 @@
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_gravity="center"
-    android:padding="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Button
-        android:id="@+id/btn_cancle"
-        android:layout_width="match_parent"
+        android:id="@+id/btn_cancel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="parent"
         android:text="@string/text_cancel"
-        android:textSize="13sp"
-        android:textColor="@color/white"
-        android:layout_weight="2"
-        android:background="@drawable/btn_confirm"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"
-        android:layout_weight="3"/>
+        android:textColor="@color/deepOrange"
+        android:background="@drawable/btn_selector"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="|"
+        android:textColor="@color/middleBlack"
+        app:layout_constraintLeft_toRightOf="@id/btn_cancel"
+        tools:ignore="MissingConstraints" />
+
     <Button
         android:id="@+id/btn_confirm"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/text_confirm"
-        android:textSize="13sp"
-        android:layout_weight="2"
-        android:background="@drawable/btn_confirm"/>
+        app:layout_constraintLeft_toRightOf="@id/line"
+        app:layout_constraintRight_toLeftOf="parent"
+        android:text="@string/text_comfirm_copy"
+        android:textColor="@color/deepOrange"
+        android:background="@drawable/btn_selector"
+        tools:ignore="MissingConstraints" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

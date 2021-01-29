@@ -2,6 +2,8 @@ package com.kuntliu.loghelper.mydialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -25,6 +27,7 @@ class MyFileDetailInfoDialog {
 
         final AlertDialog dialog = builder.create();
         Button btn_confirm = view.findViewById(R.id.btn_single_confirm);
+
         btn_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
