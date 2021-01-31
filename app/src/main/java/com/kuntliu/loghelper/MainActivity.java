@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         tab_version = findViewById(R.id.tab_version);
         viewPager = findViewById(R.id.viewPage_file);
         tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
+
     }
 
 

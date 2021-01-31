@@ -9,6 +9,7 @@
     <color name="deepOrange">#CD6600</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="middleBlack">#A5A49F</color>
+    <color name="middleBlack">#B5B2AA</color>
+    <color name="grep">#F3F2EE</color>
 
 </resources>

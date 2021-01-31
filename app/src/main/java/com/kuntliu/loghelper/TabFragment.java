@@ -25,9 +25,9 @@ public class TabFragment extends Fragment {
     private TextView tv_empty_tips;
     private FileToOperate fto = new FileToOperate();
 
-    public static TabFragment newInstance(String tab, String path) {
+    static TabFragment newInstance(String tab, String path) {
         Bundle args = new Bundle();
-        args.putString("myTab", tab);
+//        args.putString("myTab", tab);
         args.putString("myPath", path);
         TabFragment fragment = new TabFragment();
         fragment.setArguments(args);
@@ -48,7 +48,7 @@ public class TabFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        String tab = getArguments().getString("myTab");
+//        String tab = getArguments().getString("myTab");
         String path = getArguments().getString("myPath");
 
 
@@ -62,7 +62,7 @@ public class TabFragment extends Fragment {
             public void onItemClick(View view, int position) {
                 BottomMenuDialog bmd = new BottomMenuDialog();
                 File selectedFile = fto.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
-                bmd.showBottomDialog(selectedFile, fileList, getContext(), adapter, position);
+                bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position);
             }
         });
     }

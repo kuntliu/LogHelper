@@ -3,16 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
+    android:background="@color/grep"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
     <Button
         android:id="@+id/btn_sent"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:drawableTop="@drawable/ic_file_obb"
+        android:drawableTop="@drawable/ic_sent"
         android:text="@string/action_share"
+        android:textSize="12sp"
+        style="?android:attr/borderlessButtonStyle"
 
         app:layout_constraintRight_toLeftOf="@id/btn_delete"
 
@@ -24,11 +26,13 @@
 
     <Button
         android:id="@+id/btn_delete"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:drawableTop="@drawable/ic_file_obb"
+        android:drawableTop="@drawable/ic_delete"
         android:text="@string/action_delete"
+        android:textSize="12sp"
+
+        style="?android:attr/borderlessButtonStyle"
         app:layout_constraintLeft_toRightOf="@id/btn_sent"
         app:layout_constraintRight_toLeftOf="@id/btn_detail"
 
@@ -39,11 +43,14 @@
 
     <Button
         android:id="@+id/btn_detail"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:drawableTop="@drawable/ic_file_obb"
+        android:drawableTop="@drawable/ic_detail"
         android:text="@string/action_detail"
+
+        android:textSize="12sp"
+
+        style="?android:attr/borderlessButtonStyle"
 
         app:layout_constraintLeft_toRightOf="@id/btn_delete"
 
@@ -52,7 +59,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
 
         app:layout_constraintVertical_weight="1"/>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
