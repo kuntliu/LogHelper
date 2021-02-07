@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.List;
 
 public class BottomMenuDialog {
+    PopupWindow pw;
 
     public void showBottomMenu(final File file, final List<LogFile> list, final Context context, final MyRecycleViewApater apater, final int position){
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_bottom_menu, null);
@@ -31,6 +32,7 @@ public class BottomMenuDialog {
             @Override
             public void onClick(View v) {
                 FileToOperate.shareFile(file, context);
+                pwDismiss();
             }
         });
 
@@ -38,6 +40,7 @@ public class BottomMenuDialog {
             @Override
             public void onClick(View v) {
                 FileToOperate.deleteFile(file, list, position, apater, context);
+                pw.dismiss();
             }
         });
 
@@ -45,11 +48,12 @@ public class BottomMenuDialog {
             @Override
             public void onClick(View v) {
                 MyFileDetailInfoDialog.showFileDetailInfoDialog(context, file.getName(), FileSizeTransform.Tansform(file.length()), file.getPath());
+                pw.dismiss();
             }
         });
 
 
-        PopupWindow pw = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, false);
+        pw = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, false);
         pw.setContentView(view);
         pw.setOutsideTouchable(true);
         pw.setFocusable(true);   //设置焦点，可以防止popupwindow存在时，点击窗口以外的地方不会触发点击位置的点击事件
@@ -63,5 +67,11 @@ public class BottomMenuDialog {
 //        dialog.getWindow().setWindowAnimations(R.style.Dialog_Anim);
 //        dialog.show();
 
+    }
+
+    private void pwDismiss() {
+        if (pw != null && pw.isShowing()){
+            pw.dismiss();
+        }
     }
 }

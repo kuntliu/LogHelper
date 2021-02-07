@@ -10,11 +10,11 @@ import android.widget.TextView;
 
 import com.kuntliu.loghelper.R;
 
-class MyConfirmCopyDialog {
+public class MyConfirmCopyDialog {
 
     private static AlertDialog dialog;
 
-    static void showConfirmCopyDialog(Context context, String filename, String filesize, String filepath, final AlertDialogBtnClickListener
+    public static void showConfirmCopyDialog(Context context, String filename, String filesize, String filepath, final AlertDialogBtnClickListener
             alertDialogBtnClickListener){
         View view = LayoutInflater.from(context).inflate(R.layout.mydialog_confirm_copy, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -58,14 +58,14 @@ class MyConfirmCopyDialog {
         dialog.show();
     }
 
-    static void dismissConfirmCopyDialog(){
+    public static void dismissConfirmCopyDialog(){
         if (dialog.isShowing()){
             dialog.dismiss();
         }
     }
 
 
-    interface AlertDialogBtnClickListener {
+    public interface AlertDialogBtnClickListener {
         void clickCancel();
         void clickConfirm();
     }

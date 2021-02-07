@@ -66,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tab_version;
     ViewPager viewPager;
 
-    TextView tv_empty_tips;
-
-    PopupMenu popup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

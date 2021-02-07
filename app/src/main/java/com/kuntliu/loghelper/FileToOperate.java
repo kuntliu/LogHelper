@@ -101,7 +101,7 @@ public class FileToOperate {
     }
 
     //根据文件名获取list中选择的文件对象
-    public File searchSelectedFile(File[] arrFiles, String fileNameClicked){
+    public static File searchSelectedFile(File[] arrFiles, String fileNameClicked){
         File selectedFile = null;
         for (File f : arrFiles){
             if (f.getName().equals(fileNameClicked)){

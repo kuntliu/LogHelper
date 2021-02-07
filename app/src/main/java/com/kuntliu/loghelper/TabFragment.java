@@ -60,6 +60,11 @@ public class TabFragment extends Fragment {
         adapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+            }
+        });
+        adapter.setOnItemLongClickListener(new MyRecycleViewApater.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int position) {
                 BottomMenuDialog bmd = new BottomMenuDialog();
                 File selectedFile = fto.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                 bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position);

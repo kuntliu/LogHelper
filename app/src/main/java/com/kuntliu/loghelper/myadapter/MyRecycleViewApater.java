@@ -19,15 +19,21 @@ import java.util.List;
 public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApater.MyViewHolder> {
     private List<LogFile> list;
     private Context context;
-    private OnItemClickListener OnItemClickListener;
-
+    private OnItemClickListener mOnItemClickListener;
+    private OnItemLongClickListener mOnItemLongClickListener;
 
     public interface OnItemClickListener{
         void onItemClick(View view, int position);
     }
+    public interface OnItemLongClickListener{
+        void onItemLongClick(View view, int position);
+    }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.OnItemClickListener = onItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener monItemClickListener) {
+        this.mOnItemClickListener = monItemClickListener;
+    }
+    public void setOnItemLongClickListener(OnItemLongClickListener mOnItemLongClickListener) {
+        this.mOnItemLongClickListener = mOnItemLongClickListener;
     }
 
     public MyRecycleViewApater(List<LogFile> list, Context context) {
@@ -55,7 +61,14 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OnItemClickListener.onItemClick(v, position);
+                mOnItemClickListener.onItemClick(v, position);
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                mOnItemLongClickListener.onItemLongClick(view, position);
+                return true;    //需要返回true，否则在长按松开后，会触发点击事件
             }
         });
     }

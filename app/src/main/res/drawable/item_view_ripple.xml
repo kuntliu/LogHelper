@@ -3,7 +3,6 @@
     android:color="@color/middleBlack"> <!--波纹颜色-->
     <item>
         <shape android:shape="rectangle">
-            <corners android:radius="20dp"/>
             <!-- 填充背景色-->
             <solid android:color="@android:color/white"/>
         </shape>

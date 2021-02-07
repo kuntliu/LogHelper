@@ -13,11 +13,11 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 
-class CopyProgressBarDialog {
+public class CopyProgressBarDialog {
 
     private static AlertDialog dialog;
 
-    static View showCopyProgressBar(Context context, String filename){
+    public static View showCopyProgressBar(Context context, String filename){
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_progressbar, null);
         TextView tv_filename = view.findViewById(R.id.CopyingFilename);
         tv_filename.setText(filename);
@@ -46,7 +46,7 @@ class CopyProgressBarDialog {
     }
 
 
-    static void dismissCopyProgressBar(){
+    public static void dismissCopyProgressBar(){
         if (dialog.isShowing()) {
             dialog.dismiss();
         }

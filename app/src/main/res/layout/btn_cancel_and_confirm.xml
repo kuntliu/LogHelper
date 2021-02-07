@@ -6,14 +6,16 @@
 
     <Button
         android:id="@+id/btn_cancel"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/line"
         android:text="@string/text_cancel"
         android:textColor="@color/deepOrange"
-        android:background="@drawable/btn_selector" />
+        android:background="@drawable/btn_ripple"
+        style="?android:attr/borderlessButtonStyle"/>
 
     <TextView
         android:id="@+id/line"
@@ -29,14 +31,15 @@
 
     <Button
         android:id="@+id/btn_confirm"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_selector"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
         android:text="@string/text_comfirm_copy"
         android:textColor="@color/deepOrange"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/line" />
+        app:layout_constraintLeft_toRightOf="@id/line"
+        android:background="@drawable/btn_ripple"
+        style="?android:attr/borderlessButtonStyle"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
