@@ -56,7 +56,7 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
         holder.tv_fileName.setText(list.get(position).getFile_name());
         holder.tv_fileSize.setText(list.get(position).getFile_size());
         holder.tv_fileCreateTime.setText(list.get(position).getFile_time_create());
-        holder.tv_fileIcon.setImageResource(list.get(position).getFile_icon());
+        holder.tv_fileIcon.setImageDrawable(list.get(position).getFile_icon());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

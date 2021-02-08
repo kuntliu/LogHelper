@@ -1,8 +1,13 @@
 package com.kuntliu.loghelper;
 
 import android.app.AppComponentFactory;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.view.View;
@@ -16,6 +21,7 @@ import com.kuntliu.loghelper.myadapter.MyRecycleViewApater;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class FileToOperate {
@@ -39,50 +45,12 @@ public class FileToOperate {
                         String fileSize_str = FileSizeTransform.Tansform(f.length());      //获取文件大小并且进行显示单位转换
                         String time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //获取文件最后修改时间并且进行时间格式转换
 
-                        String fileType_str = FileToOperate.getFileSuffix(f);//获取文件后缀，string类型
-                        int iconResourcesId = FileToOperate.getFileIconResourceId(fileType_str, context);//根据文件后缀去使用icon图标
-
-                        LogFile log = new LogFile(iconResourcesId, f.getName(), fileSize_str, time_str);
+                        LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), fileSize_str, time_str);
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                         fileList.add(log);
                     }
                 }
                 fileList = new ArrayListSort().stringSore(fileList);   //对集合内元素进行排序
-
-//                MyRecycleViewApater adapter = new MyRecycleViewApater(fileList, this);
-//                recycleview.setAdapter(adapter);
-//                madapter = new FileAdapter(MainActivity.this, loglist);
-//                mylistview.setAdapter(madapter);
-//                mylistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//                    @Override
-//                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-//                        final String fileNameClicked = loglist.get(position).getFile_name();   //通过item的id使用getFile_name()获取要操作的文件名
-//                        Log.d("ItemClicked", fileNameClicked);
-//                        popup = new PopupMenu(MainActivity.this, view);
-//                        getMenuInflater().inflate(R.menu.menu_clicklist, popup.getMenu());
-//                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//                            @Override
-//                            public boolean onMenuItemClick(MenuItem item) {
-//                                File SelectedFile = FileToOperate.searchSelectedFile(Arr_Files, fileNameClicked);    //获取选择的文件
-//                                switch (item.getItemId()) {
-//                                    case R.id.menu_delete:
-//                                        FileToOperate.deleteFile(SelectedFile, loglist, position, madapter, MainActivity.this);
-//                                        break;
-//                                    case R.id.menu_detail:
-//                                        String FileSize = FileSizeTransform.Tansform(SelectedFile.length());
-//                                        MyFileDetailInfoDialog.showFileDetailInfoDialog(MainActivity.this, SelectedFile.getName(), FileSize, SelectedFile.getAbsolutePath().replace(SelectedFile.getName(), ""));
-//                                        break;
-//                                    case R.id.menu_share:
-//                                        FileToOperate.shareFile(SelectedFile, MainActivity.this);
-//                                        break;
-//                                }
-//                                return false;
-//                            }
-//                        });
-//                        popup.show();
-//                        return false;
-//                    }
-//                });
             }
         }else {
             fileList.clear();
@@ -112,31 +80,22 @@ public class FileToOperate {
         return selectedFile;
     }
 
-    //获取文件后缀
-    public static String getFileSuffix(File file){
+    //判断文件类型并且返回对应的文件icon资源
+    public static Drawable getFileDrawable(File file, Context context){
         String fileName = file.getName();
+        String filePath = file.getPath();
         if (fileName.endsWith(".apk")){
-            return "apk";
+            return getApkIcon(filePath ,context);
         }else if(fileName.endsWith(".txt")){
-            return "txt";
+            return context.getDrawable(R.drawable.ic_file_txt);
         }else if(fileName.endsWith(".log")){
-            return "log";
+            return context.getDrawable(R.drawable.ic_file_txt);
         }else if(fileName.endsWith(".obb")){
-            return "obb";
+            return context.getDrawable(R.drawable.ic_file_obb);
         }else
-            return "";
+            return context.getDrawable(R.drawable.ic_file_unknown);
     }
 
-    //根据文件后缀获取对应类型文件的icon资源id
-    public static int getFileIconResourceId(String fileSuffix, Context context) {
-        if (fileSuffix.equals("txt") || fileSuffix.equals("log")){
-            return context.getResources().getIdentifier("ic_file_txt","drawable","com.kuntliu.loghelper");
-        }else if(fileSuffix.equals("obb")){
-            return context.getResources().getIdentifier("ic_file_obb","drawable","com.kuntliu.loghelper");
-        }else{
-            return context.getResources().getIdentifier("ic_file_unknown","drawable","com.kuntliu.loghelper");
-        }
-    }
 
 
     //根据position删除对应的数据源
@@ -167,4 +126,28 @@ public class FileToOperate {
             context.startActivity(intent);
         }
     }
+
+    //通过apk的路径获取包信息
+    private static Drawable getApkIcon(String path, Context context){
+        Drawable icon = null;
+        PackageManager pm = context.getPackageManager();
+        PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
+        if (pi != null){
+            ApplicationInfo application = pi.applicationInfo;
+            icon = pm.getApplicationIcon(application);
+        }
+        return icon;
+    }
+
+    public String getApkVersion(String path, Context context){
+        String version = "";
+        PackageManager pm = context.getPackageManager();
+        PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
+        if (pi != null){
+            ApplicationInfo application = pi.applicationInfo;
+            version = pi.versionName;
+        }
+        return version;
+    }
+
 }

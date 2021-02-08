@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,6 +58,7 @@ public class TabFragment extends Fragment {
         final List<LogFile> fileList = fto.getFileList(path, fileArr, getContext(), tv_empty_tips);
         final MyRecycleViewApater adapter = new MyRecycleViewApater(fileList, getContext());
         recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());    //使用系统默认的删除添加动画
         adapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

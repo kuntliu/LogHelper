@@ -3,22 +3,22 @@ package com.kuntliu.loghelper;
 import android.graphics.drawable.Drawable;
 
 public class LogFile {
-    private int file_icon;
+    private Drawable file_icon;
     private String file_name;
     private String file_size;
     private String file_time_create;
 
-    public LogFile(int file_icon, String file_name, String file_size, String file_time_create) {
+    public LogFile(Drawable file_icon, String file_name, String file_size, String file_time_create) {
         this.file_icon = file_icon;
         this.file_name = file_name;
         this.file_size = file_size;
         this.file_time_create = file_time_create;
     }
 
-    public int getFile_icon() {
+    public Drawable getFile_icon() {
         return file_icon;
     }
-    public void setFile_icon(int file_icon) {
+    public void setFile_icon(Drawable file_icon) {
         this.file_icon = file_icon;
     }
 
