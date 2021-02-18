@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <PreferenceCategory app:title="@string/tab_setting"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="tab_private"
+            app:title="@string/text_private_tab"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false">
+            <intent
+                android:targetPackage="com.kuntliu.loghelper"
+                android:targetClass="com.kuntliu.loghelper.PrivateDirActivity"/>
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/tab_list_setting"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            app:key="switch_islog"
+            app:title="@string/text_islog"
+            app:iconSpaceReserved="false"/>
+
+        <ListPreference
+            app:defaultValue="sort_by_time"
+            app:entries="@array/sort_entries"
+            app:entryValues="@array/sort_values"
+            app:key="sort_type_setting"
+            app:title="@string/sort_title"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+
+<!--        <SwitchPreferenceCompat-->
+<!--            app:dependency="sync"-->
+<!--            app:key="attachment"-->
+<!--            app:summaryOff="@string/attachment_summary_off"-->
+<!--            app:summaryOn="@string/attachment_summary_on"-->
+<!--            app:title="@string/attachment_title" />-->
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

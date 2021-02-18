@@ -33,15 +33,15 @@ import java.util.List;
 
 public class ObbActivity extends AppCompatActivity {
     String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-    List<LogFile> obbFiles;
+    List<LogFile> obbFilesList = new ArrayList<>();
     File[] sdCardRootFiles;
 
     String fileSize_str;
     String fileTime_str;
-    String fileType_str;
+    String fileName_str;
 
     File selectedObbFile;
-    String CopyFileDescPath;
+    String copyFileDescPath;
 
     RecyclerView obblistview;
 
@@ -54,7 +54,7 @@ public class ObbActivity extends AppCompatActivity {
 
 
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_obb);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,60 +69,60 @@ public class ObbActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         obblistview.setLayoutManager(linearLayoutManager);
 
-
-        obbFiles = new ArrayList<>();
-        File file = new File(path_SdcardRoot);
-        sdCardRootFiles = file.listFiles();
-
-
+        sdCardRootFiles = FileToOperate.getFileArr(path_SdcardRoot);
         if(sdCardRootFiles != null) {
             for (File f : sdCardRootFiles) {
                 //过滤掉文件夹，并且找到obb文件
-                if (f.isFile() && f.getName().endsWith(".obb") || f.getName().endsWith("apk")) {
+                fileName_str = f.getName();
+                if (f.isFile() && fileName_str.endsWith(".obb") || fileName_str.endsWith("apk")) {
                     fileSize_str = FileSizeTransform.Tansform(f.length());
                     fileTime_str = MySimpleDateFormat.transFormTime(f.lastModified());
-                    LogFile obbfile = new LogFile(FileToOperate.getFileDrawable(f, ObbActivity.this), f.getName(), fileSize_str, fileTime_str);
-                    obbFiles.add(obbfile);
+
+                    String apk_version = "";
+                    if (fileName_str.endsWith(".apk")){
+                        apk_version = " - " + FileToOperate.getApkVersion(f.getAbsolutePath(), ObbActivity.this);
+                        if(apk_version.equals(" - ")){
+                            apk_version = "";
+                        }
+                    }
+                    LogFile obbfile = new LogFile(FileToOperate.getFileDrawable(f, ObbActivity.this), fileName_str, fileSize_str, fileTime_str, apk_version);
+                    obbFilesList.add(obbfile);
                 }
             }
-            if (obbFiles.size() == 0){
+            if (obbFilesList.size() == 0){
                 Toast.makeText(ObbActivity.this, "根目录无obb和apk文件", Toast.LENGTH_SHORT).show();
             }
-            MyRecycleViewApater madapter = new MyRecycleViewApater(obbFiles,ObbActivity.this);
+            MyRecycleViewApater madapter = new MyRecycleViewApater(obbFilesList,ObbActivity.this);
             obblistview.setAdapter(madapter);
             madapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
-                    Toast.makeText(ObbActivity.this, "这里是obb的点击方法回调", Toast.LENGTH_SHORT).show();
+                    FileToOperate.installAPK(FileToOperate.searchSelectedFile(sdCardRootFiles, obbFilesList.get(position).getFile_name()), ObbActivity.this);
                 }
             });
             madapter.setOnItemLongClickListener(new MyRecycleViewApater.OnItemLongClickListener() {
                 @Override
                 public void onItemLongClick(View view, int position) {
-                    Toast.makeText(ObbActivity.this, "这里是obb的长按方法回调", Toast.LENGTH_SHORT).show();
-                    String obbFileNameCilcked = obbFiles.get(position).getFile_name();
+                    String obbFileNameCilcked = obbFilesList.get(position).getFile_name();
 
                     selectedObbFile = FileToOperate.searchSelectedFile(sdCardRootFiles, obbFileNameCilcked);
 
-                    //如果点击的是APK文件则调用安装器进行安装
-                    InstallAPK(selectedObbFile);
-
                     //如果点击的是obb文件则进入复制文件流程
                     if (selectedObbFile.getName().endsWith(".obb")) {
-                        CopyFileDescPath = GetSelectedObbFileDescPath(selectedObbFile);  //获取已选择的obb文件要复制的目标路径
-                        if (CopyFileDescPath != null) {
-                            final File descFile = new File(CopyFileDescPath + selectedObbFile.getName());  //完整的目标文件对象
+                        copyFileDescPath = getSelectedObbFileDescPath(selectedObbFile);  //获取已选择的obb文件要复制的目标路径
+                        if (copyFileDescPath != null) {
+                            final File descFile = new File(copyFileDescPath + selectedObbFile.getName());  //完整的目标文件对象
 
 
-                            if (!isExisted_DirCopyFileDescPath(CopyFileDescPath)) {
+                            if (!isExisted_DirCopyFileDescPath(copyFileDescPath)) {
                                 //如果复制的目标目录不存在就先创建目录
-                                mkCopyFileDirs(CopyFileDescPath);
+                                mkCopyFileDirs(copyFileDescPath);
                             }
                             //执行复制操作前需要判断目标目录的文件是否已存在
-                            if (!Existed_CopeDescFile(selectedObbFile, obbFileNameCilcked)) {
+                            if (!copyDescFile_isExisted(selectedObbFile, obbFileNameCilcked)) {
                                 String copyFileSize = FileSizeTransform.Tansform(selectedObbFile.length());
 
-                                MyConfirmCopyDialog.showConfirmCopyDialog(ObbActivity.this, selectedObbFile.getName(), copyFileSize, CopyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
+                                MyConfirmCopyDialog.showConfirmCopyDialog(ObbActivity.this, selectedObbFile.getName(), copyFileSize, copyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
                                     @Override
                                     public void clickCancel() {
                                     }
@@ -130,7 +130,7 @@ public class ObbActivity extends AppCompatActivity {
                                     @Override
                                     public void clickConfirm() {
                                         //复制文件前先判断剩余空间是否足够，为了保险，继续预留300M的空间来进行判断
-                                        if (GetFreespace() - 300 * 1024 * 1024 > selectedObbFile.length()) {
+                                        if (getFreespace() - 300 * 1024 * 1024 > selectedObbFile.length()) {
 
                                             View view = CopyProgressBarDialog.showCopyProgressBar(ObbActivity.this, selectedObbFile.getName());
                                             final TextView tv_precent = view.findViewById(R.id.CopyPrecent);
@@ -199,43 +199,12 @@ public class ObbActivity extends AppCompatActivity {
                     }
                 }
             });
-//            obblistview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//                @Override
-//                public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-//
-//                    String ObbFileNameCilcked = ObbFiles.get(position).getFile_name();
-//                    selectedObbFile = FileToOperate.searchSelectedFile(obbfiles, ObbFileNameCilcked);
-//
-//                    final PopupMenu popup = new PopupMenu(ObbActivity.this, view);
-//                    getMenuInflater().inflate(R.menu.menu_delete_obb, popup.getMenu());
-//                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//                        @Override
-//                        public boolean onMenuItemClick(MenuItem item) {
-//                            if (item.getItemId() == R.id.action_delete_obb) {
-//                                FileToOperate.deleteFile(selectedObbFile, ObbFiles, position, madapter, ObbActivity.this);
-//                            }
-//                            return false;
-//                        }
-//                    });
-//                    popup.show();
-//                    return true;
-//                }
-//            });
-//
-
-
-//            obblistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//
-//                }
-//            });
         }
     }
 
     //获取存储的剩余空间
-    private long GetFreespace(){
-        //        Log.d("GetFreespace", "GetFreespace: "+FileSizeTransform.Tansform(Freespace));
+    private long getFreespace(){
+        //        Log.d("getFreespace", "getFreespace: "+FileSizeTransform.Tansform(Freespace));
         return Environment.getExternalStorageDirectory().getFreeSpace();
     }
 
@@ -255,7 +224,7 @@ public class ObbActivity extends AppCompatActivity {
     }
 
     //获取已选择的obb文件要复制的目标路径
-    private String GetSelectedObbFileDescPath(File file) {
+    private String getSelectedObbFileDescPath(File file) {
         String CopyFileDescPath = null;
         if (file != null) {
             if (file.getName().contains("com.activision.callofduty.shooter")) {
@@ -278,10 +247,10 @@ public class ObbActivity extends AppCompatActivity {
     }
 
     //判断复制的目标文件是否已存在
-    private boolean Existed_CopeDescFile(File file, String FileNameClicked){
+    private boolean copyDescFile_isExisted(File file, String FileNameClicked){
         boolean isExisted = false;
         File[] obbDirfile;
-        String path = GetSelectedObbFileDescPath(file);
+        String path = getSelectedObbFileDescPath(file);
         file = new File(path);
         obbDirfile = file.listFiles();
         if (obbDirfile != null) {
@@ -293,25 +262,6 @@ public class ObbActivity extends AppCompatActivity {
         }
         return isExisted;
     }
-
-    //识别并安装apk文件
-    private void InstallAPK(File file){
-        if (file.getName().endsWith(".apk")){
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Uri uri = FileProvider.getUriForFile(ObbActivity.this, "com.kuntliu.loghelper.fileprovider", file);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                intent.setDataAndType(uri, "application/vnd.android.package-archive");
-            }else {
-                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-            }
-            ObbActivity.this.startActivity(intent);
-        }
-    }
-
 }
 
 

@@ -6,5 +6,5 @@
 
     <!-- 填充颜色 -->
 <!--        <solid android:color="@android:color/transparent"/>-->
-    <solid android:color="@color/middleBlack"/>
+    <solid android:color="@android:color/darker_gray"/>
 </shape>

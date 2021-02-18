@@ -1,0 +1,15 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="sort_entries">
+        <item>时间</item>
+        <item>名称</item>
+        <item>大小</item>
+    </string-array>
+
+    <string-array name="sort_values">
+        <item>sort_by_time</item>
+        <item>sort_by_name</item>
+        <item>sort_by_size</item>
+    </string-array>
+
+</resources>

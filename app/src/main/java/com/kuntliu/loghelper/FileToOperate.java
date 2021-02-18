@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,46 +26,54 @@ import java.util.HashMap;
 import java.util.List;
 
 public class FileToOperate {
-    private File file;
+    public File file;
 
-    public List<LogFile> getFileList(String path, File[] arrFiles, Context context, TextView tv)  {
+    public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, TextView tv_empty_tips)  {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
-        arrFiles = getFileArr(path);
         //判断path目录是否存在
-        if (file.exists()){
-            if (arrFiles == null || arrFiles.length == 0){  //踩坑描述：要先判断arrFiles是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
+        if (getFileArr(path) != null){
+            if (arrFiles.length == 0){  //踩坑描述：要先判断arrFiles是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
                 fileList.clear();
-                tv.setVisibility(View.VISIBLE);
-                tv.setText("当前目录为空");
+                tv_empty_tips.setVisibility(View.VISIBLE);
+                tv_empty_tips.setText("当前目录为空");
 //                Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
             }else {
                 for (File f : arrFiles) {
-                    tv.setVisibility(View.GONE);
+                    tv_empty_tips.setVisibility(View.GONE);
 //                Log.d("FileList", f.toString());
                     if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
                         String fileSize_str = FileSizeTransform.Tansform(f.length());      //获取文件大小并且进行显示单位转换
                         String time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //获取文件最后修改时间并且进行时间格式转换
+                        //判断如果文件是apk就获取版本号
+                        String apk_version = "";
+                        if (f.getName().endsWith(".apk")){
+                            apk_version = " - " + getApkVersion(f.getAbsolutePath(), context);
+                            if (apk_version.equals(" - ")){
+                                apk_version = "";
+                            }
+                        }
+                        LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), fileSize_str, time_str, apk_version);
 
-                        LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), fileSize_str, time_str);
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                         fileList.add(log);
                     }
                 }
-                fileList = new ArrayListSort().stringSore(fileList);   //对集合内元素进行排序
+                fileList = new ArrayListSort().stringSore(fileList, 0);   //对集合内元素进行排序
             }
         }else {
             fileList.clear();
-            tv.setVisibility(View.VISIBLE);
-            tv.setText("当前目录不存在");
+            tv_empty_tips.setVisibility(View.VISIBLE);
+            tv_empty_tips.setText("当前目录不存在");
 //            Toast.makeText(MainActivity.this, "当前目录不存在", Toast.LENGTH_SHORT).show();
 //            Log.d("IsNofile", "ture");
         }
         return fileList;
     }
 
+
     //获取path目录下的文件（数组类型）
-    public File[] getFileArr(String path) {
-        file = new File(path);
+    public static File[] getFileArr(String path) {
+        File file = new File(path);
         return file.listFiles();
     }
 
@@ -83,7 +92,7 @@ public class FileToOperate {
     //判断文件类型并且返回对应的文件icon资源
     public static Drawable getFileDrawable(File file, Context context){
         String fileName = file.getName();
-        String filePath = file.getPath();
+        String filePath = file.getAbsolutePath();
         if (fileName.endsWith(".apk")){
             return getApkIcon(filePath ,context);
         }else if(fileName.endsWith(".txt")){
@@ -131,15 +140,19 @@ public class FileToOperate {
     private static Drawable getApkIcon(String path, Context context){
         Drawable icon = null;
         PackageManager pm = context.getPackageManager();
-        PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
-        if (pi != null){
+        PackageInfo pi = pm.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
+
+//        Log.d("getFileDrawable", "getFileDrawable: "+path);
+        if (pi != null) {
             ApplicationInfo application = pi.applicationInfo;
+            application.sourceDir = path;
+            application.publicSourceDir = path; //如果不加这2句，那么获取的将会是android默认的icon，而不是应用的icon
             icon = pm.getApplicationIcon(application);
         }
         return icon;
     }
 
-    public String getApkVersion(String path, Context context){
+    public static String getApkVersion(String path, Context context){
         String version = "";
         PackageManager pm = context.getPackageManager();
         PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
@@ -150,4 +163,27 @@ public class FileToOperate {
         return version;
     }
 
+
+    //识别并安装apk文件
+    public static void installAPK(File file, Context context){
+        if (file.getName().endsWith(".apk")){
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Uri uri = FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", file);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+            }else {
+                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+            }
+            context.startActivity(intent);
+        }
+    }
+
+
+    public void getLogcatData(){
+
+    }
 }

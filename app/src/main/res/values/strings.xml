@@ -15,4 +15,20 @@
     <string name="text_path">位置</string>
     <string name="text_copy">复制</string>
     <string name="text_precent">%</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="tab_setting">Tab设置</string>
+    <string name="tab_list_setting">Tab文件列表设置</string>
+
+    <!-- tab Preferences -->
+    <string name="text_private_tab">自定义目录</string>
+
+    <!-- 文件列表 Preferences -->
+    <string name="text_islog">仅显示.Log文件</string>
+    <string name="sort_title">排序方式</string>
+
+    <!--  自定义目录dialog  -->
+    <string name="text_tab_name">Tab名称</string>
+    <string name="text_tab_path">Tab目录位置</string>
 </resources>

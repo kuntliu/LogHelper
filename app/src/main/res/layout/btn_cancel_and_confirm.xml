@@ -27,7 +27,7 @@
         app:layout_constraintRight_toLeftOf="@id/btn_confirm"
         app:layout_constraintLeft_toRightOf="@id/btn_cancel"
         android:text=" | "
-        android:textColor="@color/middleBlack" />
+        android:textColor="@android:color/darker_gray" />
 
     <Button
         android:id="@+id/btn_confirm"

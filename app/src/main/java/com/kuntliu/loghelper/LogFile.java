@@ -7,12 +7,14 @@ public class LogFile {
     private String file_name;
     private String file_size;
     private String file_time_create;
+    private String file_apk_version;
 
-    public LogFile(Drawable file_icon, String file_name, String file_size, String file_time_create) {
+    public LogFile(Drawable file_icon, String file_name, String file_size, String file_time_create, String file_apk_version) {
         this.file_icon = file_icon;
         this.file_name = file_name;
         this.file_size = file_size;
         this.file_time_create = file_time_create;
+        this.file_apk_version = file_apk_version;
     }
 
     public Drawable getFile_icon() {
@@ -41,6 +43,13 @@ public class LogFile {
     }
     public void setFile_time_create(String file_time_create) {
         this.file_time_create = file_time_create;
+    }
+
+    public String getFile_apk_version() {
+        return file_apk_version;
+    }
+    public void setFile_apk_version(String file_apk_version) {
+        this.file_apk_version = file_apk_version;
     }
 
 }

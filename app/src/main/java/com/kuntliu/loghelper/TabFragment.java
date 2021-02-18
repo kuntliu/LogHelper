@@ -24,7 +24,6 @@ import java.util.List;
 public class TabFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView tv_empty_tips;
-    private FileToOperate fto = new FileToOperate();
 
     static TabFragment newInstance(String tab, String path) {
         Bundle args = new Bundle();
@@ -53,22 +52,34 @@ public class TabFragment extends Fragment {
         String path = getArguments().getString("myPath");
 
 
-//        int resourcesId = getContext().getResources().getIdentifier("ic_file_unknown","drawable","com.kuntliu.loghelper");//需要传入资源id
-        final File[] fileArr = fto.getFileArr(path);
-        final List<LogFile> fileList = fto.getFileList(path, fileArr, getContext(), tv_empty_tips);
+        final File[] fileArr = FileToOperate.getFileArr(path);
+        final List<LogFile> fileList = FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips);
+
+
+
+
         final MyRecycleViewApater adapter = new MyRecycleViewApater(fileList, getContext());
         recyclerView.setAdapter(adapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());    //使用系统默认的删除添加动画
+
+
+        //使用系统默认的删除添加动画
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
+
         adapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                //如果点击的是APK文件则调用安装器进行安装
+                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                FileToOperate.installAPK(selectedFile,  getContext());
             }
         });
         adapter.setOnItemLongClickListener(new MyRecycleViewApater.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
                 BottomMenuDialog bmd = new BottomMenuDialog();
-                File selectedFile = fto.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                 bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position);
             }
         });

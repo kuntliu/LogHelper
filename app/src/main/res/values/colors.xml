@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2196F3</color>
-    <color name="colorPrimaryDark">#2196F3</color>
-    <color name="colorAccent">#40B173</color>
+    <color name="colorPrimary">#51B7D1</color>
+    <color name="colorPrimaryDark">#51B7D1</color>
+    <color name="colorAccent">#149DBF</color>
     <color name="black">#FF000000</color>
     <color name="simpleOrange">#FFC107</color>
     <color name="orange">#FF9800</color>
     <color name="deepOrange">#CD6600</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="middleBlack">#B5B2AA</color>
-    <color name="grep">#F3F2EE</color>
+    <color name="normalTabTextColor">#084D83</color>
 
 </resources>

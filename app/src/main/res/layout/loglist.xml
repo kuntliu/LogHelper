@@ -14,7 +14,11 @@
         android:layout_height="wrap_content"
         app:tabIndicatorFullWidth="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:tabIndicatorColor="@color/white"
+        app:tabTextColor="@color/normalTabTextColor"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"/>
 
 
     <androidx.viewpager.widget.ViewPager

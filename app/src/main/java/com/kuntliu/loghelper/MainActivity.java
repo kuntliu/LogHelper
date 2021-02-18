@@ -3,11 +3,13 @@ package com.kuntliu.loghelper;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -15,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Environment;
@@ -24,12 +27,11 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kuntliu.loghelper.myadapter.FragmentAdapter;
+import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
     String path_west = path_SdcardRoot+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-
     String path_cn = path_SdcardRoot+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
     String path_garena = path_SdcardRoot+
@@ -50,9 +51,11 @@ public class MainActivity extends AppCompatActivity {
     String path_vng = path_SdcardRoot+
             File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
 
-    private String[] myTab = {"西方", "国服", "GARENA", "韩国", "VNG", "根目录"};
-    private String[] myPath = {path_west, path_cn, path_garena, path_korea, path_vng, path_SdcardRoot};
-    private List<TabFragment> tabFragmentList = new ArrayList<>();
+    private final ArrayList<String> myTab_defalut = new ArrayList<>();
+    private final ArrayList<String> myPath_defalut = new ArrayList<>();
+
+    private final List<TabFragment> tabFragmentList = new ArrayList<>();
+
 
     private AlertDialog alertDialog;
     String[] permissions = new String[]
@@ -74,8 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initData();
-        FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab, tabFragmentList);
-        viewPager.setAdapter(adapter);
+
         tab_version.setupWithViewPager(viewPager,false);
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
@@ -87,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 //            }
 //        });
-
-
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             requestPermission();
         }
@@ -102,10 +103,6 @@ public class MainActivity extends AppCompatActivity {
 //        spinner.setAdapter(adapter);
 //        spinner.setOnItemSelectedListener(this);
 
-
-
-
-
         Button button = findViewById(R.id.obbButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private void initView(){
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -125,15 +121,79 @@ public class MainActivity extends AppCompatActivity {
         tab_version = findViewById(R.id.tab_version);
         viewPager = findViewById(R.id.viewPage_file);
         tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
+        tab_version.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
     }
 
-
     private void initData() {
-        for (int i = 0; i < myTab.length; i++) {
-            tab_version.addTab(tab_version.newTab().setText(myTab[i]));
-            tabFragmentList.add(TabFragment.newInstance(myTab[i], myPath[i]));
+        myTab_defalut.add("西方");
+        myTab_defalut.add("国服");
+        myTab_defalut.add("GARENA");
+        myTab_defalut.add("韩国");
+        myTab_defalut.add("VNG");
+        myTab_defalut.add("主目录");
+        myPath_defalut.add(path_west);
+        myPath_defalut.add(path_cn);
+        myPath_defalut.add(path_garena);
+        myPath_defalut.add(path_korea);
+        myPath_defalut.add(path_vng);
+        myPath_defalut.add(path_SdcardRoot);
+
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+        if (isFirstRun){
+            editor.putBoolean("isFirstRun", false);
+            editor.apply();
+
+            MyPreferences.setSharePreferencesArrData("myTabs", myTab_defalut, this);
+            MyPreferences.setSharePreferencesArrData("myPaths", myPath_defalut, this);
+
+            for (int i=0; i<myTab_defalut.size(); i++ ){
+                tabFragmentList.add(TabFragment.newInstance(myTab_defalut.get(i), myPath_defalut.get(i)));
+            }
+
+            //第一次启动应用使用默认的Tab目录
+            FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
+            viewPager.setAdapter(adapter);
+        }else {
+            ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesArrData("myTabs", this);
+            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesArrData("myPaths", this);
+
+            for (int i=0; i<myTabsFromPreferences.size(); i++ ){
+                tabFragmentList.add(TabFragment.newInstance(myTabsFromPreferences.get(i), myPathsFromPreferences.get(i)));
+            }
+            FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
+            viewPager.setAdapter(adapter);
         }
+
+        //加个异常的保护，如果一个要显示的目录都没有，那么就再次初始化Tab
+//        if (tab_version.getTabCount() == 0){
+//            myTab_defalut.clear();
+//            myTab_defalut.add("西方");
+//            myTab_defalut.add("国服");
+//            myTab_defalut.add("GARENA");
+//            myTab_defalut.add("韩国");
+//            myTab_defalut.add("VNG");
+//            myTab_defalut.add("主目录");
+//            myPath_defalut.add(path_west);
+//            myPath_defalut.add(path_cn);
+//            myPath_defalut.add(path_garena);
+//            myPath_defalut.add(path_korea);
+//            myPath_defalut.add(path_vng);
+//            myPath_defalut.add(path_SdcardRoot);
+//            sharedPreferences.edit().clear().apply();//清空本地保存的xml数据
+//            MyPreferences.setSharePreferencesArrData("myTabs", myTab_defalut, this);
+//            MyPreferences.setSharePreferencesArrData("myPaths", myPath_defalut, this);
+//            for (int i=0; i<myTab_defalut.size(); i++ ){
+//                tabFragmentList.add(TabFragment.newInstance(myTab_defalut.get(i), myPath_defalut.get(i)));
+//            }
+//            FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
+//            viewPager.setAdapter(adapter);
+//        }
+
     }
 
     //申请权限
@@ -147,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (!permissions_rejected.isEmpty()){
-            ActivityCompat.requestPermissions(this, permissions_rejected.toArray(new String[permissions_rejected.size()]), PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this, permissions_rejected.toArray(new String[0]), PERMISSION_CODE);
         }
         else {
             Log.d("HadPermissionCheck","ALLPERMISSION");
@@ -238,6 +298,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }else if (id == R.id.action_add_version) {
             Toast.makeText(MainActivity.this, "这里是添加逻辑", Toast.LENGTH_LONG).show();
+        }else if(id == R.id.action_setting){
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

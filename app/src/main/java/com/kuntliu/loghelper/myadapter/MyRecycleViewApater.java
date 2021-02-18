@@ -11,14 +11,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kuntliu.loghelper.FileToOperate;
 import com.kuntliu.loghelper.LogFile;
 import com.kuntliu.loghelper.R;
 
 import java.util.List;
 
 public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApater.MyViewHolder> {
-    private List<LogFile> list;
-    private Context context;
+    private final List<LogFile> list;
+    private final Context context;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
 
@@ -57,6 +58,7 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
         holder.tv_fileSize.setText(list.get(position).getFile_size());
         holder.tv_fileCreateTime.setText(list.get(position).getFile_time_create());
         holder.tv_fileIcon.setImageDrawable(list.get(position).getFile_icon());
+        holder.tv_apkVersion.setText(list.get(position).getFile_apk_version());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +85,7 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
         TextView tv_fileSize;
         TextView tv_fileCreateTime;
         ImageView tv_fileIcon;
+        TextView tv_apkVersion;
 
         MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,6 +93,7 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
             tv_fileSize = itemView.findViewById(R.id.file_size);
             tv_fileCreateTime =itemView.findViewById(R.id.file_time_create);
             tv_fileIcon = itemView.findViewById(R.id.file_icon);
+            tv_apkVersion = itemView.findViewById(R.id.apkFile_version);
         }
     }
 
