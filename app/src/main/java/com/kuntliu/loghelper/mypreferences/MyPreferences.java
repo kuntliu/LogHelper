@@ -2,19 +2,18 @@ package com.kuntliu.loghelper.mypreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
-import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
 public class MyPreferences {
 
-    public static void setSharePreferencesArrData(String key,ArrayList<String> myDataToSet, Context context){
+    public static void setSharePreferencesListData(String key,ArrayList<String> myDataToSet, Context context){
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = spf.edit();
         StringBuilder data_str = new StringBuilder();
@@ -30,10 +29,18 @@ public class MyPreferences {
         editor.apply();
     }
 
-    public static ArrayList<String> getSharePreferencesArrData(String key, Context context){
+    public static ArrayList<String> getSharePreferencesListData(String key, Context context){
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
         ArrayList<String> data_arr = new ArrayList<>(Arrays.asList(spf.getString(key, "").split("#")));
         Log.d(TAG, "getSharePreferencesArrData: "+ data_arr);
         return data_arr;
     }
+
+    public static void updateSharePreferencesListData(String key, String datatoUpdata, int position, Context context){
+        ArrayList<String> dataList = getSharePreferencesListData(key, context);
+        dataList.set(position, datatoUpdata);
+        setSharePreferencesListData(key, dataList, context);
+    }
+
+
 }

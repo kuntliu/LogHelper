@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -148,8 +147,8 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("isFirstRun", false);
             editor.apply();
 
-            MyPreferences.setSharePreferencesArrData("myTabs", myTab_defalut, this);
-            MyPreferences.setSharePreferencesArrData("myPaths", myPath_defalut, this);
+            MyPreferences.setSharePreferencesListData("myTabs", myTab_defalut, this);
+            MyPreferences.setSharePreferencesListData("myPaths", myPath_defalut, this);
 
             for (int i=0; i<myTab_defalut.size(); i++ ){
                 tabFragmentList.add(TabFragment.newInstance(myTab_defalut.get(i), myPath_defalut.get(i)));
@@ -159,8 +158,8 @@ public class MainActivity extends AppCompatActivity {
             FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
             viewPager.setAdapter(adapter);
         }else {
-            ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesArrData("myTabs", this);
-            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesArrData("myPaths", this);
+            ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
+            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
 
             for (int i=0; i<myTabsFromPreferences.size(); i++ ){
                 tabFragmentList.add(TabFragment.newInstance(myTabsFromPreferences.get(i), myPathsFromPreferences.get(i)));

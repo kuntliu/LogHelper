@@ -10,12 +10,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kuntliu.loghelper.PrivateTabs;
 import com.kuntliu.loghelper.R;
-import com.kuntliu.loghelper.mydialog.EditTabsDialog;
 
 import java.util.List;
 
@@ -30,7 +28,7 @@ public class MyselfDirAdapter extends RecyclerView.Adapter<MyselfDirAdapter.MyVi
         this.myData = myData;
     }
 
-    public void setOnItemClickListener(OnItemClickListener mOnClickListener){
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener){
         this.mOnItemClickListener = mOnItemClickListener;
     }
 
@@ -48,16 +46,10 @@ public class MyselfDirAdapter extends RecyclerView.Adapter<MyselfDirAdapter.MyVi
     public void onBindViewHolder(@NonNull MyselfDirAdapter.MyViewHolder holder, final int position) {
         holder.tv_tabs.setText(myData.get(position).getTabs());
         holder.tv_paths.setText(myData.get(position).getPaths());
-        holder.btn_deleteDirs.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
                 mOnItemClickListener.OnItemClick(v, position);
-                return false;
             }
         });
     }
