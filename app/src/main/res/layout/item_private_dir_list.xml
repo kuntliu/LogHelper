@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tv_private_dir_path"
-        android:background="@drawable/ic_baseline_remove_24"/>
+        android:background="@drawable/ic_delete"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -80,7 +80,7 @@ public class ObbActivity extends AppCompatActivity {
 
                     String apk_version = "";
                     if (fileName_str.endsWith(".apk")){
-                        apk_version = " - " + FileToOperate.getApkVersion(f.getAbsolutePath(), ObbActivity.this);
+                        apk_version = " - 版本 " + FileToOperate.getApkVersion(f.getAbsolutePath(), ObbActivity.this);
                         if(apk_version.equals(" - ")){
                             apk_version = "";
                         }

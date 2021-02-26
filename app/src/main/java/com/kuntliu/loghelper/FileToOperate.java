@@ -44,7 +44,7 @@ public class FileToOperate {
                         //判断如果文件是apk就获取版本号
                         String apk_version = "";
                         if (f.getName().endsWith(".apk")){
-                            apk_version = " - " + getApkVersion(f.getAbsolutePath(), context);
+                            apk_version = " - 版本 " + getApkVersion(f.getAbsolutePath(), context);
                             if (apk_version.equals(" - ")){
                                 apk_version = "";
                             }

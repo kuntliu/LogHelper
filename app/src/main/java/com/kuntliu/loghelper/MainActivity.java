@@ -125,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
+
+        //默认的目录
         myTab_defalut.add("西方");
         myTab_defalut.add("国服");
         myTab_defalut.add("GARENA");
