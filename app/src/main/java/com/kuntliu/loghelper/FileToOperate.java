@@ -55,7 +55,7 @@ public class FileToOperate {
                         fileList.add(log);
                     }
                 }
-                fileList = new ArrayListSort().stringSore(fileList, 0);   //对集合内元素进行排序
+                fileList = new ArrayListSort().stringSore(fileList, 1);   //对集合内元素进行排序
             }
         }else {
             fileList.clear();
