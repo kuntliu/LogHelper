@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,8 @@ import com.kuntliu.loghelper.myadapter.MyRecycleViewApater;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class FileToOperate {
     public File file;
@@ -109,9 +112,10 @@ public class FileToOperate {
         if (file != null && file.exists()) {
             boolean isSuccessDeleteFile = file.delete();           //删除文件
             loglist.remove(loglist.get(position));              //删除loglist对应的数据源
-            madapter.notifyDataSetChanged();                    //刷新适配器
+            madapter.notifyItemRemoved(position);      //播放删除动画
+            madapter.notifyItemRangeChanged(position, loglist.size());  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
 //            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
-
+//            Log.d(TAG, "deleteFile: "+position);
         }else {
             Toast.makeText(context ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
         }

@@ -215,9 +215,9 @@ public class ObbActivity extends AppCompatActivity {
     }
     //如果目录不存在就创建目标目录
     private void mkCopyFileDirs(String path){
-        boolean Dir_Existed = isExisted_DirCopyFileDescPath(path);
+        boolean dir_Existed = isExisted_DirCopyFileDescPath(path);
         File file = new File(path);
-        if (!Dir_Existed) {
+        if (!dir_Existed) {
             boolean isSuccess = file.mkdirs();
 //            Log.d("DirisSuccess", "DirisSuccess"+isSuccess);
         }
@@ -239,7 +239,10 @@ public class ObbActivity extends AppCompatActivity {
             } else if (file.getName().contains("com.vng.codmvn")) {
                 CopyFileDescPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
                         File.separator + "Android" + File.separator + "obb" + File.separator + "com.vng.codmvn" + File.separator;
-            } else {
+            } else if (file.getName().contains("com.tencent.tmgp.cod")){
+                CopyFileDescPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                        File.separator + "Android" + File.separator + "obb" + File.separator + "com.tencent.tmgp.cod" + File.separator;
+            }else {
                 Toast.makeText(ObbActivity.this, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
             }
         }

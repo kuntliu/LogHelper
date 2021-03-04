@@ -1,6 +1,7 @@
 package com.kuntliu.loghelper;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import com.kuntliu.loghelper.mydialog.BottomMenuDialog;
 
 import java.io.File;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 
 public class TabFragment extends Fragment {
@@ -62,13 +65,14 @@ public class TabFragment extends Fragment {
 
 
         //使用系统默认的删除添加动画
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
 
         adapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                Log.d(TAG, "onItemClick: "+position);
                 //如果点击的是APK文件则调用安装器进行安装
                 File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                 FileToOperate.installAPK(selectedFile,  getContext());
