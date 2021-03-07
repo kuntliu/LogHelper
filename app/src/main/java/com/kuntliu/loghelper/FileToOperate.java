@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,16 +16,13 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
-import com.kuntliu.loghelper.myadapter.MyRecycleViewApater;
+import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
 public class FileToOperate {
-    public File file;
 
     public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, TextView tv_empty_tips)  {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
@@ -58,7 +54,7 @@ public class FileToOperate {
                         fileList.add(log);
                     }
                 }
-                fileList = new ArrayListSort().stringSore(fileList, 1);   //对集合内元素进行排序
+                fileList = new ArrayListSort().fileSort(fileList, 1, 1);   //对集合内元素进行排序
             }
         }else {
             fileList.clear();
@@ -105,10 +101,15 @@ public class FileToOperate {
             return context.getDrawable(R.drawable.ic_file_unknown);
     }
 
-
+    public static List<LogFile> refreshDataList(String path, TextView tv, MyRecycleViewAdapter adapter, final Context context){
+        List<LogFile> list;
+        File[] fileArr = getFileArr(path);
+        list = getFileList(path, fileArr, context, tv);
+        return list;
+    }
 
     //根据position删除对应的数据源
-    public static void deleteFile(File file, List<LogFile> loglist, int position, MyRecycleViewApater madapter, Context context){
+    public static void deleteFile(File file, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, Context context){
         if (file != null && file.exists()) {
             boolean isSuccessDeleteFile = file.delete();           //删除文件
             loglist.remove(loglist.get(position));              //删除loglist对应的数据源

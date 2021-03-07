@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 
+import androidx.preference.ListPreference;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,6 +18,7 @@ public class MyPreferences {
     public static void setSharePreferencesListData(String key,ArrayList<String> myDataToSet, Context context){
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = spf.edit();
+
         StringBuilder data_str = new StringBuilder();
         if (myDataToSet !=null && myDataToSet.size() > 0){
             for (String s : myDataToSet){

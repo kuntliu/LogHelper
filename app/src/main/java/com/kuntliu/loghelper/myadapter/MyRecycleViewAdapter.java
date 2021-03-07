@@ -1,23 +1,24 @@
 package com.kuntliu.loghelper.myadapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kuntliu.loghelper.FileToOperate;
 import com.kuntliu.loghelper.LogFile;
 import com.kuntliu.loghelper.R;
 
 import java.util.List;
 
-public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApater.MyViewHolder> {
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
+public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewAdapter.MyViewHolder> {
     private final List<LogFile> list;
     private final Context context;
     private OnItemClickListener mOnItemClickListener;
@@ -37,7 +38,7 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
         this.mOnItemLongClickListener = mOnItemLongClickListener;
     }
 
-    public MyRecycleViewApater(List<LogFile> list, Context context) {
+    public MyRecycleViewAdapter(List<LogFile> list, Context context) {
         this.list = list;
         this.context = context;
     }
@@ -53,7 +54,7 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         holder.tv_fileName.setText(list.get(position).getFile_name());
         holder.tv_fileSize.setText(list.get(position).getFile_size());
         holder.tv_fileCreateTime.setText(list.get(position).getFile_time_create());
@@ -69,6 +70,8 @@ public class MyRecycleViewApater extends RecyclerView.Adapter<MyRecycleViewApate
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+
+                Log.d(TAG, "onLongClick: "+ mOnItemLongClickListener);
                 mOnItemLongClickListener.onItemLongClick(view, position);
                 return true;    //需要返回true，否则在长按松开后，会触发点击事件
             }

@@ -14,8 +14,8 @@ import java.util.List;
 
 
 public class FragmentAdapter extends FragmentPagerAdapter {
-    private ArrayList<String> myTabs;
-    private List<TabFragment> tabFragmentList;
+    private final ArrayList<String> myTabs;
+    private final List<TabFragment> tabFragmentList;
 
     public FragmentAdapter(@NonNull FragmentManager fm, ArrayList<String> myTabs, List<TabFragment> tabFragmentList) {
         super(fm);

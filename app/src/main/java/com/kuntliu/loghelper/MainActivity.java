@@ -20,6 +20,7 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Environment;
+import android.preference.ListPreference;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     TabLayout tab_version;
     ViewPager viewPager;
+    FragmentAdapter adapter;
 
 
     @Override
@@ -119,28 +121,27 @@ public class MainActivity extends AppCompatActivity {
 
         tab_version = findViewById(R.id.tab_version);
         viewPager = findViewById(R.id.viewPage_file);
+        viewPager.setOffscreenPageLimit(5);    //默认情况下，viewPager会加载相邻的1页，这里设置为5
+
         tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
         tab_version.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
     }
 
     private void initData() {
-
-        //默认的目录
+        //默认的目录和路径
+        myTab_defalut.add("主目录");
         myTab_defalut.add("西方");
         myTab_defalut.add("国服");
         myTab_defalut.add("GARENA");
         myTab_defalut.add("韩国");
         myTab_defalut.add("VNG");
-        myTab_defalut.add("主目录");
+        myPath_defalut.add(path_SdcardRoot);
         myPath_defalut.add(path_west);
         myPath_defalut.add(path_cn);
         myPath_defalut.add(path_garena);
         myPath_defalut.add(path_korea);
         myPath_defalut.add(path_vng);
-        myPath_defalut.add(path_SdcardRoot);
-
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -157,44 +158,18 @@ public class MainActivity extends AppCompatActivity {
             }
 
             //第一次启动应用使用默认的Tab目录
-            FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
-            viewPager.setAdapter(adapter);
+            adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
         }else {
+            //读取配置中的Tab目录和对应的Path
             ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
             ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
 
             for (int i=0; i<myTabsFromPreferences.size(); i++ ){
                 tabFragmentList.add(TabFragment.newInstance(myTabsFromPreferences.get(i), myPathsFromPreferences.get(i)));
             }
-            FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
-            viewPager.setAdapter(adapter);
+            adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
         }
-
-        //加个异常的保护，如果一个要显示的目录都没有，那么就再次初始化Tab
-//        if (tab_version.getTabCount() == 0){
-//            myTab_defalut.clear();
-//            myTab_defalut.add("西方");
-//            myTab_defalut.add("国服");
-//            myTab_defalut.add("GARENA");
-//            myTab_defalut.add("韩国");
-//            myTab_defalut.add("VNG");
-//            myTab_defalut.add("主目录");
-//            myPath_defalut.add(path_west);
-//            myPath_defalut.add(path_cn);
-//            myPath_defalut.add(path_garena);
-//            myPath_defalut.add(path_korea);
-//            myPath_defalut.add(path_vng);
-//            myPath_defalut.add(path_SdcardRoot);
-//            sharedPreferences.edit().clear().apply();//清空本地保存的xml数据
-//            MyPreferences.setSharePreferencesArrData("myTabs", myTab_defalut, this);
-//            MyPreferences.setSharePreferencesArrData("myPaths", myPath_defalut, this);
-//            for (int i=0; i<myTab_defalut.size(); i++ ){
-//                tabFragmentList.add(TabFragment.newInstance(myTab_defalut.get(i), myPath_defalut.get(i)));
-//            }
-//            FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
-//            viewPager.setAdapter(adapter);
-//        }
-
+        viewPager.setAdapter(adapter);
     }
 
     //申请权限

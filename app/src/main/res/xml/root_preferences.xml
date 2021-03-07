@@ -19,11 +19,6 @@
     <PreferenceCategory app:title="@string/tab_list_setting"
         app:iconSpaceReserved="false">
 
-        <SwitchPreferenceCompat
-            app:key="switch_islog"
-            app:title="@string/text_islog"
-            app:iconSpaceReserved="false"/>
-
         <ListPreference
             app:defaultValue="sort_by_time"
             app:entries="@array/sort_entries"
@@ -33,12 +28,16 @@
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 
-<!--        <SwitchPreferenceCompat-->
-<!--            app:dependency="sync"-->
-<!--            app:key="attachment"-->
-<!--            app:summaryOff="@string/attachment_summary_off"-->
-<!--            app:summaryOn="@string/attachment_summary_on"-->
-<!--            app:title="@string/attachment_title" />-->
+        <ListPreference
+            app:defaultValue="show_all"
+            app:entries="@array/show_type_entries"
+            app:entryValues="@array/show_type_values"
+            app:key="show_type"
+            app:title="@string/show_type_title"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+
+
 
     </PreferenceCategory>
 

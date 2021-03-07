@@ -1,6 +1,8 @@
 package com.kuntliu.loghelper;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +12,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.kuntliu.loghelper.myadapter.MyRecycleViewApater;
+import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 import com.kuntliu.loghelper.mydialog.BottomMenuDialog;
 
 import java.io.File;
@@ -26,6 +29,10 @@ import static android.content.ContentValues.TAG;
 public class TabFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView tv_empty_tips;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private List<LogFile> fileList;
+
+    private MyRecycleViewAdapter adapter;
 
     static TabFragment newInstance(String tab, String path) {
         Bundle args = new Bundle();
@@ -44,6 +51,12 @@ public class TabFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         tv_empty_tips = view.findViewById(R.id.tv_empty_tips);
+
+
+
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
         return view;
     }
 
@@ -51,39 +64,51 @@ public class TabFragment extends Fragment {
     public void onStart() {
         super.onStart();
 //        String tab = getArguments().getString("myTab");
-        String path = getArguments().getString("myPath");
+        final String path = getArguments().getString("myPath");
 
+        SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (spf.getString("show_type_values", "").equals("show_all")){
+
+        }
 
         final File[] fileArr = FileToOperate.getFileArr(path);
-        final List<LogFile> fileList = FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips);
+        fileList = FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips);
 
 
-
-
-        final MyRecycleViewApater adapter = new MyRecycleViewApater(fileList, getContext());
+        adapter = new MyRecycleViewAdapter(fileList, getContext());
         recyclerView.setAdapter(adapter);
 
 
-        //使用系统默认的删除添加动画
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-
-
-        adapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
+        adapter.setOnItemClickListener(new MyRecycleViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, "onItemClick: "+position);
-                //如果点击的是APK文件则调用安装器进行安装
                 File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                if (selectedFile.getName().endsWith(".obb")){
+                    ObbActivity oa = new ObbActivity();
+                    oa.copyObbFile(selectedFile, fileList.get(position).getFile_name());
+                }
+
+                //如果点击的是APK文件则调用安装器进行安装
                 FileToOperate.installAPK(selectedFile,  getContext());
             }
         });
-        adapter.setOnItemLongClickListener(new MyRecycleViewApater.OnItemLongClickListener() {
+        adapter.setOnItemLongClickListener(new MyRecycleViewAdapter.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
                 BottomMenuDialog bmd = new BottomMenuDialog();
-                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name()); //刷新后的新文件无法删除bug
                 bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position);
+            }
+        });
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fileList.clear();
+                final File[] fileArr = FileToOperate.getFileArr(path);
+                fileList.addAll(FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
+                adapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

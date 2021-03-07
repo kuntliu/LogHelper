@@ -5,11 +5,21 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/swipe_refresh"
+        app:layout_constraintTop_toTopOf="parent">
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_file_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <TextView
         android:id="@+id/tv_empty_tips"
         android:layout_width="match_parent"

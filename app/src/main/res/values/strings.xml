@@ -25,8 +25,8 @@
     <string name="text_private_tab">自定义目录</string>
 
     <!-- 文件列表 Preferences -->
-    <string name="text_islog">仅显示.Log文件</string>
     <string name="sort_title">排序方式</string>
+    <string name="show_type_title">显示文件类型</string>
 
     <!--  自定义目录dialog  -->
     <string name="text_tab_name">Tab名称</string>

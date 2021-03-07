@@ -7,7 +7,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="ExtraText">//解决主界面被标题栏遮挡
 
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_version"
         android:layout_width="match_parent"
@@ -21,12 +20,16 @@
         app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"/>
 
 
+
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewPage_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tab_version"
         android:layout_above="@id/obbButton"/>
+
+
 
 
 

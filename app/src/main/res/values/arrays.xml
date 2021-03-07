@@ -12,4 +12,16 @@
         <item>sort_by_size</item>
     </string-array>
 
+
+    <string-array name="show_type_entries">
+        <item>显示所有文件</item>
+        <item>仅显示apk,obb</item>
+    </string-array>
+
+    <string-array name="show_type_values">
+        <item>show_all</item>
+        <item>show_apk_obb</item>
+    </string-array>
+
+
 </resources>
