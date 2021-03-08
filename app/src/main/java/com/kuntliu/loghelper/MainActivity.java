@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
 
         tab_version = findViewById(R.id.tab_version);
         viewPager = findViewById(R.id.viewPage_file);
+        viewPager.setOffscreenPageLimit(5);
+
         tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
         tab_version.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
@@ -303,7 +305,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

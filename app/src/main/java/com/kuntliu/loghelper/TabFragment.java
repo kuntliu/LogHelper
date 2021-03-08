@@ -64,10 +64,6 @@ public class TabFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
 
-        //使用系统默认的删除添加动画
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-
 
         adapter.setOnItemClickListener(new MyRecycleViewApater.OnItemClickListener() {
             @Override

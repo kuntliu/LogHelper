@@ -44,12 +44,15 @@ public class PrivateDirActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         rv_privateDir.setLayoutManager(linearLayoutManager);
 
-        MyselfDirAdapter adapter = new MyselfDirAdapter(this,list);
+        final MyselfDirAdapter adapter = new MyselfDirAdapter(this,list);
         rv_privateDir.setAdapter(adapter);
         adapter.setOnItemClickListener(new MyselfDirAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(View v, int position) {
-                EditTabsDialog.ShowEditTabsDialog(PrivateDirActivity.this, position);
+                EditTabsDialog.ShowEditTabsDialog(PrivateDirActivity.this, position, adapter, list);
+                adapter.notifyDataSetChanged();
+
+
             }
         });
 
