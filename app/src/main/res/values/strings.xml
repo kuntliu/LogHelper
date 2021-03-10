@@ -17,18 +17,20 @@
     <string name="text_div_line">|</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Preference Titles -->
-    <string name="tab_setting">Tab设置</string>
-    <string name="tab_list_setting">Tab文件列表设置</string>
+    <!-- PreferenceCategory -->
+    <string name="dir_path_setting">目录设置</string>
+    <string name="file_list_setting">文件显示设置</string>
 
-    <!-- tab Preferences -->
-    <string name="text_private_tab">自定义目录</string>
+    <!-- 目录设置 -->
+    <string name="text_private_tab">自定义配置Tab目录</string>
+    <string name="text_private_obb">自定义配置Obb目录</string>
 
-    <!-- 文件列表 Preferences -->
+    <!-- 文件显示设置 -->
     <string name="sort_title">排序方式</string>
-    <string name="show_type_title">显示文件类型</string>
+    <string name="show_type_title">主目录显示类型</string>
 
     <!--  自定义目录dialog  -->
     <string name="text_tab_name">Tab名称</string>
     <string name="text_tab_path">Tab目录位置</string>
+    <string name="menu_set_defalut">恢复默认</string>
 </resources>

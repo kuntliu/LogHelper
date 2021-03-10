@@ -3,17 +3,20 @@ package com.kuntliu.loghelper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
 
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
@@ -182,6 +185,33 @@ public class FileToOperate {
             }
             context.startActivity(intent);
         }
+    }
+
+    public static void setDefalutTabAndPath(ArrayList<String> TabList, ArrayList<String> PathList){
+        String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String path_west = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_cn = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_garena = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_korea = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_vng = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+
+        TabList.add("主目录");
+        TabList.add("西方");
+        TabList.add("国服");
+        TabList.add("GARENA");
+        TabList.add("韩国");
+        TabList.add("VNG");
+        PathList.add(path_SdcardRoot);
+        PathList.add(path_west);
+        PathList.add(path_cn);
+        PathList.add(path_garena);
+        PathList.add(path_korea);
+        PathList.add(path_vng);
     }
 
 

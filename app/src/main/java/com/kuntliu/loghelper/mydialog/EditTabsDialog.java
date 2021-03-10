@@ -26,18 +26,11 @@ public class EditTabsDialog {
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
 
-
         final EditText edit_tabs = view.findViewById(R.id.et_tabs);
         final EditText edit_paths = view.findViewById(R.id.et_paths);
-//        ArrayList<String> myTabs = MyPreferences.getSharePreferencesListData("myTabs",context);
-//        ArrayList<String> myPaths = MyPreferences.getSharePreferencesListData("myPaths",context);
-//
-//        tv_tabs_edit.setText(myTabs.get(position));
-//        tv_paths_edit.setText(myPaths.get(position));
+
         edit_tabs.setText(list.get(position).getTabs());
         edit_paths.setText(list.get(position).getPaths());
-
-
 
 
         Button btn_confirm = view.findViewById(R.id.btn_confirm);
@@ -68,9 +61,6 @@ public class EditTabsDialog {
                 }
             }
         });
-
-
         dialog.show();
-
     }
 }

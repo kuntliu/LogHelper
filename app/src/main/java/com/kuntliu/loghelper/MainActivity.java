@@ -39,17 +39,6 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
-    String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-    String path_west = path_SdcardRoot+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-    String path_cn = path_SdcardRoot+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-    String path_garena = path_SdcardRoot+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-    String path_korea = path_SdcardRoot+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-    String path_vng = path_SdcardRoot+
-            File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
 
     private final ArrayList<String> myTab_defalut = new ArrayList<>();
     private final ArrayList<String> myPath_defalut = new ArrayList<>();
@@ -130,18 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         //默认的目录和路径
-        myTab_defalut.add("主目录");
-        myTab_defalut.add("西方");
-        myTab_defalut.add("国服");
-        myTab_defalut.add("GARENA");
-        myTab_defalut.add("韩国");
-        myTab_defalut.add("VNG");
-        myPath_defalut.add(path_SdcardRoot);
-        myPath_defalut.add(path_west);
-        myPath_defalut.add(path_cn);
-        myPath_defalut.add(path_garena);
-        myPath_defalut.add(path_korea);
-        myPath_defalut.add(path_vng);
+        FileToOperate.setDefalutTabAndPath(myTab_defalut, myPath_defalut);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -274,11 +252,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }else if (id == R.id.action_add_version) {
             Toast.makeText(MainActivity.this, "这里是添加逻辑", Toast.LENGTH_LONG).show();
+            return true;
         }else if(id == R.id.action_setting){
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+            return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
