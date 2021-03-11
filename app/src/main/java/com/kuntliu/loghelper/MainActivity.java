@@ -63,9 +63,11 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            requestPermission();
+            //获得权限了之后去初始化数据
+            if (getPermission()){
+                initData();
+            }
         }
-        initData();
         tab_version.setupWithViewPager(viewPager,false);
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
             //第一次启动应用使用默认的Tab目录
             adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
         }else {
-            //读取配置中的Tab目录和对应的Path
+            //非第一次启动应用就读取配置中的Tab目录和对应的Path
             ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
             ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
 
@@ -138,18 +140,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //申请权限
-    private void requestPermission() {
+    private boolean getPermission() {
         permissions_rejected.clear();
+        boolean isGetAllPermissions = false;
         //判断是否有权限
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                 permissions_rejected.add(permission);
-                Log.d("Permissions_rejected", permissions_rejected.toString());
+//                Log.d("Permissions_rejected", permissions_rejected.toString());
             }
         }
         if (!permissions_rejected.isEmpty()){
             ActivityCompat.requestPermissions(this, permissions_rejected.toArray(new String[0]), PERMISSION_CODE);
+        }else {
+            isGetAllPermissions = true;
         }
+        return isGetAllPermissions;
     }
 
     //权限窗口，用户操作的结果回调
@@ -157,17 +163,21 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean hasRejectPermission = false;
-        if (PERMISSION_CODE == requestCode){
+        if (requestCode == PERMISSION_CODE){
             for (int i = 0; i < grantResults.length; i++){
                 //用户选择“允许”
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
 //                    Log.d("PermissionsResult", "onRequestPermissionsResult"+permissions[i]);
-                }if(grantResults[i] == PackageManager.PERMISSION_DENIED){
+                }
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                     hasRejectPermission = true;
+                    break;
                 }
             }
             if(hasRejectPermission){
                 showDialogAndGotoSetting();
+            }else {
+                initData();
             }
         }
     }
@@ -176,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == SETTING_CODE){       //从设置返回后再次进行权限判断
-            requestPermission();
+            getPermission();
         }
     }
 

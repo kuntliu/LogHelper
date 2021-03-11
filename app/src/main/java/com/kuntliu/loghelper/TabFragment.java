@@ -105,12 +105,7 @@ public class TabFragment extends Fragment {
                 fileList.addAll(FileToOperate.getFileList(path, fileArr_refresh, getContext(), tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
                 adapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
-                if (fileList.size() == 0){
-                    tv_empty_tips.setVisibility(View.VISIBLE);
-                    tv_empty_tips.setText("当前目录为空");
-                }else {
-                    tv_empty_tips.setVisibility(View.INVISIBLE);
-                }
+                FileToOperate.tvSwitch(fileList, fileArr_refresh, tv_empty_tips);
             }
         });
     }

@@ -23,7 +23,7 @@
 
     <!-- 目录设置 -->
     <string name="text_private_tab">自定义配置Tab目录</string>
-    <string name="text_private_obb">自定义配置Obb目录</string>
+    <string name="text_private_obb">自定义配置obb目录</string>
 
     <!-- 文件显示设置 -->
     <string name="sort_title">排序方式</string>

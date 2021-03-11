@@ -61,13 +61,7 @@ public class FileToOperate {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
         if (getFileArr(path) != null){
-            if (arrFiles.length == 0){  //踩坑描述：要先判断arrFiles是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
-//                fileList.clear();
-//                tv_empty_tips.setVisibility(View.VISIBLE);
-//                tv_empty_tips.setText("当前目录为空");
-            }else {
                 for (File f : arrFiles) {
-                    tv_empty_tips.setVisibility(View.GONE);
 //                Log.d("FileList", f.toString());
                     if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
                         String fileSize_str = FileSizeTransform.Tansform(f.length());      //获取文件大小并且进行显示单位转换
@@ -87,11 +81,6 @@ public class FileToOperate {
                 }
                 fileList = new ArrayListSort().fileSort(fileList, 1, 1);   //对集合内元素进行排序
             }
-        }else {
-//            fileList.clear();
-//            tv_empty_tips.setVisibility(View.VISIBLE);
-//            tv_empty_tips.setText("当前目录不存在");
-        }
         return fileList;
     }
 
@@ -99,11 +88,10 @@ public class FileToOperate {
         if (list.size() == 0){
             tv.setVisibility(View.VISIBLE);
             tv.setText("当前目录为空");
-        }else if(arrFiles ==null){
-            list.clear();
+        }if (arrFiles == null){
             tv.setVisibility(View.VISIBLE);
             tv.setText("当前目录不存在");
-        }else {
+        }if (list.size() != 0 && arrFiles != null) {
             tv.setVisibility(View.GONE);
         }
     }
@@ -194,7 +182,6 @@ public class FileToOperate {
         PackageManager pm = context.getPackageManager();
         PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
         if (pi != null){
-            ApplicationInfo application = pi.applicationInfo;
             version = pi.versionName;
         }
         return version;
