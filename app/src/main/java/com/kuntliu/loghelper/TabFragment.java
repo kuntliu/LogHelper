@@ -2,7 +2,6 @@ package com.kuntliu.loghelper;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,11 +51,8 @@ public class TabFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         tv_empty_tips = view.findViewById(R.id.tv_empty_tips);
 
-
-
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-
         return view;
     }
 
@@ -77,7 +73,8 @@ public class TabFragment extends Fragment {
 
         adapter = new MyRecycleViewAdapter(fileList, getContext());
         recyclerView.setAdapter(adapter);
-
+        //根据fileList判断，显示对应的提示
+        FileToOperate.tvSwitch(fileList, fileArr, tv_empty_tips);
 
         adapter.setOnItemClickListener(new MyRecycleViewAdapter.OnItemClickListener() {
             @Override
@@ -85,10 +82,9 @@ public class TabFragment extends Fragment {
                 Log.d(TAG, "onItemClick: "+position);
                 File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                 if (selectedFile.getName().endsWith(".obb")){
-                    ObbActivity oa = new ObbActivity();
-                    oa.copyObbFile(selectedFile, fileList.get(position).getFile_name());
+                    ObbFile obbFile = new ObbFile();
+                    obbFile.copyObbFile(selectedFile, fileList.get(position).getFile_name(), getContext());
                 }
-
                 //如果点击的是APK文件则调用安装器进行安装
                 FileToOperate.installAPK(selectedFile,  getContext());
             }
@@ -97,19 +93,26 @@ public class TabFragment extends Fragment {
             @Override
             public void onItemLongClick(View view, int position) {
                 BottomMenuDialog bmd = new BottomMenuDialog();
-                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name()); //刷新后的新文件无法删除bug
-                bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position);
+                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position, tv_empty_tips);
             }
         });
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 fileList.clear();
-                final File[] fileArr = FileToOperate.getFileArr(path);
-                fileList.addAll(FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
+                final File[] fileArr_refresh = FileToOperate.getFileArr(path);
+                fileList.addAll(FileToOperate.getFileList(path, fileArr_refresh, getContext(), tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
                 adapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
+                if (fileList.size() == 0){
+                    tv_empty_tips.setVisibility(View.VISIBLE);
+                    tv_empty_tips.setText("当前目录为空");
+                }else {
+                    tv_empty_tips.setVisibility(View.INVISIBLE);
+                }
             }
         });
     }
+
 }

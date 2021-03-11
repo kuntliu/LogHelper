@@ -27,15 +27,44 @@ import java.util.List;
 
 public class FileToOperate {
 
+
+    //设置默认的初始Tab名称和Tab对应的路径
+    public static void setDefalutTabAndPath(ArrayList<String> TabList, ArrayList<String> PathList){
+        String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String path_west = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_cn = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_garena = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_korea = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_vng = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+
+        TabList.add("主目录");
+        TabList.add("西方");
+        TabList.add("国服");
+        TabList.add("GARENA");
+        TabList.add("韩国");
+        TabList.add("VNG");
+        PathList.add(path_SdcardRoot);
+        PathList.add(path_west);
+        PathList.add(path_cn);
+        PathList.add(path_garena);
+        PathList.add(path_korea);
+        PathList.add(path_vng);
+    }
+
+    //获取文件，数据形式为list
     public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, TextView tv_empty_tips)  {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
         if (getFileArr(path) != null){
             if (arrFiles.length == 0){  //踩坑描述：要先判断arrFiles是否为null，然后再判断后面的length == 0，否侧可能会出现空指针
-                fileList.clear();
-                tv_empty_tips.setVisibility(View.VISIBLE);
-                tv_empty_tips.setText("当前目录为空");
-//                Toast.makeText(this, "当前目录为空", Toast.LENGTH_SHORT).show();
+//                fileList.clear();
+//                tv_empty_tips.setVisibility(View.VISIBLE);
+//                tv_empty_tips.setText("当前目录为空");
             }else {
                 for (File f : arrFiles) {
                     tv_empty_tips.setVisibility(View.GONE);
@@ -52,7 +81,6 @@ public class FileToOperate {
                             }
                         }
                         LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), fileSize_str, time_str, apk_version);
-
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                         fileList.add(log);
                     }
@@ -60,15 +88,25 @@ public class FileToOperate {
                 fileList = new ArrayListSort().fileSort(fileList, 1, 1);   //对集合内元素进行排序
             }
         }else {
-            fileList.clear();
-            tv_empty_tips.setVisibility(View.VISIBLE);
-            tv_empty_tips.setText("当前目录不存在");
-//            Toast.makeText(MainActivity.this, "当前目录不存在", Toast.LENGTH_SHORT).show();
-//            Log.d("IsNofile", "ture");
+//            fileList.clear();
+//            tv_empty_tips.setVisibility(View.VISIBLE);
+//            tv_empty_tips.setText("当前目录不存在");
         }
         return fileList;
     }
 
+    public static void tvSwitch(List<LogFile> list, File[] arrFiles, TextView tv){
+        if (list.size() == 0){
+            tv.setVisibility(View.VISIBLE);
+            tv.setText("当前目录为空");
+        }else if(arrFiles ==null){
+            list.clear();
+            tv.setVisibility(View.VISIBLE);
+            tv.setText("当前目录不存在");
+        }else {
+            tv.setVisibility(View.GONE);
+        }
+    }
 
     //获取path目录下的文件（数组类型）
     public static File[] getFileArr(String path) {
@@ -104,14 +142,7 @@ public class FileToOperate {
             return context.getDrawable(R.drawable.ic_file_unknown);
     }
 
-    public static List<LogFile> refreshDataList(String path, TextView tv, MyRecycleViewAdapter adapter, final Context context){
-        List<LogFile> list;
-        File[] fileArr = getFileArr(path);
-        list = getFileList(path, fileArr, context, tv);
-        return list;
-    }
-
-    //根据position删除对应的数据源
+    //根据position删除对应的数据源并刷新适配器
     public static void deleteFile(File file, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, Context context){
         if (file != null && file.exists()) {
             boolean isSuccessDeleteFile = file.delete();           //删除文件
@@ -130,7 +161,7 @@ public class FileToOperate {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
-        //适配7.0版本以下的Android系统,需要使用内容提供器
+        //适配7.0版本以上的Android系统,需要使用内容提供器
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -141,7 +172,7 @@ public class FileToOperate {
         }
     }
 
-    //通过apk的路径获取包信息
+    //通过apk的路径获取apk安装包的图标
     private static Drawable getApkIcon(String path, Context context){
         Drawable icon = null;
         PackageManager pm = context.getPackageManager();
@@ -157,6 +188,7 @@ public class FileToOperate {
         return icon;
     }
 
+    //通过apk的路径获取apk安装包的版本号
     public static String getApkVersion(String path, Context context){
         String version = "";
         PackageManager pm = context.getPackageManager();
@@ -187,35 +219,4 @@ public class FileToOperate {
         }
     }
 
-    public static void setDefalutTabAndPath(ArrayList<String> TabList, ArrayList<String> PathList){
-        String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String path_west = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_cn = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_garena = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_korea = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_vng = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-
-        TabList.add("主目录");
-        TabList.add("西方");
-        TabList.add("国服");
-        TabList.add("GARENA");
-        TabList.add("韩国");
-        TabList.add("VNG");
-        PathList.add(path_SdcardRoot);
-        PathList.add(path_west);
-        PathList.add(path_cn);
-        PathList.add(path_garena);
-        PathList.add(path_korea);
-        PathList.add(path_vng);
-    }
-
-
-    public void getLogcatData(){
-
-    }
 }

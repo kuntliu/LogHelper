@@ -26,7 +26,7 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".ObbActivity"
+            android:name=".ObbFile"
             android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity
             android:name=".MainActivity"

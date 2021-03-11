@@ -34,8 +34,8 @@ public class MyConfirmCopyDialog {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialogBtnClickListener.clickCancel();
                 dialog.dismiss();
+                alertDialogBtnClickListener.clickCancel();
             }
         });
         btn_confirm.setOnClickListener(new View.OnClickListener() {

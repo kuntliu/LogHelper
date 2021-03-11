@@ -19,25 +19,10 @@
         app:tabSelectedTextColor="@color/white"
         app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"/>
 
-
-
-
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewPage_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tab_version"
-        android:layout_above="@id/obbButton"/>
+        android:layout_below="@id/tab_version"/>
 
-
-
-
-
-    <Button
-        android:id="@+id/obbButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/obb_text"
-        android:textColor="@color/black"/>
 </RelativeLayout>

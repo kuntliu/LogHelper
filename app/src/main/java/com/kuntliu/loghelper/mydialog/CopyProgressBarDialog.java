@@ -22,7 +22,6 @@ public class CopyProgressBarDialog {
         TextView tv_filename = view.findViewById(R.id.CopyingFilename);
         tv_filename.setText(filename);
 
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
         dialog = builder.create();
@@ -31,8 +30,6 @@ public class CopyProgressBarDialog {
         //dialog.setCancelable(false);
         //
         //dialog弹出后会点击屏幕或物理返回键，dialog不消失
-        //
-        //
         //dialog.setCanceledOnTouchOutside(false);
         //dialog弹出后，点击屏幕dialog不消失；点击物理返回键dialog消失
 
@@ -44,7 +41,6 @@ public class CopyProgressBarDialog {
         dialog.show();
         return view;
     }
-
 
     public static void dismissCopyProgressBar(){
         if (dialog.isShowing()) {

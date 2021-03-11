@@ -35,7 +35,7 @@ public class PrivateDirActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                PrivateDirActivity.this.finish();
             }
         });
         setSupportActionBar(toolbar);//自定义的toolbar需要调用此函数才能获得ActionBar的效果
@@ -92,7 +92,6 @@ public class PrivateDirActivity extends AppCompatActivity {
                 list.add(privateTabs);
             }
             adapter.notifyDataSetChanged();
-
             return true;
         }
         return super.onOptionsItemSelected(item);

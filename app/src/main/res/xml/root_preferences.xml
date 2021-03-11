@@ -15,13 +15,13 @@
                 android:targetClass="com.kuntliu.loghelper.PrivateDirActivity"/>
         </Preference>
         <Preference
-            app:key="tab_private"
+            app:key="tab_obb"
             app:title="@string/text_private_obb"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false">
-            <intent
-                android:targetPackage="com.kuntliu.loghelper"
-                android:targetClass="com.kuntliu.loghelper.PrivateDirActivity"/>
+<!--            <intent-->
+<!--                android:targetPackage="com.kuntliu.loghelper"-->
+<!--                android:targetClass="com.kuntliu.loghelper.PrivateDirActivity"/>-->
         </Preference>
 
     </PreferenceCategory>

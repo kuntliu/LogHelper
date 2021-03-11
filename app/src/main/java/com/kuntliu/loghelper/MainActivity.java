@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -19,8 +20,6 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import android.os.Environment;
-import android.preference.ListPreference;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -33,7 +32,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.kuntliu.loghelper.myadapter.FragmentAdapter;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,11 +52,9 @@ public class MainActivity extends AppCompatActivity {
     int PERMISSION_CODE = 1000;
     int SETTING_CODE = 1001;
 
-
     TabLayout tab_version;
     ViewPager viewPager;
     FragmentAdapter adapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +62,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermission();
+        }
         initData();
-
         tab_version.setupWithViewPager(viewPager,false);
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
@@ -79,12 +77,9 @@ public class MainActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 //            }
 //        });
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            requestPermission();
-        }
 
-//已弃用，改用tab
+
+//已弃用，改用TabLayout
 //        Spinner spinner = findViewById(R.id.spinner_item);
 //        Resources resources = getResources();
 //        String[] arr_path = resources.getStringArray(R.array.arr_path);
@@ -93,14 +88,6 @@ public class MainActivity extends AppCompatActivity {
 //        spinner.setAdapter(adapter);
 //        spinner.setOnItemSelectedListener(this);
 
-        Button button = findViewById(R.id.obbButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ObbActivity.class);
-                startActivity(intent);
-            }
-        });
 
     }
 
@@ -163,9 +150,6 @@ public class MainActivity extends AppCompatActivity {
         if (!permissions_rejected.isEmpty()){
             ActivityCompat.requestPermissions(this, permissions_rejected.toArray(new String[0]), PERMISSION_CODE);
         }
-        else {
-            Log.d("HadPermissionCheck","ALLPERMISSION");
-        }
     }
 
     //权限窗口，用户操作的结果回调
@@ -177,8 +161,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < grantResults.length; i++){
                 //用户选择“允许”
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
-//                    getAllFile(path_west);
-                    Log.d(permissions[i], "onRequestPermissionsResult:ture ");
+//                    Log.d("PermissionsResult", "onRequestPermissionsResult"+permissions[i]);
                 }if(grantResults[i] == PackageManager.PERMISSION_DENIED){
                     hasRejectPermission = true;
                 }

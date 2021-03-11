@@ -1,4 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,7 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@id/line"
         android:text="@string/text_cancel"
-        android:textColor="@color/deepOrange"
+        android:textColor="@color/colorPrimary"
         android:background="@drawable/btn_ripple"
         style="?android:attr/borderlessButtonStyle"/>
 
@@ -34,7 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:text="@string/text_comfirm"
-        android:textColor="@color/deepOrange"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"

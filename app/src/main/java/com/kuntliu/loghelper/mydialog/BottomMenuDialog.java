@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.kuntliu.loghelper.FileSizeTransform;
 import com.kuntliu.loghelper.FileToOperate;
@@ -14,13 +15,15 @@ import com.kuntliu.loghelper.LogFile;
 import com.kuntliu.loghelper.R;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.List;
 
 public class BottomMenuDialog {
     PopupWindow pw;
 
-    public void showBottomMenu(final File file, final List<LogFile> list, final Context context, final MyRecycleViewAdapter apater, final int position){
+    public void showBottomMenu(final File file, final List<LogFile> list, final Context context, final MyRecycleViewAdapter apater, final int position , final TextView tv){
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_bottom_menu, null);
         Button btn_sent = view.findViewById(R.id.btn_sent);
         Button btn_delete = view.findViewById(R.id.btn_delete);
@@ -30,7 +33,7 @@ public class BottomMenuDialog {
             @Override
             public void onClick(View v) {
                 FileToOperate.shareFile(file, context);
-                pwDismiss();
+                pw.dismiss();
             }
         });
 
@@ -39,6 +42,10 @@ public class BottomMenuDialog {
             public void onClick(View v) {
                 FileToOperate.deleteFile(file, list, position, apater, context);
                 pw.dismiss();
+                if (list.size() == 0){
+                    tv.setVisibility(View.VISIBLE);
+                    tv.setText("当前目录为空");
+                }
             }
         });
 
@@ -49,7 +56,6 @@ public class BottomMenuDialog {
                 pw.dismiss();
             }
         });
-
 
         pw = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, false);
         pw.setContentView(view);
@@ -64,12 +70,12 @@ public class BottomMenuDialog {
 //        dialog.setView(view);
 //        dialog.getWindow().setWindowAnimations(R.style.Dialog_Anim);
 //        dialog.show();
-
     }
 
-    private void pwDismiss() {
+    public boolean pwDismiss() {
         if (pw != null && pw.isShowing()){
             pw.dismiss();
         }
+        return true;
     }
 }
