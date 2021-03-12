@@ -6,36 +6,37 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
-import com.kuntliu.loghelper.myadapter.MyselfDirAdapter;
+import com.kuntliu.loghelper.myadapter.PrivateTabsAdapter;
 import com.kuntliu.loghelper.mydialog.EditTabsDialog;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.util.ArrayList;
 
-public class PrivateDirActivity extends AppCompatActivity {
+public class PrivateTabActivity extends AppCompatActivity {
 
     ArrayList<PrivateTabs> list = new ArrayList<>();
     ArrayList<String> myTabsToShow;
     ArrayList<String> myPathsToShow;
-    MyselfDirAdapter adapter;
+    PrivateTabsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_private_dir);
+        setContentView(R.layout.activity_private_tab);
 
 
-        Toolbar toolbar = findViewById(R.id.toolbar_dir_act);
+        Toolbar toolbar = findViewById(R.id.toolbar_private_tab);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PrivateDirActivity.this.finish();
+                PrivateTabActivity.this.finish();
             }
         });
         setSupportActionBar(toolbar);//自定义的toolbar需要调用此函数才能获得ActionBar的效果
@@ -48,22 +49,46 @@ public class PrivateDirActivity extends AppCompatActivity {
             list.add(privateTabs);
         }
 
-        RecyclerView rv_privateDir = findViewById(R.id.rv_private_dir);
+        RecyclerView rv_privateTab = findViewById(R.id.rv_private_tab);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
-        rv_privateDir.setLayoutManager(linearLayoutManager);
+        rv_privateTab.setLayoutManager(linearLayoutManager);
 
-        adapter = new MyselfDirAdapter(this,list);
-        rv_privateDir.setAdapter(adapter);
-        adapter.setOnItemClickListener(new MyselfDirAdapter.OnItemClickListener() {
+        adapter = new PrivateTabsAdapter(this,list);
+        rv_privateTab.setAdapter(adapter);
+        adapter.setOnItemClickListener(new PrivateTabsAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(View v, int position) {
-                EditTabsDialog.ShowEditTabsDialog(PrivateDirActivity.this, position, adapter, list);
+                EditTabsDialog.ShowEditTabsDialog(PrivateTabActivity.this, position, adapter, list);
             }
         });
+        adapter.setOnItemLongClickListener(new PrivateTabsAdapter.OnItemLongClickListener() {
+            @Override
+            public void OnItemLongClick(View v, final int position) {
+                Spinner spinner = findViewById(R.id.spinner_private_tab);
+                String[] tabMenu = getResources().getStringArray(R.array.delete_private_tab);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(PrivateTabActivity.this, R.layout.support_simple_spinner_dropdown_item, tabMenu);
+                spinner.setAdapter(arrayAdapter);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (i == 0) {
+                            MyPreferences.deleteSharePreferenceListData("myTabs", position, PrivateTabActivity.this);
+                            MyPreferences.deleteSharePreferenceListData("myPaths", position, PrivateTabActivity.this);
+                            list.remove(position);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
 
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+            }
+        });
     }
 
-
+    //创建右上角的菜单
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -72,6 +97,7 @@ public class PrivateDirActivity extends AppCompatActivity {
         return true;
     }
 
+    //对应的菜单被点击，执行对应的逻辑
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -79,7 +105,7 @@ public class PrivateDirActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //Tab名称和对应的path恢复默认
         if (id == R.id.action_set_defalut) {
             list.clear();
             myTabsToShow.clear();

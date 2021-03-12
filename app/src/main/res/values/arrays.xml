@@ -1,27 +1,28 @@
 <resources>
-    <!-- Reply Preference -->
+    <!-- 设置-排序方式 -->
     <string-array name="sort_entries">
         <item>时间</item>
         <item>名称</item>
         <item>大小</item>
     </string-array>
-
     <string-array name="sort_values">
         <item>sort_by_time</item>
         <item>sort_by_name</item>
         <item>sort_by_size</item>
     </string-array>
 
-
+    <!-- 设置-显示方式 -->
     <string-array name="show_type_entries">
         <item>显示所有文件</item>
         <item>仅显示apk,obb</item>
     </string-array>
-
     <string-array name="show_type_values">
         <item>show_all</item>
         <item>show_apk_obb</item>
     </string-array>
 
-
+    <!-- 设置-Tab-菜单 -->
+    <string-array name="delete_private_tab">
+        <item>删除</item>
+    </string-array>
 </resources>

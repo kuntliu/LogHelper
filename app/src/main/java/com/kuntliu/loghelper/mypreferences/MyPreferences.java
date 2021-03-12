@@ -32,16 +32,22 @@ public class MyPreferences {
         editor.apply();
     }
 
-    public static ArrayList<String> getSharePreferencesListData(String key, Context context){
-        SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
-        ArrayList<String> data_arr = new ArrayList<>(Arrays.asList(spf.getString(key, "").split("#")));
-        Log.d(TAG, "getSharePreferencesArrData: "+ data_arr);
-        return data_arr;
+    public static void deleteSharePreferenceListData(String key, int position, Context context){
+        ArrayList<String> dataList = getSharePreferencesListData(key, context);
+        dataList.remove(position);
+        setSharePreferencesListData(key, dataList, context);
     }
 
-    public static void updateSharePreferencesListData(String key, String datatoUpdata, int position, Context context){
+    public static ArrayList<String> getSharePreferencesListData(String key, Context context){
+        SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
+        ArrayList<String> dataList = new ArrayList<>(Arrays.asList(spf.getString(key, "").split("#")));
+        Log.d(TAG, "getSharePreferencesArrData: "+ dataList);
+        return dataList;
+    }
+
+    public static void updateSharePreferencesListData(String key, String strToUpdate, int position, Context context){
         ArrayList<String> dataList = getSharePreferencesListData(key, context);
-        dataList.set(position, datatoUpdata);
+        dataList.set(position, strToUpdate);
         setSharePreferencesListData(key, dataList, context);
     }
 

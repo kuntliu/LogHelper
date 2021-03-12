@@ -70,12 +70,12 @@ public class BottomMenuDialog {
 //        dialog.setView(view);
 //        dialog.getWindow().setWindowAnimations(R.style.Dialog_Anim);
 //        dialog.show();
+        pw.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+            }
+        });
     }
 
-    public boolean pwDismiss() {
-        if (pw != null && pw.isShowing()){
-            pw.dismiss();
-        }
-        return true;
-    }
+
 }

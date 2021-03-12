@@ -28,6 +28,4 @@ public class PrivateTabs {
         this.paths = paths;
     }
 
-
-
 }

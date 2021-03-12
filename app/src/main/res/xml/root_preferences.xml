@@ -12,7 +12,7 @@
             app:iconSpaceReserved="false">
             <intent
                 android:targetPackage="com.kuntliu.loghelper"
-                android:targetClass="com.kuntliu.loghelper.PrivateDirActivity"/>
+                android:targetClass="com.kuntliu.loghelper.PrivateTabActivity"/>
         </Preference>
         <Preference
             app:key="tab_obb"
@@ -21,7 +21,7 @@
             app:iconSpaceReserved="false">
 <!--            <intent-->
 <!--                android:targetPackage="com.kuntliu.loghelper"-->
-<!--                android:targetClass="com.kuntliu.loghelper.PrivateDirActivity"/>-->
+<!--                android:targetClass="com.kuntliu.loghelper.PrivateTabActivity"/>-->
         </Preference>
 
     </PreferenceCategory>

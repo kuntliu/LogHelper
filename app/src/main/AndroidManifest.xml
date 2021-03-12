@@ -19,15 +19,12 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="q">
-        <activity android:name=".PrivateDirActivity">
+        <activity android:name=".PrivateTabActivity">
 
         </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".ObbFile"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

@@ -31,7 +31,7 @@ public class ObbFile {
 
             if (!isExisted_DirCopyFileDescPath(copyFileDescPath)) {
                 //如果复制的目标目录不存在就先创建目录
-                mkCopyFileDirs(copyFileDescPath);
+                mkCopyFileDir(copyFileDescPath);
             }
             //执行复制操作前需要判断目标目录的obb文件是否已存在
             if (!copyDescFile_isExisted(selectedObbFile, obbFileNameCilcked, context)) {
@@ -125,7 +125,7 @@ public class ObbFile {
         return file.exists();
     }
     //如果目录不存在就创建目标目录
-    private void mkCopyFileDirs(String path){
+    private void mkCopyFileDir(String path){
         boolean dir_Existed = isExisted_DirCopyFileDescPath(path);
         File file = new File(path);
         if (!dir_Existed) {

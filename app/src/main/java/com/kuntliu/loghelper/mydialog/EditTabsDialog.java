@@ -9,7 +9,7 @@ import android.widget.EditText;
 
 import com.kuntliu.loghelper.PrivateTabs;
 import com.kuntliu.loghelper.R;
-import com.kuntliu.loghelper.myadapter.MyselfDirAdapter;
+import com.kuntliu.loghelper.myadapter.PrivateTabsAdapter;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class EditTabsDialog {
 
-    public static void ShowEditTabsDialog(final Context context, final int position, final MyselfDirAdapter adapter, final ArrayList<PrivateTabs> list){
+    public static void ShowEditTabsDialog(final Context context, final int position, final PrivateTabsAdapter adapter, final ArrayList<PrivateTabs> list){
         View view  = LayoutInflater.from(context).inflate(R.layout.dialog_edit_dirs, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);

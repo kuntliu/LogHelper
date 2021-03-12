@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -22,10 +21,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
@@ -81,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
 
-//已弃用，改用TabLayout
+//          已弃用Spinner，改用TabLayout
+//          整体的实现逻辑：首次启动将写入tab和对应path配置，保存在本地，非首次启动就去读取已保存的配置，根据tab的position去获取对应的path显示该路径下的文件
 //        Spinner spinner = findViewById(R.id.spinner_item);
 //        Resources resources = getResources();
 //        String[] arr_path = resources.getStringArray(R.array.arr_path);
@@ -90,8 +88,24 @@ public class MainActivity extends AppCompatActivity {
 //        spinner.setAdapter(adapter);
 //        spinner.setOnItemSelectedListener(this);
 
-
     }
+
+    //通过重写onRestart重新加载tab名称
+    //默认的activity生命周期的模式下，onRestart()会在点击返回和从后台切回应用时被调用
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        tabFragmentList.clear();
+        ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", MainActivity.this);
+        Log.d("MainActivity", "onRestart: "+myTabsFromPreferences);
+        for (int i=0; i<myTabsFromPreferences.size(); i++ ){
+            tabFragmentList.add(TabFragment.newInstance(i));
+        }
+        adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
+        viewPager.setAdapter(adapter);
+    }
+
+
 
     private void initView(){
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -99,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
         tab_version = findViewById(R.id.tab_version);
         viewPager = findViewById(R.id.viewPage_file);
-        viewPager.setOffscreenPageLimit(5);    //默认情况下，viewPager会加载相邻的1页，这里设置为5
+        viewPager.setOffscreenPageLimit(6);    //默认情况下，viewPager会加载相邻的1页，这里设置为5
 
         tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
         tab_version.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
@@ -121,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             MyPreferences.setSharePreferencesListData("myPaths", myPath_defalut, this);
 
             for (int i=0; i<myTab_defalut.size(); i++ ){
-                tabFragmentList.add(TabFragment.newInstance(myTab_defalut.get(i), myPath_defalut.get(i)));
+                tabFragmentList.add(TabFragment.newInstance( i));
             }
 
             //第一次启动应用使用默认的Tab目录
@@ -129,10 +143,10 @@ public class MainActivity extends AppCompatActivity {
         }else {
             //非第一次启动应用就读取配置中的Tab目录和对应的Path
             ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
-            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
+//            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
 
             for (int i=0; i<myTabsFromPreferences.size(); i++ ){
-                tabFragmentList.add(TabFragment.newInstance(myTabsFromPreferences.get(i), myPathsFromPreferences.get(i)));
+                tabFragmentList.add(TabFragment.newInstance(i));
             }
             adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
         }
@@ -164,12 +178,9 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean hasRejectPermission = false;
         if (requestCode == PERMISSION_CODE){
-            for (int i = 0; i < grantResults.length; i++){
+            for (int grantResult : grantResults) {
                 //用户选择“允许”
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
-//                    Log.d("PermissionsResult", "onRequestPermissionsResult"+permissions[i]);
-                }
-                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                if (grantResult == PackageManager.PERMISSION_DENIED) {
                     hasRejectPermission = true;
                     break;
                 }
@@ -177,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
             if(hasRejectPermission){
                 showDialogAndGotoSetting();
             }else {
+                //拿到全部全限后就开始初始化数据
                 initData();
             }
         }

@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class FileToOperate {
 
@@ -144,19 +147,43 @@ public class FileToOperate {
         }
     }
 
+    //判断手机是否已安装QQ
+    public static boolean isInstallQQ(Context context){
+        boolean isInstall = false;
+        PackageManager pm = context.getPackageManager();
+        //获取手机内已安装应用的列表
+        List<PackageInfo> packageInfoList = pm.getInstalledPackages(0);
+        Log.d(TAG, "getAppList: "+packageInfoList);
+        for (PackageInfo p : packageInfoList){
+            if (p.packageName.equals("com.tencent.mobileqq")) {
+                isInstall = true;
+                break;
+            }
+        }
+        return isInstall;
+    }
+
     //通过QQ上我的电脑分享（发送）文件
     public static void shareFile(File selectedFile, Context context) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
-        //适配7.0版本以上的Android系统,需要使用内容提供器
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            context.startActivity(intent);
+        if (isInstallQQ(context)){
+            if (selectedFile.exists()){
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
+                //适配7.0版本以上的Android系统,需要使用内容提供器
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    context.startActivity(intent);
+                }else {
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(selectedFile));
+                    context.startActivity(intent);
+                }
+            }else {
+                Toast.makeText(context, "文件不存在", Toast.LENGTH_LONG).show();
+            }
         }else {
-            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(selectedFile));
-            context.startActivity(intent);
+            Toast.makeText(context, "未安装QQ", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -1,5 +1,9 @@
 package com.kuntliu.loghelper;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 import com.kuntliu.loghelper.mydialog.BottomMenuDialog;
+import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
 import java.util.List;
@@ -30,15 +35,20 @@ public class TabFragment extends Fragment {
     private TextView tv_empty_tips;
     private SwipeRefreshLayout swipeRefreshLayout;
     private List<LogFile> fileList;
-
+    File[] fileArr;
+    String path;
+    int tabPosition;
     private MyRecycleViewAdapter adapter;
+    Context context;
 
-    static TabFragment newInstance(String tab, String path) {
+    static TabFragment newInstance(int tabPosition) {
         Bundle args = new Bundle();
 //        args.putString("myTab", tab);
-        args.putString("myPath", path);
+//        args.putString("myPath", path);
+        args.putInt("tabPosition", tabPosition);
         TabFragment fragment = new TabFragment();
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -60,18 +70,23 @@ public class TabFragment extends Fragment {
     public void onStart() {
         super.onStart();
 //        String tab = getArguments().getString("myTab");
-        final String path = getArguments().getString("myPath");
-
-        SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (spf.getString("show_type_values", "").equals("show_all")){
-
+        if (getArguments() != null) {
+            tabPosition = getArguments().getInt("tabPosition");
+            Log.d(TAG, "onStart_Tabposition: "+tabPosition);
+        }
+        if (getContext() != null){
+            context = getContext();
+            path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
+            SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
+            if (spf.getString("show_type_values", "").equals("show_all")){
+            }
         }
 
-        final File[] fileArr = FileToOperate.getFileArr(path);
+        fileArr = FileToOperate.getFileArr(path);
         fileList = FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips);
+        Log.d(TAG, "onStart_myPath: "+getArguments().getString("myPath"));
 
-
-        adapter = new MyRecycleViewAdapter(fileList, getContext());
+        adapter = new MyRecycleViewAdapter(fileList, context);
         recyclerView.setAdapter(adapter);
         //根据fileList判断，显示对应的提示
         FileToOperate.tvSwitch(fileList, fileArr, tv_empty_tips);
@@ -83,7 +98,7 @@ public class TabFragment extends Fragment {
                 File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                 if (selectedFile.getName().endsWith(".obb")){
                     ObbFile obbFile = new ObbFile();
-                    obbFile.copyObbFile(selectedFile, fileList.get(position).getFile_name(), getContext());
+                    obbFile.copyObbFile(selectedFile, fileList.get(position).getFile_name(), context);
                 }
                 //如果点击的是APK文件则调用安装器进行安装
                 FileToOperate.installAPK(selectedFile,  getContext());
@@ -94,20 +109,24 @@ public class TabFragment extends Fragment {
             public void onItemLongClick(View view, int position) {
                 BottomMenuDialog bmd = new BottomMenuDialog();
                 File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
-                bmd.showBottomMenu(selectedFile, fileList, getContext(), adapter, position, tv_empty_tips);
+                bmd.showBottomMenu(selectedFile, fileList, context, adapter, position, tv_empty_tips);
             }
         });
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fileList.clear();
-                final File[] fileArr_refresh = FileToOperate.getFileArr(path);
-                fileList.addAll(FileToOperate.getFileList(path, fileArr_refresh, getContext(), tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
-                adapter.notifyDataSetChanged();
+                toRefresh();
                 swipeRefreshLayout.setRefreshing(false);
-                FileToOperate.tvSwitch(fileList, fileArr_refresh, tv_empty_tips);
             }
         });
     }
 
+    private void toRefresh(){
+        fileList.clear();
+        path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
+        final File[] fileArr_refresh = FileToOperate.getFileArr(path);
+        fileList.addAll(FileToOperate.getFileList(path, fileArr_refresh, context, tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
+        adapter.notifyDataSetChanged();
+        FileToOperate.tvSwitch(fileList, fileArr_refresh, tv_empty_tips);
+    }
 }
