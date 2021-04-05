@@ -28,7 +28,6 @@ public class CopyProgressBarDialog {
         dialog.setTitle("正在复制...");
         dialog.setCancelable(false);
         //dialog.setCancelable(false);
-        //
         //dialog弹出后会点击屏幕或物理返回键，dialog不消失
         //dialog.setCanceledOnTouchOutside(false);
         //dialog弹出后，点击屏幕dialog不消失；点击物理返回键dialog消失

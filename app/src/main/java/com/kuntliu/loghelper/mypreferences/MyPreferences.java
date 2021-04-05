@@ -51,5 +51,8 @@ public class MyPreferences {
         setSharePreferencesListData(key, dataList, context);
     }
 
+    public static int SharePreferenceSize(Context context){
+        return getSharePreferencesListData("myTabs", context).size();
+    }
 
 }

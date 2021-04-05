@@ -59,7 +59,7 @@ public class FileToOperate {
         PathList.add(path_vng);
     }
 
-    //获取文件，数据形式为list
+    //获取文件列表，数据形式为list
     public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, TextView tv_empty_tips)  {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
@@ -87,6 +87,8 @@ public class FileToOperate {
         return fileList;
     }
 
+
+    //根据list和file[]正确判断当前文件列表状态
     public static void tvSwitch(List<LogFile> list, File[] arrFiles, TextView tv){
         if (list.size() == 0){
             tv.setVisibility(View.VISIBLE);
@@ -136,9 +138,9 @@ public class FileToOperate {
     //根据position删除对应的数据源并刷新适配器
     public static void deleteFile(File file, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, Context context){
         if (file != null && file.exists()) {
-            boolean isSuccessDeleteFile = file.delete();           //删除文件
+            boolean isSuccessDeleteFile = file.delete();         //删除文件
             loglist.remove(loglist.get(position));              //删除loglist对应的数据源
-            madapter.notifyItemRemoved(position);      //播放删除动画
+            madapter.notifyItemRemoved(position);               //播放删除动画
             madapter.notifyItemRangeChanged(position, loglist.size());  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
 //            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
 //            Log.d(TAG, "deleteFile: "+position);
@@ -147,7 +149,7 @@ public class FileToOperate {
         }
     }
 
-    //判断手机是否已安装QQ
+    //判断系统是否已安装QQ
     public static boolean isInstallQQ(Context context){
         boolean isInstall = false;
         PackageManager pm = context.getPackageManager();
@@ -163,7 +165,7 @@ public class FileToOperate {
         return isInstall;
     }
 
-    //通过QQ上我的电脑分享（发送）文件
+    //通过QQ-“发送我的电脑”分享（发送）文件
     public static void shareFile(File selectedFile, Context context) {
         if (isInstallQQ(context)){
             if (selectedFile.exists()){
@@ -192,7 +194,6 @@ public class FileToOperate {
         Drawable icon = null;
         PackageManager pm = context.getPackageManager();
         PackageInfo pi = pm.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
-
 //        Log.d("getFileDrawable", "getFileDrawable: "+path);
         if (pi != null) {
             ApplicationInfo application = pi.applicationInfo;

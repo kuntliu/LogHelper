@@ -5,6 +5,7 @@ package com.kuntliu.loghelper;
 import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,6 +20,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static android.content.ContentValues.TAG;
 
 public class ObbFile {
 
@@ -154,7 +159,16 @@ public class ObbFile {
                 descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
                         File.separator + "Android" + File.separator + "obb" + File.separator + "com.tencent.tmgp.cod" + File.separator;
             }else {
-                Toast.makeText(context, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
+                String pattern = "[c][o][m][a-zA-z|.]+$[.]";
+                Pattern p = Pattern.compile(pattern);
+                Matcher m = p.matcher(file.getName());
+                if (m.find()){
+                    descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                            File.separator + "Android" + File.separator + "obb" + File.separator + m + File.separator;
+                    Log.d(TAG, "getSelectedObbFileDescPath: "+descPath);
+                }else {
+                    Toast.makeText(context, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
+                }
             }
         }
         return descPath;

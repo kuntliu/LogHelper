@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final List<TabFragment> tabFragmentList = new ArrayList<>();
 
-
     private AlertDialog alertDialog;
     String[] permissions = new String[]
             {Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //通过重写onRestart重新加载tab名称
-    //默认的activity生命周期的模式下，onRestart()会在点击返回和从后台切回应用时被调用
+    //默认的Activity生命周期模式下，onRestart()会在点击返回或者从后台切回应用时被调用
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         tab_version = findViewById(R.id.tab_version);
         viewPager = findViewById(R.id.viewPage_file);
-        viewPager.setOffscreenPageLimit(6);    //默认情况下，viewPager会加载相邻的1页，这里设置为5
+        viewPager.setOffscreenPageLimit(MyPreferences.SharePregerenceSize(MainActivity.this));    //默认情况下，viewPager会加载相邻的1页，这里设置为5
 
         tab_version.setTabMode(TabLayout.MODE_SCROLLABLE);
         tab_version.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
