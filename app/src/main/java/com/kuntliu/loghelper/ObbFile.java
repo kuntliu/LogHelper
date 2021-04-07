@@ -39,7 +39,7 @@ public class ObbFile {
                 mkCopyFileDir(copyFileDescPath);
             }
             //执行复制操作前需要判断目标目录的obb文件是否已存在
-            if (!copyDescFile_isExisted(selectedObbFile, obbFileNameCilcked, context)) {
+            if (copyDescFile_isExisted(selectedObbFile, obbFileNameCilcked, context)) {
                 String copyFileSize = FileSizeTransform.Tansform(selectedObbFile.length());
 
                 MyConfirmCopyDialog.showConfirmCopyDialog(context, selectedObbFile.getName(), copyFileSize, copyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
@@ -142,33 +142,21 @@ public class ObbFile {
     //获取已选择的obb文件要复制的目标路径
     private String getSelectedObbFileDescPath(File file, Context context) {
         String descPath = "";
+        String fileName = file.getName();
+        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         if (file != null) {
-            if (file.getName().contains("com.activision.callofduty.shooter")) {
-                descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                        File.separator + "Android" + File.separator + "obb" + File.separator + "com.activision.callofduty.shooter" + File.separator;
-            } else if (file.getName().contains("com.garena.game.codm")) {
-                descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                        File.separator + "Android" + File.separator + "obb" + File.separator + "com.garena.game.codm" + File.separator;
-            } else if (file.getName().contains("com.tencent.tmgp.kr.codm")) {
-                descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                        File.separator + "Android" + File.separator + "obb" + File.separator + "com.tencent.tmgp.kr.codm" + File.separator;
-            } else if (file.getName().contains("com.vng.codmvn")) {
-                descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                        File.separator + "Android" + File.separator + "obb" + File.separator + "com.vng.codmvn" + File.separator;
-            } else if (file.getName().contains("com.tencent.tmgp.cod")){
-                descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                        File.separator + "Android" + File.separator + "obb" + File.separator + "com.tencent.tmgp.cod" + File.separator;
+            //通过正则表达式去获取obb路径
+            String pattern = "(com).\\w+(.+(?=.obb))";
+            Pattern p = Pattern.compile(pattern);
+            Matcher m = p.matcher(fileName);
+            Log.d(TAG, "getSelectedObbFileDescPath: "+m);
+            if (m.find()){
+                descPath = sdPath +
+                        File.separator + "Android" + File.separator + "obb" + File.separator + m.group() + File.separator;
+                Log.d(TAG, "getSelectedObbFileDescPath: "+descPath);
             }else {
-                String pattern = "[c][o][m][a-zA-z|.]+$[.]";
-                Pattern p = Pattern.compile(pattern);
-                Matcher m = p.matcher(file.getName());
-                if (m.find()){
-                    descPath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                            File.separator + "Android" + File.separator + "obb" + File.separator + m + File.separator;
-                    Log.d(TAG, "getSelectedObbFileDescPath: "+descPath);
-                }else {
-                    Toast.makeText(context, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(context, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
+                return null;
             }
         }
         return descPath;
