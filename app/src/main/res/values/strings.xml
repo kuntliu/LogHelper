@@ -33,4 +33,8 @@
     <string name="text_tab_name">Tab名称</string>
     <string name="text_tab_path">Tab目录位置</string>
     <string name="menu_set_defalut">恢复默认</string>
+
+    <!--  obb目录的正则表达式  -->
+    <string name="obb_re">(com).\\w+(.+(?=.obb))</string>
+
 </resources>

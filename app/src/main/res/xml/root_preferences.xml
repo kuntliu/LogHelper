@@ -14,14 +14,23 @@
                 android:targetPackage="com.kuntliu.loghelper"
                 android:targetClass="com.kuntliu.loghelper.PrivateTabActivity"/>
         </Preference>
+
+        <EditTextPreference
+            app:key="private_obb_re"
+            app:summary="根据obb文件名获取obb目录的正则表达式，获取的obb目录不准确时可调整此项，需要输入正确预期的正则表达式，可点击以下链接测试输入的正则表达式"
+            app:title="自定义obb目录正则表达式"
+            app:dialogTitle="输入正则表达式"
+            app:iconSpaceReserved="false"
+            app:defaultValue="@string/obb_re"/>
+
         <Preference
-            app:key="tab_obb"
-            app:title="@string/text_private_obb"
+            app:key="re_test"
+            app:title="正则表达式测试"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false">
-<!--            <intent-->
-<!--                android:targetPackage="com.kuntliu.loghelper"-->
-<!--                android:targetClass="com.kuntliu.loghelper.PrivateTabActivity"/>-->
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://c.runoob.com/front-end/854"/>
         </Preference>
 
     </PreferenceCategory>

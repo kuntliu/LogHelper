@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //通过重写onRestart重新加载tab名称
-    //默认的Activity生命周期模式下，onRestart()会在点击返回或者从后台切回应用时被调用
+    //默认的Activity生命周期模式下，onRestart()会在点击返回键或者从后台切回应用时被调用
     @Override
     protected void onRestart() {
         super.onRestart();

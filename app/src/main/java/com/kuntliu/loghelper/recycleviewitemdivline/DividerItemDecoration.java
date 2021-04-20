@@ -11,6 +11,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
         int pos = parent.getChildAdapterPosition(view);
-        outRect.bottom = 3;
+        outRect.bottom = 10;
     }
 }

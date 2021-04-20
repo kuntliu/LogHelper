@@ -45,6 +45,11 @@ public class MyPreferences {
         return dataList;
     }
 
+    public static String getSharePreferencesStringData(String key, Context context){
+        SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
+        return spf.getString(key, "");
+    }
+
     public static void updateSharePreferencesListData(String key, String strToUpdate, int position, Context context){
         ArrayList<String> dataList = getSharePreferencesListData(key, context);
         dataList.set(position, strToUpdate);

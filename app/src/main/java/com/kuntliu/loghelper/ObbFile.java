@@ -5,6 +5,7 @@ package com.kuntliu.loghelper;
 import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.kuntliu.loghelper.mydialog.CopyProgressBarDialog;
 import com.kuntliu.loghelper.mydialog.MyConfirmCopyDialog;
+import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +32,8 @@ public class ObbFile {
 
     public void copyObbFile(final File selectedObbFile, String obbFileNameCilcked, final Context context){
 
-        String copyFileDescPath = getSelectedObbFileDescPath(selectedObbFile, context);  //获取已选择的obb文件要复制的目标路径
-        if (copyFileDescPath != null) {
+        String copyFileDescPath = getSelectedObbFileDescPath(obbFileNameCilcked, context);  //获取已选择的obb文件要复制的目标路径
+        if (!copyFileDescPath.equals("")) {
             final File descFile = new File(copyFileDescPath + selectedObbFile.getName());  //完整的目标文件对象
 
             if (!isExisted_DirCopyFileDescPath(copyFileDescPath)) {
@@ -39,7 +41,7 @@ public class ObbFile {
                 mkCopyFileDir(copyFileDescPath);
             }
             //执行复制操作前需要判断目标目录的obb文件是否已存在
-            if (copyDescFile_isExisted(selectedObbFile, obbFileNameCilcked, context)) {
+            if (!copyDescFile_isExisted(obbFileNameCilcked, context)) {
                 String copyFileSize = FileSizeTransform.Tansform(selectedObbFile.length());
 
                 MyConfirmCopyDialog.showConfirmCopyDialog(context, selectedObbFile.getName(), copyFileSize, copyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
@@ -55,12 +57,12 @@ public class ObbFile {
                             final TextView tv_precent = view.findViewById(R.id.CopyPrecent);
 
                             final ProgressBar progressBar = view.findViewById(R.id.CopyProgressbar);
-                            final Handler handler = new Handler();
+                            final Handler handler = new Handler(Looper.getMainLooper());
 
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    long tansforSize = 0;
+                                    long transforSize = 0;
                                     int Progress;
                                     FileChannel inputChannel = null;
                                     FileChannel outputChannel = null;
@@ -72,8 +74,8 @@ public class ObbFile {
 
                                         while (inputChannel.read(buffer) != -1) {
                                             buffer.flip();
-                                            tansforSize += outputChannel.write(buffer);
-                                            Progress = (int) (tansforSize * 100 / selectedObbFile.length());
+                                            transforSize += outputChannel.write(buffer);
+                                            Progress = (int) (transforSize * 100 / selectedObbFile.length());
 //                                                Log.d("CopyProgress", "CopyProgress"+Progress);
                                             final int finalProgress = Progress;
                                             handler.post(new Runnable() {
@@ -140,13 +142,14 @@ public class ObbFile {
     }
 
     //获取已选择的obb文件要复制的目标路径
-    private String getSelectedObbFileDescPath(File file, Context context) {
+    private String getSelectedObbFileDescPath(String fileName, Context context) {
         String descPath = "";
-        String fileName = file.getName();
         String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        if (file != null) {
+        if (fileName != null) {
             //通过正则表达式去获取obb路径
-            String pattern = "(com).\\w+(.+(?=.obb))";
+//            String pattern = "(com).\\w+(.+(?=.obb))";
+            String pattern = MyPreferences.getSharePreferencesStringData("private_obb_re", context);
+            Log.d(TAG, "pattern: "+pattern);
             Pattern p = Pattern.compile(pattern);
             Matcher m = p.matcher(fileName);
             Log.d(TAG, "getSelectedObbFileDescPath: "+m);
@@ -155,23 +158,22 @@ public class ObbFile {
                         File.separator + "Android" + File.separator + "obb" + File.separator + m.group() + File.separator;
                 Log.d(TAG, "getSelectedObbFileDescPath: "+descPath);
             }else {
-                Toast.makeText(context, "获取复制目标目录失败", Toast.LENGTH_SHORT).show();
-                return null;
+                Toast.makeText(context, "获取目标目录失败,请在设置中修改正则表达式后重试", Toast.LENGTH_SHORT).show();
             }
         }
         return descPath;
     }
 
     //根据要复制的文件名去判断复制的目标目录下是否已存在obb文件
-    private boolean copyDescFile_isExisted(File file, String FileNameClicked, Context context){
+    private boolean copyDescFile_isExisted(String fileNameClicked, Context context){
         boolean isExisted = false;
         File[] obbDirfile;
-        String path = getSelectedObbFileDescPath(file, context);
-        file = new File(path);
-        obbDirfile = file.listFiles();
+        String path = getSelectedObbFileDescPath(fileNameClicked, context);
+        File file1 = new File(path);
+        obbDirfile = file1.listFiles();
         if (obbDirfile != null) {
             for (File f : obbDirfile) {
-                if (f.getName().equals(FileNameClicked)){
+                if (f.getName().equals(fileNameClicked)){
                     isExisted = true;
                 }
             }
