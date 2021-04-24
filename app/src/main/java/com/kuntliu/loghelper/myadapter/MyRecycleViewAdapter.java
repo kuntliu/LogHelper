@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kuntliu.loghelper.LogFile;
 import com.kuntliu.loghelper.R;
+import com.kuntliu.loghelper.Transform;
 
 import java.util.List;
 
@@ -56,8 +57,8 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewAdap
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         holder.tv_fileName.setText(list.get(position).getFile_name());
-        holder.tv_fileSize.setText(list.get(position).getFile_size());
-        holder.tv_fileCreateTime.setText(list.get(position).getFile_time_create());
+        holder.tv_fileSize.setText(Transform.transformSize(list.get(position).getFile_size()));
+        holder.tv_fileCreateTime.setText(Transform.transFormTime(list.get(position).getFile_time_create()));
         holder.tv_fileIcon.setImageDrawable(list.get(position).getFile_icon());
         holder.tv_apkVersion.setText(list.get(position).getFile_apk_version());
 

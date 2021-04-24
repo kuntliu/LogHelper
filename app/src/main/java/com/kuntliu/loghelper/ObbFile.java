@@ -42,7 +42,7 @@ public class ObbFile {
             }
             //执行复制操作前需要判断目标目录的obb文件是否已存在
             if (!copyDescFile_isExisted(obbFileNameCilcked, context)) {
-                String copyFileSize = FileSizeTransform.Tansform(selectedObbFile.length());
+                String copyFileSize = Transform.transformSize(selectedObbFile.length());
 
                 MyConfirmCopyDialog.showConfirmCopyDialog(context, selectedObbFile.getName(), copyFileSize, copyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
                     @Override

@@ -39,11 +39,11 @@
         app:iconSpaceReserved="false">
 
         <ListPreference
-            app:defaultValue="sort_by_time"
+            app:key="sort_setting"
+            app:title="@string/sort_title"
+            app:defaultValue="1,0"
             app:entries="@array/sort_entries"
             app:entryValues="@array/sort_values"
-            app:key="sort_type_setting"
-            app:title="@string/sort_title"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 

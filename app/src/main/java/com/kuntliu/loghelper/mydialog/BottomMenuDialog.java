@@ -9,13 +9,12 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.kuntliu.loghelper.FileSizeTransform;
 import com.kuntliu.loghelper.FileToOperate;
 import com.kuntliu.loghelper.LogFile;
 import com.kuntliu.loghelper.R;
+import com.kuntliu.loghelper.Transform;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.List;
@@ -52,7 +51,7 @@ public class BottomMenuDialog {
         btn_detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyFileDetailInfoDialog.showFileDetailInfoDialog(context, file.getName(), FileSizeTransform.Tansform(file.length()), file.getPath());
+                MyFileDetailInfoDialog.showFileDetailInfoDialog(context, file.getName(), Transform.transformSize(file.length()), file.getPath());
                 pw.dismiss();
             }
         });

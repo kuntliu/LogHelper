@@ -56,6 +56,16 @@ public class MyPreferences {
         setSharePreferencesListData(key, dataList, context);
     }
 
+    public static int[] getSharePreferencesSortData(String key, Context context){
+        SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
+        String[] sortData_str = spf.getString(key, "1,0").split(",");
+        int[] sortData_int = new int[sortData_str.length];
+        for (int i=0; i<sortData_str.length; i++){
+            sortData_int[i] = Integer.parseInt(sortData_str[i]);
+        }
+        return sortData_int;
+    }
+
     public static int SharePreferenceSize(Context context){
         return getSharePreferencesListData("myTabs", context).size();
     }

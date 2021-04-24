@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager;
 
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
+import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +31,11 @@ import static android.content.ContentValues.TAG;
 
 public class FileToOperate {
 
+    private static final int SORT_BY_TIME = 1;     //根据时间排序
+    private static final int SORT_BY_SIZE = 2;     //根据大小排序
+    private static final int SORT_BY_NAME = 3;     //根据名称排序
+    private static final int ORDER_POSITIVE = 0;   //正序
+    private static final int ORDER_REVERSE = 1;    //逆序
 
     //设置默认的初始Tab名称和Tab对应的路径
     public static void setDefalutTabAndPath(ArrayList<String> TabList, ArrayList<String> PathList){
@@ -67,8 +73,6 @@ public class FileToOperate {
                 for (File f : arrFiles) {
 //                Log.d("FileList", f.toString());
                     if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
-                        String fileSize_str = FileSizeTransform.Tansform(f.length());      //获取文件大小并且进行显示单位转换
-                        String time_str = MySimpleDateFormat.transFormTime(f.lastModified());    //获取文件最后修改时间并且进行时间格式转换
                         //判断如果文件是apk就获取版本号
                         String apk_version = "";
                         if (f.getName().endsWith(".apk")){
@@ -77,12 +81,12 @@ public class FileToOperate {
                                 apk_version = "";
                             }
                         }
-                        LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), fileSize_str, time_str, apk_version);
+                        LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
                         fileList.add(log);
                     }
                 }
-                fileList = new ArrayListSort().fileSort(fileList, 1, 1);   //对集合内元素进行排序
+                fileList = new ArrayListSort().fileSort(fileList, MyPreferences.getSharePreferencesSortData("sort_setting", context)[0], MyPreferences.getSharePreferencesSortData("sort_setting", context)[1]);   //对集合内元素进行排序
             }
         return fileList;
     }

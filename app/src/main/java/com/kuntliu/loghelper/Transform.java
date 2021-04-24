@@ -2,10 +2,11 @@ package com.kuntliu.loghelper;
 
 import android.annotation.SuppressLint;
 
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class FileSizeTransform {
-    public static String Tansform(long FileSize){
+public class Transform {
+    public static String transformSize(long FileSize){
         String fileSize_str;
         double fileSize_db;
         if (FileSize >= Math.pow(2, 30)){
@@ -21,5 +22,9 @@ public class FileSizeTransform {
             fileSize_str = FileSize + " B";
         }
         return fileSize_str;
+    }
+    public static String transFormTime(Long time_long){
+        SimpleDateFormat sd = new SimpleDateFormat("yyyy/M/d HH:mm", Locale.getDefault());
+        return sd.format(time_long);
     }
 }
