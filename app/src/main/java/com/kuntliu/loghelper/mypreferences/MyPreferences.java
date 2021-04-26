@@ -4,10 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-
-import androidx.preference.ListPreference;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -45,9 +41,9 @@ public class MyPreferences {
         return dataList;
     }
 
-    public static String getSharePreferencesStringData(String key, Context context){
+    public static String getSharePreferencesStringData(String key, String defValue, Context context){
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
-        return spf.getString(key, "");
+        return spf.getString(key, defValue);
     }
 
     public static void updateSharePreferencesListData(String key, String strToUpdate, int position, Context context){

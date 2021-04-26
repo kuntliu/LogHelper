@@ -38,6 +38,8 @@ public class TabFragment extends Fragment {
     File[] fileArr;
     String path;
     int tabPosition;
+    String filterCondition;
+    boolean isSdCardRoot = false;
     private MyRecycleViewAdapter adapter;
     Context context;
 
@@ -77,13 +79,16 @@ public class TabFragment extends Fragment {
         if (getContext() != null){
             context = getContext();
             path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
-            SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
-            if (spf.getString("show_type_values", "").equals("show_all")){
-            }
         }
 
+        //判断当前tab是否是主目录
+        if (tabPosition == 0){
+            isSdCardRoot = true;
+
+        }
+        filterCondition = MyPreferences.getSharePreferencesStringData("show_type", "show_all", context);
         fileArr = FileToOperate.getFileArr(path);
-        fileList = FileToOperate.getFileList(path, fileArr, getContext(), tv_empty_tips);
+        fileList = FileToOperate.getFileList(path, fileArr, getContext(), filterCondition, isSdCardRoot);
         Log.d(TAG, "onStart_myPath: "+getArguments().getString("myPath"));
 
         adapter = new MyRecycleViewAdapter(fileList, context);
@@ -124,8 +129,8 @@ public class TabFragment extends Fragment {
     private void toRefresh(){
         fileList.clear();
         path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
-        final File[] fileArr_refresh = FileToOperate.getFileArr(path);
-        fileList.addAll(FileToOperate.getFileList(path, fileArr_refresh, context, tv_empty_tips));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
+        File[] fileArr_refresh = FileToOperate.getFileArr(path);
+        fileList.addAll(FileToOperate.getFileList(path, fileArr_refresh, context, filterCondition, isSdCardRoot));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
         adapter.notifyDataSetChanged();
         FileToOperate.tvSwitch(fileList, fileArr_refresh, tv_empty_tips);
     }

@@ -48,11 +48,11 @@
             app:iconSpaceReserved="false"/>
 
         <ListPreference
+            app:key="show_type"
+            app:title="@string/show_type_title"
             app:defaultValue="show_all"
             app:entries="@array/show_type_entries"
             app:entryValues="@array/show_type_values"
-            app:key="show_type"
-            app:title="@string/show_type_title"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 

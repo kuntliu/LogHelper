@@ -148,7 +148,7 @@ public class ObbFile {
         if (fileName != null) {
             //通过正则表达式去获取obb路径
 //            String pattern = "(com).\\w+(.+(?=.obb))";
-            String pattern = MyPreferences.getSharePreferencesStringData("private_obb_re", context);
+            String pattern = MyPreferences.getSharePreferencesStringData("private_obb_re", "(com).\\w+(.+(?=.obb))", context);
             Log.d(TAG, "pattern: "+pattern);
             Pattern p = Pattern.compile(pattern);
             Matcher m = p.matcher(fileName);

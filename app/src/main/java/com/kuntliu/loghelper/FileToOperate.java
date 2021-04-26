@@ -66,7 +66,7 @@ public class FileToOperate {
     }
 
     //获取文件列表，数据形式为list
-    public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, TextView tv_empty_tips)  {
+    public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, String filterConditon, Boolean isSdCardroot)  {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
         if (getFileArr(path) != null){
@@ -81,12 +81,20 @@ public class FileToOperate {
                                 apk_version = "";
                             }
                         }
-                        LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
+                        if (isSdCardroot && filterConditon.equals( "show_apk_obb")){
+                            if (f.getName().endsWith("apk") || f.getName().endsWith("obb")){
+                                LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
-                        fileList.add(log);
+                                fileList.add(log);
+                            }
+                        }else {
+                            LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
+                            fileList.add(log);
+                        }
                     }
                 }
-                fileList = new ArrayListSort().fileSort(fileList, MyPreferences.getSharePreferencesSortData("sort_setting", context)[0], MyPreferences.getSharePreferencesSortData("sort_setting", context)[1]);   //对集合内元素进行排序
+                //对集合内元素进行排序
+                fileList = new ArrayListSort().fileSort(fileList, MyPreferences.getSharePreferencesSortData("sort_setting", context)[0], MyPreferences.getSharePreferencesSortData("sort_setting", context)[1]);
             }
         return fileList;
     }
