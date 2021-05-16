@@ -153,7 +153,7 @@ public class FileToOperate {
             boolean isSuccessDeleteFile = file.delete();         //删除文件
             loglist.remove(loglist.get(position));              //删除loglist对应的数据源
             madapter.notifyItemRemoved(position);               //播放删除动画
-            madapter.notifyItemRangeChanged(position, loglist.size());  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
+            madapter.notifyItemRangeChanged(position, loglist.size() - position);  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
 //            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
 //            Log.d(TAG, "deleteFile: "+position);
         }else {

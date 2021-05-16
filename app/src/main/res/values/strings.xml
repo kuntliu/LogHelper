@@ -24,6 +24,7 @@
     <!-- 目录设置 -->
     <string name="text_private_tab">自定义配置Tab目录</string>
     <string name="text_private_obb">自定义配置obb目录</string>
+    <string name="root_path">/storage/emulated/0/</string>
 
     <!-- 文件显示设置 -->
     <string name="sort_title">排序方式</string>
@@ -33,6 +34,7 @@
     <string name="text_tab_name">Tab名称</string>
     <string name="text_tab_path">Tab目录位置</string>
     <string name="menu_set_defalut">恢复默认</string>
+    <string name="tab_add">添加</string>
 
     <!--  obb目录的正则表达式  -->
     <string name="obb_re">(com).\\w+(.+(?=.obb))</string>

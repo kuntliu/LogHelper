@@ -11,12 +11,12 @@ import static android.content.ContentValues.TAG;
 
 public class MyPreferences {
 
+    //设置存储的List，每次调用都会覆盖原来的数据
     public static void setSharePreferencesListData(String key,ArrayList<String> myDataToSet, Context context){
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = spf.edit();
-
         StringBuilder data_str = new StringBuilder();
-        if (myDataToSet !=null && myDataToSet.size() > 0){
+        if (myDataToSet != null && myDataToSet.size() > 0){
             for (String s : myDataToSet){
                 data_str.append(s);
                 data_str.append("#");//由于保存数据的Set集合是不可重复并且无序的，因此使用字符串和#作为分隔符来存储数组类型的数据

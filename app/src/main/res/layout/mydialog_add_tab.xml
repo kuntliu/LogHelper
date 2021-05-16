@@ -11,11 +11,11 @@
         android:layout_height="wrap_content"
         android:text="@string/text_tab_name"/>
     <EditText
-        android:id="@+id/et_tabs"
+        android:id="@+id/add_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:autofillHints="输入要显示的目录名称"
+        android:autofillHints="输入要新增的tab名称"
         android:inputType="none"
         tools:ignore="LabelFor" />
 
@@ -24,10 +24,10 @@
         android:layout_height="wrap_content"
         android:text="@string/text_tab_path"/>
     <EditText
-        android:id="@+id/et_paths"
+        android:id="@+id/add_paths"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="输入要显示的目录路径"
+        android:autofillHints="输入要新增的目录路径"
         android:inputType="none"
         tools:ignore="LabelFor"
         android:layout_marginBottom="20dp"/>

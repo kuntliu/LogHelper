@@ -63,12 +63,7 @@ public class BottomMenuDialog {
 
         pw.setAnimationStyle(R.style.Dialog_Anim);
         pw.showAtLocation(LayoutInflater.from(context).inflate(R.layout.activity_main,null), Gravity.BOTTOM, 0 ,0 );
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//        AlertDialog dialog = builder.create();
-//        dialog.setView(view);
-//        dialog.getWindow().setWindowAnimations(R.style.Dialog_Anim);
-//        dialog.show();
+
         pw.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {

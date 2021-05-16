@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_add_tab"
+        android:orderInCategory="100"
+        android:title="@string/tab_add"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_set_defalut"
+        android:orderInCategory="200"
+        android:title="@string/menu_set_defalut"
+        app:showAsAction="ifRoom" />
+</menu>

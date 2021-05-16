@@ -11,15 +11,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 
 import com.kuntliu.loghelper.myadapter.PrivateTabsAdapter;
+import com.kuntliu.loghelper.mydialog.BottomMenuPopupWindow;
 import com.kuntliu.loghelper.mydialog.EditTabsDialog;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
@@ -73,27 +77,7 @@ public class PrivateTabActivity extends AppCompatActivity {
         adapter.setOnItemLongClickListener(new PrivateTabsAdapter.OnItemLongClickListener() {
             @Override
             public void OnItemLongClick(View v, final int position) {
-                PopupWindow pw = new PopupWindow();
-
-                String[] tabMenu = getResources().getStringArray(R.array.delete_private_tab);
-//                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(PrivateTabActivity.this, R.layout.support_simple_spinner_dropdown_item, tabMenu);
-//                spinner.setAdapter(arrayAdapter);
-//                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//                    @Override
-//                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                        if (i == 0) {
-//                            MyPreferences.deleteSharePreferenceListData("myTabs", position, PrivateTabActivity.this);
-//                            MyPreferences.deleteSharePreferenceListData("myPaths", position, PrivateTabActivity.this);
-//                            tabList.remove(position);
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//                    }
-//                });
+                BottomMenuPopupWindow.showBottomPopWindow(PrivateTabActivity.this, position, tabList, adapter);
             }
         });
     }
@@ -103,7 +87,7 @@ public class PrivateTabActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         menu.clear();
-        getMenuInflater().inflate(R.menu.menu_set_deafalut_tab, menu);
+        getMenuInflater().inflate(R.menu.menu_private_tab, menu);
         return true;
     }
 
@@ -120,7 +104,47 @@ public class PrivateTabActivity extends AppCompatActivity {
             showConfirmDeleteTabDialog(PrivateTabActivity.this);
             return true;
         }
+        if (id == R.id.action_add_tab){
+            showAddTabDialog(PrivateTabActivity.this);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showAddTabDialog(final Context context) {
+        View view = LayoutInflater.from(context).inflate(R.layout.mydialog_add_tab, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(view);
+        final AlertDialog dialog = builder.create();
+        Button btn_cancel = view.findViewById(R.id.btn_cancel);
+        Button btn_confirm = view.findViewById(R.id.btn_confirm);
+        final EditText et_add_tab = view.findViewById(R.id.add_tabs);
+        final EditText et_add_path = view.findViewById(R.id.add_paths);
+        et_add_path.setText(getResources().getText(R.string.root_path));
+
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btn_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MyPreferences.updateSharePreferencesListData("myTabs", et_add_tab.getText().toString(), tabList.size()-1, context);
+                MyPreferences.updateSharePreferencesListData("myPaths", et_add_path.getText().toString(), tabList.size()-1, context);
+                PrivateTabs pt = new PrivateTabs(et_add_tab.getText().toString(), et_add_path.getText().toString());
+                tabList.add(pt);
+                adapter.notifyItemInserted(tabList.size());
+                adapter.notifyItemRangeChanged(tabList.size(), 0);  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setTitle("新增页签");
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.show();
     }
 
     public void showConfirmDeleteTabDialog(final Context context){
