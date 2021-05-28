@@ -3,7 +3,6 @@ package com.kuntliu.loghelper;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,14 +14,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.preference.PreferenceManager;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
+import com.kuntliu.loghelper.mydocumentfile.MyDocumentFile;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,45 +30,40 @@ import static android.content.ContentValues.TAG;
 
 public class FileToOperate {
 
-    private static final int SORT_BY_TIME = 1;     //根据时间排序
-    private static final int SORT_BY_SIZE = 2;     //根据大小排序
-    private static final int SORT_BY_NAME = 3;     //根据名称排序
-    private static final int ORDER_POSITIVE = 0;   //正序
-    private static final int ORDER_REVERSE = 1;    //逆序
-
     //设置默认的初始Tab名称和Tab对应的路径
     public static void setDefalutTabAndPath(ArrayList<String> TabList, ArrayList<String> PathList){
         String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
         String path_west = path_SdcardRoot+
                 File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_cn = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_garena = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_korea = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-        String path_vng = path_SdcardRoot+
-                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+//        String path_cn = path_SdcardRoot+
+//                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+//        String path_garena = path_SdcardRoot+
+//                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+//        String path_korea = path_SdcardRoot+
+//                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+//        String path_vng = path_SdcardRoot+
+//                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
 
         TabList.add("主目录");
         TabList.add("西方");
-        TabList.add("国服");
-        TabList.add("GARENA");
-        TabList.add("韩国");
-        TabList.add("VNG");
+//        TabList.add("国服");
+//        TabList.add("GARENA");
+//        TabList.add("韩国");
+//        TabList.add("VNG");
         PathList.add(path_SdcardRoot);
         PathList.add(path_west);
-        PathList.add(path_cn);
-        PathList.add(path_garena);
-        PathList.add(path_korea);
-        PathList.add(path_vng);
+//        PathList.add(path_cn);
+//        PathList.add(path_garena);
+//        PathList.add(path_korea);
+//        PathList.add(path_vng);
     }
 
     //获取文件列表，数据形式为list
     public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, String filterConditon, Boolean isSdCardroot)  {
         List<LogFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
-        if (getFileArr(path) != null){
+        if (!MyDocumentFile.checkIsNeedDocument(path)){
+            if (getFileArr(path) != null){
                 for (File f : arrFiles) {
 //                Log.d("FileList", f.toString());
                     if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
@@ -96,20 +90,32 @@ public class FileToOperate {
                 //对集合内元素进行排序
                 fileList = new ArrayListSort().fileSort(fileList, MyPreferences.getSharePreferencesSortData("sort_setting", context)[0], MyPreferences.getSharePreferencesSortData("sort_setting", context)[1]);
             }
+        }
         return fileList;
     }
 
-
     //根据list和file[]正确判断当前文件列表状态
-    public static void tvSwitch(List<LogFile> list, File[] arrFiles, TextView tv){
-        if (list.size() == 0){
-            tv.setVisibility(View.VISIBLE);
-            tv.setText("当前目录为空");
-        }if (arrFiles == null){
-            tv.setVisibility(View.VISIBLE);
-            tv.setText("当前目录不存在");
-        }if (list.size() != 0 && arrFiles != null) {
-            tv.setVisibility(View.GONE);
+    public static void tvSwitch(String path, List<LogFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, TextView tv){
+        if (!MyDocumentFile.checkIsNeedDocument(path)){
+            if (list.size() == 0){
+                tv.setVisibility(View.VISIBLE);
+                tv.setText("当前目录为空");
+            }if (arrFiles == null){
+                tv.setVisibility(View.VISIBLE);
+                tv.setText("当前目录不存在");
+            }if (list.size() != 0 && arrFiles != null) {
+                tv.setVisibility(View.GONE);
+            }
+        }else {
+            if (list.size() == 0){
+                tv.setVisibility(View.VISIBLE);
+                tv.setText("当前目录为空");
+            }if (documentFilesArr == null){
+                tv.setVisibility(View.VISIBLE);
+                tv.setText("当前目录不存在");
+            }if (list.size() != 0 && documentFilesArr != null) {
+                tv.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -138,14 +144,15 @@ public class FileToOperate {
         if (fileName.endsWith(".apk")){
             return getApkIcon(filePath ,context);
         }else if(fileName.endsWith(".txt")){
-            return context.getDrawable(R.drawable.ic_file_txt);
+            return ContextCompat.getDrawable(context, R.drawable.ic_file_txt);
         }else if(fileName.endsWith(".log")){
-            return context.getDrawable(R.drawable.ic_file_txt);
+            return ContextCompat.getDrawable(context, R.drawable.ic_file_txt);
         }else if(fileName.endsWith(".obb")){
-            return context.getDrawable(R.drawable.ic_file_obb);
+            return ContextCompat.getDrawable(context, R.drawable.ic_file_obb);
         }else
-            return context.getDrawable(R.drawable.ic_file_unknown);
+            return ContextCompat.getDrawable(context, R.drawable.ic_file_unknown);
     }
+
 
     //根据position删除对应的数据源并刷新适配器
     public static void deleteFile(File file, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, Context context){
@@ -188,11 +195,10 @@ public class FileToOperate {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    context.startActivity(intent);
                 }else {
                     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(selectedFile));
-                    context.startActivity(intent);
                 }
+                context.startActivity(intent);
             }else {
                 Toast.makeText(context, "文件不存在", Toast.LENGTH_LONG).show();
             }
@@ -202,7 +208,7 @@ public class FileToOperate {
     }
 
     //通过apk的路径获取apk安装包的图标
-    private static Drawable getApkIcon(String path, Context context){
+    public static Drawable getApkIcon(String path, Context context){
         Drawable icon = null;
         PackageManager pm = context.getPackageManager();
         PackageInfo pi = pm.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);

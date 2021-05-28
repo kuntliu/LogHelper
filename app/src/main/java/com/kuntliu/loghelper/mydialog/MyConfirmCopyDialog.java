@@ -31,11 +31,20 @@ public class MyConfirmCopyDialog {
 
         Button btn_cancel = view.findViewById(R.id.btn_cancel);
         Button btn_confirm = view.findViewById(R.id.btn_confirm);
+        Button btn_move = view.findViewById(R.id.btn_move);
+
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
                 alertDialogBtnClickListener.clickCancel();
+            }
+        });
+        btn_move.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                alertDialogBtnClickListener.clickMove();
             }
         });
         btn_confirm.setOnClickListener(new View.OnClickListener() {
@@ -68,5 +77,6 @@ public class MyConfirmCopyDialog {
     public interface AlertDialogBtnClickListener {
         void clickCancel();
         void clickConfirm();
+        void clickMove();
     }
 }

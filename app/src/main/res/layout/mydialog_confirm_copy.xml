@@ -46,5 +46,5 @@
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
         android:textColor="@color/black"/>
-    <include layout="@layout/btn_cancel_and_confirm"/>
+    <include layout="@layout/btn_confirm_obb_info"/>
 </LinearLayout>

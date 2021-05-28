@@ -34,8 +34,6 @@ class MyFileDetailInfoDialog {
                 dialog.dismiss();
             }
         });
-
-
         Window window = dialog.getWindow();
         if (window != null){
             window.setWindowAnimations(R.style.Dialog_Anim);

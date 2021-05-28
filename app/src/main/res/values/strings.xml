@@ -1,16 +1,16 @@
 <resources>
     <string name="app_name">LogHelper</string>
-    <string name="action_settings">设置</string>
-    <string name="obb_text">一键放置obb文件</string>
     <string name="action_delete">删除</string>
     <string name="action_share">发送</string>
     <string name="action_detail">详细信息</string>
     <string name="action_about">关于</string>
+    <string name="action_settings">设置</string>
     <string name="text_filename">文件名</string>
     <string name="text_filesize">文件大小</string>
     <string name="text_filepath">复制的目标路径</string>
     <string name="text_cancel">取消</string>
-    <string name="text_comfirm">确定</string>
+    <string name="text_confirm">确定</string>
+    <string name="text_move">移动</string>
     <string name="text_path">位置</string>
     <string name="text_copy">复制</string>
     <string name="text_precent">%</string>
@@ -34,9 +34,10 @@
     <string name="text_tab_name">Tab名称</string>
     <string name="text_tab_path">Tab目录位置</string>
     <string name="menu_set_defalut">恢复默认</string>
-    <string name="tab_add">添加</string>
+    <string name="tab_add">添加页签</string>
 
     <!--  obb目录的正则表达式  -->
     <string name="obb_re">(com).\\w+(.+(?=.obb))</string>
+    <string name="android_eleven_limit_text">由于Android11系统的限制的，无法访问其他应用data目录</string>
 
 </resources>

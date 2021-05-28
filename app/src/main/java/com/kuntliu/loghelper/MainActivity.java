@@ -1,6 +1,7 @@
 package com.kuntliu.loghelper;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,14 +12,18 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -31,6 +36,8 @@ import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,12 +53,13 @@ public class MainActivity extends AppCompatActivity {
              Manifest.permission.WRITE_EXTERNAL_STORAGE};    //需要申请的权限
     List<String> permissions_rejected = new ArrayList<>();//保存未授予权限
     int PERMISSION_CODE = 1000;
-    int SETTING_CODE = 1001;
+    int REQUEST_CODE_FOR_DIR = 1002;
 
     TabLayout tab_version;
     ViewPager viewPager;
     FragmentAdapter adapter;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,12 +67,34 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            boolean isGetAllPermission = getPermission();
+            Log.d(TAG, "onCreate: isGetAllPermission "+isGetAllPermission);
+            Log.d(TAG, "onCreate: isExternalStorageManager "+Environment.isExternalStorageManager());
+
             //获得权限了之后去初始化数据
-            if (getPermission()){
-                initData();
+            if (isGetAllPermission){
+                if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()){
+                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                    startActivity(intent);
+                    startForRoot(MainActivity.this, REQUEST_CODE_FOR_DIR);
+               }
+                if (Environment.isExternalStorageManager()){
+                    //主线程初始化view，新开子线程去初始化数据
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            initData();
+                        }
+                    }).start();
+                }
             }
         }
         tab_version.setupWithViewPager(viewPager,false);
+
+
+
+//        FileToOperate.getFiles(FileToOperate.getDoucmentFile(MainActivity.this, FileToOperate.path_west));
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -193,14 +223,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == SETTING_CODE){       //从设置返回后再次进行权限判断
-            getPermission();
-        }
-    }
-
 
     private void showDialogAndGotoSetting(){
         if (alertDialog == null) {
@@ -233,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", getPackageName(), null);
         intent.setData(uri);
-        startActivityForResult(intent, SETTING_CODE);
+        startActivity(intent);
     }
 
     @Override
@@ -254,9 +276,6 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_about) {
             Toast.makeText(MainActivity.this, "Current Version:1.1 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
             return true;
-        }else if (id == R.id.action_add_version) {
-            Toast.makeText(MainActivity.this, "这里是添加逻辑", Toast.LENGTH_LONG).show();
-            return true;
         }else if(id == R.id.action_setting){
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -264,4 +283,42 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+//
+//    public static String changeToUri(String path) {
+//        if (path.endsWith("/")) {
+//            path = path.substring(0, path.length() - 1);
+//        }
+//        String path2 = path.replace("/storage/emulated/0/", "").replace("/", "%2F");
+//        return "content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A" + path2;
+//    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void startForRoot(Activity context, int REQUEST_CODE_FOR_DIR) {
+        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata");
+        Log.d("startForRoot", "startForRoot:uri "+uri);
+        DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentFile.getUri());
+        context.startActivityForResult(intent, REQUEST_CODE_FOR_DIR);
+    }
+
+
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Uri uri;
+        if (data == null) {
+            return;
+        }
+        if (requestCode == REQUEST_CODE_FOR_DIR && (uri = data.getData()) != null) {
+            getContentResolver().takePersistableUriPermission(uri, data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));//关键是这里，这个就是保存这个目录的访问权限
+        }
+    }
+
 }

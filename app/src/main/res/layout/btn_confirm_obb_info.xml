@@ -11,21 +11,44 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/line"
+        app:layout_constraintRight_toLeftOf="@id/line1"
         android:text="@string/text_cancel"
         android:textColor="@color/colorPrimary"
         android:background="@drawable/btn_ripple"
         style="?android:attr/borderlessButtonStyle"/>
 
     <TextView
-        android:id="@+id/line"
+        android:id="@+id/line1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/btn_cancel"
+        app:layout_constraintRight_toRightOf="@id/btn_move"
+        android:text="@string/text_div_line"
+        android:textColor="@android:color/darker_gray" />
+
+    <Button
+        android:id="@+id/btn_move"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:text="@string/text_move"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="@id/line2"
+        app:layout_constraintLeft_toRightOf="@id/line1"
+        android:background="@drawable/btn_ripple"
+        style="?android:attr/borderlessButtonStyle"/>
+
+    <TextView
+        android:id="@+id/line2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/btn_move"
+        app:layout_constraintRight_toRightOf="@id/btn_confirm"
         android:text="@string/text_div_line"
         android:textColor="@android:color/darker_gray" />
 
@@ -33,13 +56,16 @@
         android:id="@+id/btn_confirm"
         android:layout_width="0dp"
         android:layout_height="32dp"
-        android:text="@string/text_confirm"
+        android:text="@string/text_copy"
         android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/line"
+        app:layout_constraintLeft_toRightOf="@id/line2"
         android:background="@drawable/btn_ripple"
         style="?android:attr/borderlessButtonStyle"/>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

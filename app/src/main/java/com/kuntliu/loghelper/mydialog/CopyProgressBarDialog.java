@@ -46,4 +46,22 @@ public class CopyProgressBarDialog {
             dialog.dismiss();
         }
     }
+
+        public static void showCircleProgressBar(Context context){
+            View view = LayoutInflater.from(context).inflate(R.layout.dialog_progressbar_circle, null);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(view);
+            dialog = builder.create();
+            dialog.setCancelable(false);
+
+            Window window = dialog.getWindow();
+            window.setBackgroundDrawableResource(R.drawable.view_radius);
+            if (window != null){
+                window.setWindowAnimations(R.style.Dialog_Anim);
+                window.setGravity(Gravity.CENTER);
+            }
+            dialog.show();
+        }
+
 }
