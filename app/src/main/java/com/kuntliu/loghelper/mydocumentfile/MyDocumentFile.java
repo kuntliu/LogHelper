@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
+import android.text.format.Time;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -32,12 +33,12 @@ import static android.content.ContentValues.TAG;
 public class MyDocumentFile {
 
 
-    public static List<LogFile> getDocumentFileList(String path, boolean isNeedUseDoc, Context context) {
+    public static List<LogFile> getDocumentFileList(DocumentFile[] documentFileArr, boolean isNeedUseDoc, Context context) {
+        long start_time = System.currentTimeMillis();
         List<LogFile> fileList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc) {
-            DocumentFile[] documentFilesArr = getdestDocumentFileArr(getDataDirDocumentFile(context, path), getDatadirItemPath(path));
-            if (documentFilesArr != null) {
-                for (DocumentFile df : documentFilesArr) {
+            if (documentFileArr != null) {
+                for (DocumentFile df : documentFileArr) {
                     String documentFileName = df.getName();
                     if (df.isFile() && !documentFileName.startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
                         //判断如果文件是apk就获取版本号
@@ -57,6 +58,8 @@ public class MyDocumentFile {
                 fileList = new ArrayListSort().fileSort(fileList, MyPreferences.getSharePreferencesSortData("sort_setting", context)[0], MyPreferences.getSharePreferencesSortData("sort_setting", context)[1]);
             }
         }
+        long end_time = System.currentTimeMillis();
+        Log.d(TAG, "getDocumentFileList: dotime "+(end_time-start_time));
         return fileList;
     }
 
@@ -87,24 +90,22 @@ public class MyDocumentFile {
 //                    }
 //                }
 //           }
+        DocumentFile[] documentFileArr = new DocumentFile[0];
+        long start_time = System.currentTimeMillis();
         for (DocumentFile d: documentFile.listFiles()){
             if (d.isDirectory() && d.getName().equals("com.activision.callofduty.shooter")){
-                Log.d(TAG, "com.activision.callofduty.shooter"+d.listFiles());
                 for (DocumentFile e:d.listFiles()){
                     if (e.isDirectory() && e.getName().equals("cache")){
-                        Log.d(TAG, "cache"+e.listFiles());
                         for (DocumentFile f:e.listFiles()){
                             if (f.isDirectory() && f.getName().equals("Cache")){
-
-                                Log.d(TAG, "Cache"+e.listFiles());
                                 for (DocumentFile g:f.listFiles()){
                                     if (g.isDirectory() && g.getName().equals("Log")){
-
-                                        Log.d(TAG, "Log"+e.listFiles());
-                                        for (DocumentFile h: g.listFiles()){
-                                            Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
-                                        }
-                                        return g.listFiles();
+//                                        for (DocumentFile h: g.listFiles()){
+//                                            Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
+//                                        }
+                                        long end_time = System.currentTimeMillis();
+                                        Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
+                                        documentFileArr = g.listFiles();
                                     }
                                 }
                             }
@@ -113,11 +114,12 @@ public class MyDocumentFile {
                 }
             }
         }
-        return documentFile.listFiles();
+        return documentFileArr;
     }
 
     //转换至uriTree的路径
     public static DocumentFile getDataDirDocumentFile(Context context, String path) {
+        long start_time = System.currentTimeMillis();
         if (path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
         }
@@ -135,10 +137,12 @@ public class MyDocumentFile {
 //            Log.d(TAG, "getDataDirDoucmentFile: isDir "+d.isDirectory() );
 //            Log.d(TAG, "getDataDirDoucmentFile: isCanread "+d.canRead() );
 //            Log.d(TAG, "getDataDirDoucmentFile: Name "+d.getName() );
-            for (DocumentFile e :d.listFiles()){
-                Log.d(TAG, "getDataDirDoucmentFile: getDestDirFileList "+e.getName());
-            }
+//            for (DocumentFile e :d.listFiles()){
+//                Log.d(TAG, "getDataDirDoucmentFile: getDestDirFileList "+e.getName());
+//            }
 //        }
+        long end_time = System.currentTimeMillis();
+        Log.d(TAG, "getDataDirDocumentFile: dotime "+(end_time-start_time));
         return d;
     }
 

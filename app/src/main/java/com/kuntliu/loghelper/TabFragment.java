@@ -81,7 +81,7 @@ public class TabFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= 30 && MyDocumentFile.checkIsNeedDocument(path)){
             Log.d(TAG, "onStart: doDocumentFileMethod");
             documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
-            fileList = MyDocumentFile.getDocumentFileList(path, MyDocumentFile.checkIsNeedDocument(path), context);
+            fileList = MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context);
         }else{
             Log.d(TAG, "onStart: doFileMethod");
             fileArr = FileToOperate.getFileArr(path);
@@ -148,7 +148,7 @@ public class TabFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= 30 && MyDocumentFile.checkIsNeedDocument(path)){
             Log.d(TAG, "onStart: doDocumentFileMethod");
             documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
-            fileList.addAll(MyDocumentFile.getDocumentFileList(path, MyDocumentFile.checkIsNeedDocument(path), context));
+            fileList.addAll(MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context));
         }else{
             Log.d(TAG, "onStart: doFileMethod");
             fileArr = FileToOperate.getFileArr(path);
