@@ -1,6 +1,7 @@
 package com.kuntliu.loghelper.mydialog;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import com.kuntliu.loghelper.FileToOperate;
 import com.kuntliu.loghelper.LogFile;
@@ -22,7 +25,7 @@ import java.util.List;
 public class BottomMenuDialog {
     PopupWindow pw;
 
-    public void showBottomMenu(final File file, final List<LogFile> list, final Context context, final MyRecycleViewAdapter apater, final int position , final TextView tv){
+    public void showBottomMenu(final File file, final DocumentFile documentFile, final boolean isNeedUseDoc, final List<LogFile> list, final Context context, final MyRecycleViewAdapter apater, final int position , final TextView tv){
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_bottom_menu, null);
         Button btn_sent = view.findViewById(R.id.btn_sent);
         Button btn_delete = view.findViewById(R.id.btn_delete);
@@ -31,7 +34,7 @@ public class BottomMenuDialog {
         btn_sent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FileToOperate.shareFile(file, context);
+                FileToOperate.shareFile(file, documentFile, context);
                 pw.dismiss();
             }
         });
@@ -39,7 +42,7 @@ public class BottomMenuDialog {
         btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FileToOperate.deleteFile(file, list, position, apater, context);
+                FileToOperate.deleteFile(file, documentFile, list, position, apater, isNeedUseDoc, context);
                 pw.dismiss();
                 if (list.size() == 0){
                     tv.setVisibility(View.VISIBLE);
@@ -51,7 +54,11 @@ public class BottomMenuDialog {
         btn_detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyFileDetailInfoDialog.showFileDetailInfoDialog(context, file.getName(), Transform.transformSize(file.length()), file.getPath());
+                if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
+                    MyFileDetailInfoDialog.showFileDetailInfoDialog(context, documentFile.getName(), Transform.transformSize(documentFile.length()), documentFile.getUri().getPath().replace("/tree/primary:Android/data/document/primary:", ""));
+                }else {
+                    MyFileDetailInfoDialog.showFileDetailInfoDialog(context, file.getName(), Transform.transformSize(file.length()), file.getPath());
+                }
                 pw.dismiss();
             }
         });

@@ -70,7 +70,7 @@ public class MyDocumentFile {
         if (path.startsWith(path2) && Build.VERSION.SDK_INT >= 30){
             isNeedUseDocument = true;
         }
-        Log.d(TAG, "checkIsNeedDocument: isNeedUsaDoc "+isNeedUseDocument);
+        Log.d(TAG, "checkIsNeedDocument: isNeedUseDoc "+isNeedUseDocument);
         return isNeedUseDocument;
     }
 
@@ -79,42 +79,29 @@ public class MyDocumentFile {
         return path.replace("/storage/emulated/0/Android/data/", "").split(File.separator);
     }
 
-    //递归调用，一层层目录进去找到对象目录的listFiles()
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static DocumentFile[] getdestDocumentFileArr(DocumentFile documentFile, String[] path) {
-//            Log.d(TAG, "getdestDocumentFileArr:path " + Arrays.toString(path));
-//            for (String s : path) {
-//                for (DocumentFile d : documentFile.listFiles()) {
-//                    if (d.isDirectory() && d.getName().equals(s)) {
-//                        getdestDocumentFileArr(d, path);
-//                    }
-//                }
-//           }
-        DocumentFile[] documentFileArr = new DocumentFile[0];
         long start_time = System.currentTimeMillis();
-        for (DocumentFile d: documentFile.listFiles()){
-            if (d.isDirectory() && d.getName().equals("com.activision.callofduty.shooter")){
-                for (DocumentFile e:d.listFiles()){
-                    if (e.isDirectory() && e.getName().equals("cache")){
-                        for (DocumentFile f:e.listFiles()){
-                            if (f.isDirectory() && f.getName().equals("Cache")){
-                                for (DocumentFile g:f.listFiles()){
-                                    if (g.isDirectory() && g.getName().equals("Log")){
-//                                        for (DocumentFile h: g.listFiles()){
-//                                            Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
-//                                        }
-                                        long end_time = System.currentTimeMillis();
-                                        Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
-                                        documentFileArr = g.listFiles();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        Log.d(TAG, "getdestDocumentFileArr:path " + Arrays.toString(path));
+        for (String s : path) {
+            documentFile = getItemDirDocumentFile(documentFile, s);
+        }
+        for (DocumentFile h: documentFile.listFiles()){
+            Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
+        }
+        long end_time = System.currentTimeMillis();
+        Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
+        return documentFile.listFiles();
+    }
+
+    public static DocumentFile getItemDirDocumentFile(DocumentFile documentFile, String itemDirName){
+        for (DocumentFile d : documentFile.listFiles()){
+            if (d.isDirectory() && d.getName().equals(itemDirName)){
+                return d;
             }
         }
-        return documentFileArr;
+        return null;
     }
 
     //转换至uriTree的路径
@@ -124,26 +111,12 @@ public class MyDocumentFile {
             path = path.substring(0, path.length() - 1);
         }
         String path2 = path.replace("/storage/emulated/0/Android/data", "").replace("/", "%2F");
-
-        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A" + path2);
+        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A");
         Log.d(TAG, "getDataDirDoucmentFile: path2 "+path2);
-
-        DocumentFile d = DocumentFile.fromTreeUri(context, uri);
-
-
-
-        //        if (d != null){
-//           //        d = DocumentFile.fromFile(new File(path));
-//            Log.d(TAG, "getDataDirDoucmentFile: isDir "+d.isDirectory() );
-//            Log.d(TAG, "getDataDirDoucmentFile: isCanread "+d.canRead() );
-//            Log.d(TAG, "getDataDirDoucmentFile: Name "+d.getName() );
-//            for (DocumentFile e :d.listFiles()){
-//                Log.d(TAG, "getDataDirDoucmentFile: getDestDirFileList "+e.getName());
-//            }
-//        }
+        DocumentFile dataDocumentFile = DocumentFile.fromTreeUri(context, uri);
         long end_time = System.currentTimeMillis();
         Log.d(TAG, "getDataDirDocumentFile: dotime "+(end_time-start_time));
-        return d;
+        return dataDocumentFile;
     }
 
     //判断文件类型并且返回对应的文件icon资源

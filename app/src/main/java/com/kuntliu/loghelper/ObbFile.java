@@ -15,10 +15,12 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 import com.kuntliu.loghelper.mydialog.CopyProgressBarDialog;
 import com.kuntliu.loghelper.mydialog.MyConfirmCopyDialog;
+import com.kuntliu.loghelper.mydocumentfile.MyDocumentFile;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
@@ -41,16 +43,16 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class ObbFile {
 
 
-    public void copyObbFile(final File selectedObbFile, final List<LogFile> filelist, final int position, final Context context, final MyRecycleViewAdapter adapter){
+    public void copyObbFile(final File selectedObbFile, final DocumentFile documentFile, final List<LogFile> filelist, final int position, final Context context, final MyRecycleViewAdapter adapter){
         String obbFileNameCilcked = filelist.get(position).getFile_name();
 
-        String copyFileDescPath = getSelectedObbFileDescPath(obbFileNameCilcked, context);  //获取已选择的obb文件要复制的目标路径
-        if (!copyFileDescPath.equals("")) {
-            final File destFile = new File(copyFileDescPath + selectedObbFile.getName());  //完整的目标文件对象
+        final String copyFileDestPath = getSelectedObbFileDescPath(obbFileNameCilcked, context);  //获取已选择的obb文件要复制的目标路径
+        if (!copyFileDestPath.equals("")) {
+            final File destFile = new File(copyFileDestPath + selectedObbFile.getName());  //完整的目标文件对象
 
-            if (!isExisted_DirCopyFileDescPath(copyFileDescPath)) {
+            if (!isExisted_DirCopyFileDescPath(copyFileDestPath)) {
                 //如果复制的目标目录不存在就先创建目录
-                mkCopyFileDir(copyFileDescPath);
+                mkCopyFileDir(copyFileDestPath);
             }
             //执行复制操作前需要判断目标目录的obb文件是否已存在
             if (!copyDescFile_isExisted(obbFileNameCilcked, context)) {
@@ -58,9 +60,7 @@ public class ObbFile {
 
                 final Handler handler = new Handler(Looper.getMainLooper());
 
-
-
-                MyConfirmCopyDialog.showConfirmCopyDialog(context, selectedObbFile.getName(), copyFileSize, copyFileDescPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
+                MyConfirmCopyDialog.showConfirmCopyDialog(context, selectedObbFile.getName(), copyFileSize, copyFileDestPath, new MyConfirmCopyDialog.AlertDialogBtnClickListener() {
                     @Override
                     public void clickCancel() {
                     }
@@ -72,7 +72,7 @@ public class ObbFile {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Path sourcePath = selectedObbFile.toPath();
+                                    final Path sourcePath = selectedObbFile.toPath();
                                     Path destPath = destFile.toPath();
                                     try {
                                         Path targrtPath = Files.copy(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
@@ -85,7 +85,7 @@ public class ObbFile {
                                                 @Override
                                                 public void run() {
                                                     //移动完成后删除源文件
-                                                    FileToOperate.deleteFile(selectedObbFile, filelist, position, adapter, context);
+                                                    FileToOperate.deleteFile(selectedObbFile, documentFile, filelist, position, adapter, MyDocumentFile.checkIsNeedDocument(selectedObbFile.getPath()), context);
                                                     Toast.makeText(context, "obb文件移动完成", Toast.LENGTH_LONG).show();
                                                     CopyProgressBarDialog.dismissCopyProgressBar();
                                                 }

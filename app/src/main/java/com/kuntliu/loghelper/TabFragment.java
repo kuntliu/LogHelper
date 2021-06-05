@@ -7,11 +7,14 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +32,8 @@ import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.content.ContentValues.TAG;
 
@@ -40,9 +45,14 @@ public class TabFragment extends Fragment {
     private List<LogFile> fileList;
     File[] fileArr;
     DocumentFile[] documentFileArr;
+
+    DocumentFile selectedDocFile;
+    File selectedFile;
+
     String path;
     int tabPosition;
     String filterCondition;
+    boolean isNeedUseDoc;
     boolean isSdCardRoot = false;
     private MyRecycleViewAdapter adapter;
     Context context;
@@ -78,51 +88,77 @@ public class TabFragment extends Fragment {
 
         prePareTab();
 
-        if (Build.VERSION.SDK_INT >= 30 && MyDocumentFile.checkIsNeedDocument(path)){
-            Log.d(TAG, "onStart: doDocumentFileMethod");
-            documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
-            fileList = MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context);
-        }else{
-            Log.d(TAG, "onStart: doFileMethod");
-            fileArr = FileToOperate.getFileArr(path);
-            fileList = FileToOperate.getFileList(path, fileArr, getContext(), filterCondition, isSdCardRoot);
-        }
-
-        adapter = new MyRecycleViewAdapter(fileList, context);
-        recyclerView.setAdapter(adapter);
-        //根据fileList判断，显示对应的提示
-        FileToOperate.tvSwitch(path, fileList, fileArr, documentFileArr, tv_empty_tips);
-
-        adapter.setOnItemClickListener(new MyRecycleViewAdapter.OnItemClickListener() {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        new Thread(new Runnable() {
             @Override
-            public void onItemClick(View view, int position) {
-                Log.d(TAG, "onItemClick: position "+position);
-                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
-                Log.d(TAG, "onItemClick: selectedFile "+selectedFile);
-                if (selectedFile.getName().endsWith(".obb")){
-                    ObbFile obbFile = new ObbFile();
-                    obbFile.copyObbFile(selectedFile, fileList, position, context, adapter);
+            public void run() {
+                if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
+                    Log.d(TAG, "onStart: doDocumentFileMethod");
+                    documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
+                    fileList = MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context);
+                }else{
+                    Log.d(TAG, "onStart: doFileMethod");
+                    fileArr = FileToOperate.getFileArr(path);
+                    fileList = FileToOperate.getFileList(path, fileArr, getContext(), filterCondition, isSdCardRoot);
                 }
-                //如果点击的是APK文件则调用安装器进行安装
-                FileToOperate.installAPK(selectedFile,  getContext());
+                //完成数据加载去通知ui线程进行更新界面
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter = new MyRecycleViewAdapter(fileList, context);
+                        recyclerView.setAdapter(adapter);
+                        //根据fileList判断，显示对应的提示
+                        FileToOperate.tvSwitch(path, fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);
+
+                        adapter.setOnItemClickListener(new MyRecycleViewAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                Log.d(TAG, "onItemClick: position "+position);
+                                if (Build.VERSION.SDK_INT >=30 && isNeedUseDoc){
+                                    selectedDocFile = FileToOperate.searchSelectedDocFile(documentFileArr, fileList.get(position).getFile_name());
+                                    if (selectedDocFile.getName().endsWith(".obb")){
+                                        Toast.makeText(context, "由于Android 11及以上的系统限制，暂不支持在data和obb目录下obb文件的操作", Toast.LENGTH_SHORT).show();
+                                    }
+                                }else {
+                                    selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                                    if (selectedFile.getName().endsWith(".obb")){
+                                        ObbFile obbFile = new ObbFile();
+                                        obbFile.copyObbFile(selectedFile, selectedDocFile, fileList, position, context, adapter);
+                                    }
+                                }
+                                Log.d(TAG, "OnStar:selectedFile "+selectedFile);
+                                Log.d(TAG, "OnStar:selectedDocFile "+selectedDocFile);
+                                //如果点击的是APK文件则调用安装器进行安装
+                                FileToOperate.installAPK(selectedFile, selectedDocFile, isNeedUseDoc, getContext());
+                            }
+                        });
+                        adapter.setOnItemLongClickListener(new MyRecycleViewAdapter.OnItemLongClickListener() {
+                            @Override
+                            public void onItemLongClick(View view, int position) {
+                                BottomMenuDialog bmd = new BottomMenuDialog();
+                                if (Build.VERSION.SDK_INT >=30 && isNeedUseDoc){
+                                    selectedDocFile = FileToOperate.searchSelectedDocFile(documentFileArr, fileList.get(position).getFile_name());
+                                }else {
+                                    selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
+                                }
+                                bmd.showBottomMenu(selectedFile, selectedDocFile, isNeedUseDoc, fileList, context, adapter, position, tv_empty_tips);
+                            }
+                        });
+                        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                            @Override
+                            public void onRefresh() {
+                                toRefresh();
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+                });
+
             }
-        });
-        adapter.setOnItemLongClickListener(new MyRecycleViewAdapter.OnItemLongClickListener() {
-            @Override
-            public void onItemLongClick(View view, int position) {
-                BottomMenuDialog bmd = new BottomMenuDialog();
-                File selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
-                bmd.showBottomMenu(selectedFile, fileList, context, adapter, position, tv_empty_tips);
-            }
-        });
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                toRefresh();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+        }).start();
     }
+
+
 
     private void prePareTab(){
         if (getArguments() != null) {
@@ -139,13 +175,14 @@ public class TabFragment extends Fragment {
             isSdCardRoot = true;
         }
         filterCondition = MyPreferences.getSharePreferencesStringData("show_type", "show_all", context);
+        isNeedUseDoc = MyDocumentFile.checkIsNeedDocument(path);
     }
 
     private void toRefresh(){
         fileList.clear();
         path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
         Log.d(TAG, "toRefresh: Refreshpath "+path);
-        if (Build.VERSION.SDK_INT >= 30 && MyDocumentFile.checkIsNeedDocument(path)){
+        if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
             Log.d(TAG, "onStart: doDocumentFileMethod");
             documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
             fileList.addAll(MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context));
@@ -155,6 +192,6 @@ public class TabFragment extends Fragment {
             fileList.addAll(FileToOperate.getFileList(path, fileArr, context, filterCondition, isSdCardRoot));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
         }
         adapter.notifyDataSetChanged();
-        FileToOperate.tvSwitch(path, fileList, fileArr, documentFileArr, tv_empty_tips);
+        FileToOperate.tvSwitch(path, fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);
     }
 }

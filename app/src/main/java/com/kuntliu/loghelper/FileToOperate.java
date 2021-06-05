@@ -35,27 +35,27 @@ public class FileToOperate {
         String path_SdcardRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
         String path_west = path_SdcardRoot+
                 File.separator+"Android"+File.separator+"data"+File.separator+"com.activision.callofduty.shooter"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-//        String path_cn = path_SdcardRoot+
-//                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-//        String path_garena = path_SdcardRoot+
-//                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-//        String path_korea = path_SdcardRoot+
-//                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
-//        String path_vng = path_SdcardRoot+
-//                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_cn = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.cod"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_garena = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.garena.game.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_korea = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.tencent.tmgp.kr.codm"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
+        String path_vng = path_SdcardRoot+
+                File.separator+"Android"+File.separator+"data"+File.separator+"com.vng.codmvn"+File.separator+"cache"+File.separator+"Cache"+File.separator+"Log"+File.separator ;
 
         TabList.add("主目录");
         TabList.add("西方");
-//        TabList.add("国服");
-//        TabList.add("GARENA");
-//        TabList.add("韩国");
-//        TabList.add("VNG");
+        TabList.add("国服");
+        TabList.add("GARENA");
+        TabList.add("韩国");
+        TabList.add("VNG");
         PathList.add(path_SdcardRoot);
         PathList.add(path_west);
-//        PathList.add(path_cn);
-//        PathList.add(path_garena);
-//        PathList.add(path_korea);
-//        PathList.add(path_vng);
+        PathList.add(path_cn);
+        PathList.add(path_garena);
+        PathList.add(path_korea);
+        PathList.add(path_vng);
     }
 
     //获取文件列表，数据形式为list
@@ -95,8 +95,8 @@ public class FileToOperate {
     }
 
     //根据list和file[]正确判断当前文件列表状态
-    public static void tvSwitch(String path, List<LogFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, TextView tv){
-        if (!MyDocumentFile.checkIsNeedDocument(path)){
+    public static void tvSwitch(String path, List<LogFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, boolean isNeedUseDoc, TextView tv){
+        if (!isNeedUseDoc){
             if (list.size() == 0){
                 tv.setVisibility(View.VISIBLE);
                 tv.setText("当前目录为空");
@@ -137,6 +137,15 @@ public class FileToOperate {
         return selectedFile;
     }
 
+    public static DocumentFile searchSelectedDocFile(DocumentFile[] DocumentFileArr, String fileNameClicked){
+        for (DocumentFile d : DocumentFileArr){
+            if (d.getName().equals(fileNameClicked)){
+                return d;
+            }
+        }
+        return null;
+    }
+
     //判断文件类型并且返回对应的文件icon资源
     public static Drawable getFileDrawable(File file, Context context){
         String fileName = file.getName();
@@ -155,16 +164,29 @@ public class FileToOperate {
 
 
     //根据position删除对应的数据源并刷新适配器
-    public static void deleteFile(File file, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, Context context){
-        if (file != null && file.exists()) {
-            boolean isSuccessDeleteFile = file.delete();         //删除文件
-            loglist.remove(loglist.get(position));              //删除loglist对应的数据源
-            madapter.notifyItemRemoved(position);               //播放删除动画
-            madapter.notifyItemRangeChanged(position, loglist.size() - position);  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
+    public static void deleteFile(File file, DocumentFile documentFile, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, boolean isNeedUseDoc, Context context){
+        if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
+            if (documentFile != null && documentFile.exists()) {
+                boolean isSuccessDeleteFile = documentFile.delete();         //删除文件
+                loglist.remove(loglist.get(position));              //删除loglist对应的数据源
+                madapter.notifyItemRemoved(position);               //播放删除动画
+                madapter.notifyItemRangeChanged(position, loglist.size() - position);  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
 //            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
 //            Log.d(TAG, "deleteFile: "+position);
+            }else {
+                Toast.makeText(context ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
+            }
         }else {
-            Toast.makeText(context ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
+            if (file != null && file.exists()) {
+                boolean isSuccessDeleteFile = file.delete();         //删除文件
+                loglist.remove(loglist.get(position));              //删除loglist对应的数据源
+                madapter.notifyItemRemoved(position);               //播放删除动画
+                madapter.notifyItemRangeChanged(position, loglist.size() - position);  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
+//            Log.d("isSuccessDeleteFile", String.valueOf(isSuccessDeleteFile));
+//            Log.d(TAG, "deleteFile: "+position);
+            }else {
+                Toast.makeText(context ,"删除失败，文件不存在", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -185,16 +207,20 @@ public class FileToOperate {
     }
 
     //通过QQ-“发送我的电脑”分享（发送）文件
-    public static void shareFile(File selectedFile, Context context) {
+    public static void shareFile(File selectedFile, DocumentFile documentFile, Context context) {
         if (isInstallQQ(context)){
-            if (selectedFile.exists()){
+//            if (selectedFile.exists()){
+            if (documentFile.exists()){
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
                 //适配7.0版本以上的Android系统,需要使用内容提供器
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    if (Build.VERSION.SDK_INT >= 30){
+                        intent.putExtra(Intent.EXTRA_STREAM, documentFile.getUri());
+                    }else {
+                        intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
+                    }intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }else {
                     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(selectedFile));
                 }
@@ -235,14 +261,25 @@ public class FileToOperate {
 
 
     //识别并安装apk文件
-    public static void installAPK(File file, Context context){
-        if (file.getName().endsWith(".apk")){
+    public static void installAPK(File file, DocumentFile documentFile, boolean isNeeduseDoc, Context context){
+        String filename;
+        if (Build.VERSION.SDK_INT >= 30 && isNeeduseDoc){
+            filename = documentFile.getName();
+        }else {
+            filename = file.getName();
+        }
+        if (filename.endsWith(".apk")){
             Intent intent = new Intent();
+            Uri uri;
             intent.setAction(Intent.ACTION_VIEW);
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Uri uri = FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", file);
+                if (Build.VERSION.SDK_INT >= 30 && isNeeduseDoc){
+                    uri = documentFile.getUri();
+                }else {
+                    uri = FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", file);
+                }
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 intent.setDataAndType(uri, "application/vnd.android.package-archive");
             }else {
