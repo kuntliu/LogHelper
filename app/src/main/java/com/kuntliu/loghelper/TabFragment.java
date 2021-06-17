@@ -1,10 +1,7 @@
 package com.kuntliu.loghelper;
 
-import android.content.BroadcastReceiver;
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -28,12 +24,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 import com.kuntliu.loghelper.mydialog.BottomMenuDialog;
 import com.kuntliu.loghelper.mydocumentfile.MyDocumentFile;
+import com.kuntliu.loghelper.mypermission.PermissionManager;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static android.content.ContentValues.TAG;
 
@@ -42,10 +37,10 @@ public class TabFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView tv_empty_tips;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private List<LogFile> fileList;
+    private List<MyFile> fileList;
     File[] fileArr;
     DocumentFile[] documentFileArr;
-
+    DocumentFile dataDirDocumentFile;
     DocumentFile selectedDocFile;
     File selectedFile;
 
@@ -85,17 +80,44 @@ public class TabFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         prePareTab();
+        loadingTabData();
+    }
 
+
+    //页签数据加载准备工作
+    private void prePareTab(){
+        if (getArguments() != null) {
+            tabPosition = getArguments().getInt("tabPosition");
+            Log.d(TAG, "onStart_Tabposition: "+tabPosition);
+        }
+        if (getContext() != null){
+            context = getContext();
+            path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
+            Log.d(TAG, "prePareTab: Currentpath "+path);
+        }
+        //判断当前tab是否是主目录
+        if (tabPosition == 0){
+            isSdCardRoot = true;
+        }
+        filterCondition = MyPreferences.getSharePreferencesStringData("show_type", "show_all", context);
+        isNeedUseDoc = MyDocumentFile.checkIsNeedDocument(path);
+    }
+
+    //开始加载对应页签内的数据
+    private void loadingTabData(){
         final Handler handler = new Handler(Looper.getMainLooper());
         new Thread(new Runnable() {
             @Override
             public void run() {
+
+                dataDirDocumentFile = MyDocumentFile.getDataDirDocumentFile(context, path);
                 if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
                     Log.d(TAG, "onStart: doDocumentFileMethod");
-                    documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
-                    fileList = MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context);
+                    if (dataDirDocumentFile != null){
+                        documentFileArr = MyDocumentFile.getdestDocumentFileArr(dataDirDocumentFile, MyDocumentFile.getDatadirItemPath(path));
+                    }
+                    fileList = MyDocumentFile.getDocumentFileList(documentFileArr, isNeedUseDoc, context);
                 }else{
                     Log.d(TAG, "onStart: doFileMethod");
                     fileArr = FileToOperate.getFileArr(path);
@@ -115,8 +137,8 @@ public class TabFragment extends Fragment {
                             public void onItemClick(View view, int position) {
                                 Log.d(TAG, "onItemClick: position "+position);
                                 if (Build.VERSION.SDK_INT >=30 && isNeedUseDoc){
-                                    selectedDocFile = FileToOperate.searchSelectedDocFile(documentFileArr, fileList.get(position).getFile_name());
-                                    if (selectedDocFile.getName().endsWith(".obb")){
+                                    selectedDocFile = FileToOperate.searchSelectedDocFile(documentFileArr, fileList.get(position).getFile_name(), context);
+                                    if (selectedDocFile != null && selectedDocFile.getName().endsWith(".obb")){
                                         Toast.makeText(context, "由于Android 11及以上的系统限制，暂不支持在data和obb目录下obb文件的操作", Toast.LENGTH_SHORT).show();
                                     }
                                 }else {
@@ -137,11 +159,13 @@ public class TabFragment extends Fragment {
                             public void onItemLongClick(View view, int position) {
                                 BottomMenuDialog bmd = new BottomMenuDialog();
                                 if (Build.VERSION.SDK_INT >=30 && isNeedUseDoc){
-                                    selectedDocFile = FileToOperate.searchSelectedDocFile(documentFileArr, fileList.get(position).getFile_name());
+                                    selectedDocFile = FileToOperate.searchSelectedDocFile(documentFileArr, fileList.get(position).getFile_name(), context);
                                 }else {
                                     selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                                 }
-                                bmd.showBottomMenu(selectedFile, selectedDocFile, isNeedUseDoc, fileList, context, adapter, position, tv_empty_tips);
+                                if (selectedDocFile != null || selectedFile != null){
+                                    bmd.showBottomMenu(selectedFile, selectedDocFile, isNeedUseDoc, fileList, context, adapter, position, tv_empty_tips);
+                                }
                             }
                         });
                         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -158,34 +182,18 @@ public class TabFragment extends Fragment {
         }).start();
     }
 
-
-
-    private void prePareTab(){
-        if (getArguments() != null) {
-            tabPosition = getArguments().getInt("tabPosition");
-            Log.d(TAG, "onStart_Tabposition: "+tabPosition);
-        }
-        if (getContext() != null){
-            context = getContext();
-            path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
-            Log.d(TAG, "prePareTab: Currentpath "+path);
-        }
-        //判断当前tab是否是主目录
-        if (tabPosition == 0){
-            isSdCardRoot = true;
-        }
-        filterCondition = MyPreferences.getSharePreferencesStringData("show_type", "show_all", context);
-        isNeedUseDoc = MyDocumentFile.checkIsNeedDocument(path);
-    }
-
+    //每个Tab的刷新功能
     private void toRefresh(){
+        if (isNeedUseDoc && documentFileArr == null){
+            PermissionManager.showDataPermissionTips((Activity) context);
+        }
         fileList.clear();
         path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
         Log.d(TAG, "toRefresh: Refreshpath "+path);
         if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
             Log.d(TAG, "onStart: doDocumentFileMethod");
-            documentFileArr = MyDocumentFile.getdestDocumentFileArr(MyDocumentFile.getDataDirDocumentFile(context, path), MyDocumentFile.getDatadirItemPath(path));
-            fileList.addAll(MyDocumentFile.getDocumentFileList(documentFileArr, MyDocumentFile.checkIsNeedDocument(path), context));
+            documentFileArr = MyDocumentFile.getdestDocumentFileArr(dataDirDocumentFile, MyDocumentFile.getDatadirItemPath(path));
+            fileList.addAll(MyDocumentFile.getDocumentFileList(documentFileArr, isNeedUseDoc, context));
         }else{
             Log.d(TAG, "onStart: doFileMethod");
             fileArr = FileToOperate.getFileArr(path);

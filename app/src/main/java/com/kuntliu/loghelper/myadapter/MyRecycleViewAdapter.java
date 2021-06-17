@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kuntliu.loghelper.LogFile;
+import com.kuntliu.loghelper.MyFile;
 import com.kuntliu.loghelper.R;
 import com.kuntliu.loghelper.Transform;
 
@@ -20,7 +20,7 @@ import java.util.List;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewAdapter.MyViewHolder> {
-    private final List<LogFile> list;
+    private final List<MyFile> list;
     private final Context context;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
@@ -39,7 +39,7 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewAdap
         this.mOnItemLongClickListener = mOnItemLongClickListener;
     }
 
-    public MyRecycleViewAdapter(List<LogFile> list, Context context) {
+    public MyRecycleViewAdapter(List<MyFile> list, Context context) {
         this.list = list;
         this.context = context;
     }

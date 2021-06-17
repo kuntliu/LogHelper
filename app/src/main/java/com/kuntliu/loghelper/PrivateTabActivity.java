@@ -131,11 +131,11 @@ public class PrivateTabActivity extends AppCompatActivity {
         btn_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyPreferences.updateSharePreferencesListData("myTabs", et_add_tab.getText().toString(), tabList.size()-1, context);
-                MyPreferences.updateSharePreferencesListData("myPaths", et_add_path.getText().toString(), tabList.size()-1, context);
+                MyPreferences.addSharePreferencesStringData("myTabs", et_add_tab.getText().toString(), context);
+                MyPreferences.addSharePreferencesStringData("myPaths", et_add_path.getText().toString(), context);
                 PrivateTabs pt = new PrivateTabs(et_add_tab.getText().toString(), et_add_path.getText().toString());
                 tabList.add(pt);
-                adapter.notifyItemInserted(tabList.size());
+                adapter.notifyItemInserted(tabList.size()-1);
                 adapter.notifyItemRangeChanged(tabList.size(), 0);  //解决删除文件后list的position发生变化的问题，对于被删掉的位置及其后range大小范围内的view进行重新onBindViewHolder
                 dialog.dismiss();
             }
@@ -152,17 +152,7 @@ public class PrivateTabActivity extends AppCompatActivity {
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                tabList.clear();
-                myTabsToShow.clear();
-                myPathsToShow.clear();
-                FileToOperate.setDefalutTabAndPath(myTabsToShow, myPathsToShow);
-                MyPreferences.setSharePreferencesListData("myTabs", myTabsToShow, context);
-                MyPreferences.setSharePreferencesListData("myPaths", myPathsToShow, context);
-                for (int i=0; i<myTabsToShow.size(); i++){
-                    PrivateTabs privateTabs = new PrivateTabs(myTabsToShow.get(i), myPathsToShow.get(i));
-                    tabList.add(privateTabs);
-                }
-                adapter.notifyDataSetChanged();
+                recoverDefaultTab(context);
                 dialog.dismiss();
             }
         });
@@ -179,6 +169,20 @@ public class PrivateTabActivity extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
         dialog.show();
+    }
+
+    public void recoverDefaultTab(Context context) {
+        tabList.clear();
+        myTabsToShow.clear();
+        myPathsToShow.clear();
+        FileToOperate.setDefalutTabAndPath(myTabsToShow, myPathsToShow);
+        MyPreferences.setSharePreferencesListData("myTabs", myTabsToShow, context);
+        MyPreferences.setSharePreferencesListData("myPaths", myPathsToShow, context);
+        for (int i=0; i<myTabsToShow.size(); i++){
+            PrivateTabs privateTabs = new PrivateTabs(myTabsToShow.get(i), myPathsToShow.get(i));
+            tabList.add(privateTabs);
+        }
+        adapter.notifyDataSetChanged();
     }
 
 }

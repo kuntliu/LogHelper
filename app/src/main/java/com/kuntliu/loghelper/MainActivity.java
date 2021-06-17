@@ -1,8 +1,5 @@
 package com.kuntliu.loghelper;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,18 +10,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kuntliu.loghelper.myadapter.FragmentAdapter;
+import com.kuntliu.loghelper.mypermission.PermissionManager;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.util.ArrayList;
@@ -47,17 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
     private final List<TabFragment> tabFragmentList = new ArrayList<>();
 
-    private AlertDialog alertDialog;
-    String[] permissions = new String[]
-            {Manifest.permission.READ_EXTERNAL_STORAGE,
-             Manifest.permission.WRITE_EXTERNAL_STORAGE};    //需要申请的权限
-    List<String> permissions_rejected = new ArrayList<>();//保存未授予权限
-    int PERMISSION_CODE = 1000;
-    int REQUEST_CODE_FOR_DIR = 1002;
 
     TabLayout tab_version;
     ViewPager viewPager;
     FragmentAdapter adapter;
+
+    static int PERMISSION_CODE = 1000;
+    int REQUEST_CODE_FOR_DIR = 1002;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -67,19 +55,15 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            boolean isGetAllPermission = getPermission();
-            Log.d(TAG, "onCreate: isGetAllPermission "+isGetAllPermission);
-            Log.d(TAG, "onCreate: isExternalStorageManager "+Environment.isExternalStorageManager());
-
+            boolean isGetNormalPermission = PermissionManager.getNormalPermission(MainActivity.this);
             //获得权限了之后去初始化数据
-            if (isGetAllPermission){
+            if (isGetNormalPermission){
                 if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()){
-                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
-                    startActivity(intent);
-                    startForRoot(MainActivity.this, REQUEST_CODE_FOR_DIR);
-               }
-                if (Environment.isExternalStorageManager()){
+
+                    Log.d(TAG, "run: isGetDataPermission "+ Environment.isExternalStorageManager());
+                    //Android11如果还没授予data权限，先显示授权data的提示框
+                    PermissionManager.showDataPermissionTips(MainActivity.this);
+                }else {
                     //主线程初始化view，新开子线程去初始化数据
                     new Thread(new Runnable() {
                         @Override
@@ -166,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
             for (int i=0; i<myTab_defalut.size(); i++ ){
                 tabFragmentList.add(TabFragment.newInstance( i));
             }
-
             //第一次启动应用使用默认的Tab目录
             adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
         }else {
@@ -182,25 +165,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
     }
 
-    //申请权限
-    private boolean getPermission() {
-        permissions_rejected.clear();
-        boolean isGetAllPermissions = false;
-        //判断是否有权限
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                permissions_rejected.add(permission);
-//                Log.d("Permissions_rejected", permissions_rejected.toString());
-            }
-        }
-        if (!permissions_rejected.isEmpty()){
-            ActivityCompat.requestPermissions(this, permissions_rejected.toArray(new String[0]), PERMISSION_CODE);
-        }else {
-            isGetAllPermissions = true;
-        }
-        return isGetAllPermissions;
-    }
-
     //权限窗口，用户操作的结果回调
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -208,55 +172,24 @@ public class MainActivity extends AppCompatActivity {
         boolean hasRejectPermission = false;
         if (requestCode == PERMISSION_CODE){
             for (int grantResult : grantResults) {
-                //用户选择“允许”
+                //用户选择“拒绝”
                 if (grantResult == PackageManager.PERMISSION_DENIED) {
                     hasRejectPermission = true;
                     break;
                 }
             }
             if(hasRejectPermission){
-                showDialogAndGotoSetting();
+                PermissionManager.showDialogAndGotoSetting(MainActivity.this);
             }else {
                 //拿到全部全限后就开始初始化数据
+                if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()){
+                    PermissionManager.showDataPermissionTips(MainActivity.this);
+                }
                 initData();
             }
         }
     }
 
-
-    private void showDialogAndGotoSetting(){
-        if (alertDialog == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("提示")
-                    .setMessage("缺少权限")
-                    .setPositiveButton("去允许", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (alertDialog != null) {//先关闭弹窗再跳转
-                                alertDialog.dismiss();
-                            }
-                            gotoSetting();
-                        }
-                    })
-                    .setNegativeButton("退出", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            alertDialog.dismiss();
-                            System.exit(0);
-                        }
-                    });
-            alertDialog = builder.create();
-            alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.show();
-        }
-    }
-
-    private void gotoSetting(){
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getPackageName(), null);
-        intent.setData(uri);
-        startActivity(intent);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -274,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
-            Toast.makeText(MainActivity.this, "Current Version:1.1 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Current Version:1.2 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
             return true;
         }else if(id == R.id.action_setting){
             Intent intent = new Intent(this, SettingsActivity.class);
@@ -282,30 +215,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-//
-//    public static String changeToUri(String path) {
-//        if (path.endsWith("/")) {
-//            path = path.substring(0, path.length() - 1);
-//        }
-//        String path2 = path.replace("/storage/emulated/0/", "").replace("/", "%2F");
-//        return "content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A" + path2;
-//    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void startForRoot(Activity context, int REQUEST_CODE_FOR_DIR) {
-        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata");
-        Log.d("startForRoot", "startForRoot:uri "+uri);
-        DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
-        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentFile.getUri());
-        context.startActivityForResult(intent, REQUEST_CODE_FOR_DIR);
     }
 
 
@@ -320,5 +229,4 @@ public class MainActivity extends AppCompatActivity {
                     | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));//关键是这里，这个就是保存这个目录的访问权限
         }
     }
-
 }

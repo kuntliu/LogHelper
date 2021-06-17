@@ -2,14 +2,14 @@ package com.kuntliu.loghelper;
 
 import android.graphics.drawable.Drawable;
 
-public class LogFile {
+public class MyFile {
     private Drawable file_icon;
     private String file_name;
     private Long file_size;
     private Long file_time_create;
     private String file_apk_version;
 
-    public LogFile(Drawable file_icon, String file_name, Long file_size, Long file_time_create, String file_apk_version) {
+    public MyFile(Drawable file_icon, String file_name, Long file_size, Long file_time_create, String file_apk_version) {
         this.file_icon = file_icon;
         this.file_name = file_name;
         this.file_size = file_size;

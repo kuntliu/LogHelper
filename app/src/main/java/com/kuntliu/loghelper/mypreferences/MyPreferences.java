@@ -52,6 +52,13 @@ public class MyPreferences {
         setSharePreferencesListData(key, dataList, context);
     }
 
+    public static void addSharePreferencesStringData(String key, String strToAdd, Context context){
+        ArrayList<String> dataList = getSharePreferencesListData(key, context);
+        dataList.add(strToAdd);
+        setSharePreferencesListData(key, dataList, context);
+    }
+
+
     public static int[] getSharePreferencesSortData(String key, Context context){
         SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
         String[] sortData_str = spf.getString(key, "1,0").split(",");

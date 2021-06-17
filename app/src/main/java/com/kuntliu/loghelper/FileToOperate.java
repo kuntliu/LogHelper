@@ -59,8 +59,8 @@ public class FileToOperate {
     }
 
     //获取文件列表，数据形式为list
-    public static List<LogFile> getFileList(String path, File[] arrFiles, Context context, String filterConditon, Boolean isSdCardroot)  {
-        List<LogFile> fileList = new ArrayList<>();   //初始化数据
+    public static List<MyFile> getFileList(String path, File[] arrFiles, Context context, String filterConditon, Boolean isSdCardroot)  {
+        List<MyFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
         if (!MyDocumentFile.checkIsNeedDocument(path)){
             if (getFileArr(path) != null){
@@ -77,13 +77,13 @@ public class FileToOperate {
                         }
                         if (isSdCardroot && filterConditon.equals( "show_apk_obb")){
                             if (f.getName().endsWith("apk") || f.getName().endsWith("obb")){
-                                LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
+                                MyFile myFile = new MyFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
 //                    Log.d("fileName:fileSize", f.getName()+":"+ f.length());
-                                fileList.add(log);
+                                fileList.add(myFile);
                             }
                         }else {
-                            LogFile log = new LogFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
-                            fileList.add(log);
+                            MyFile myFile = new MyFile(getFileDrawable(f, context), f.getName(), f.length(), f.lastModified(), apk_version);
+                            fileList.add(myFile);
                         }
                     }
                 }
@@ -95,7 +95,7 @@ public class FileToOperate {
     }
 
     //根据list和file[]正确判断当前文件列表状态
-    public static void tvSwitch(String path, List<LogFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, boolean isNeedUseDoc, TextView tv){
+    public static void tvSwitch(String path, List<MyFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, boolean isNeedUseDoc, TextView tv){
         if (!isNeedUseDoc){
             if (list.size() == 0){
                 tv.setVisibility(View.VISIBLE);
@@ -137,10 +137,14 @@ public class FileToOperate {
         return selectedFile;
     }
 
-    public static DocumentFile searchSelectedDocFile(DocumentFile[] DocumentFileArr, String fileNameClicked){
+    public static DocumentFile searchSelectedDocFile(DocumentFile[] DocumentFileArr, String fileNameClicked, Context context){
         for (DocumentFile d : DocumentFileArr){
-            if (d.getName().equals(fileNameClicked)){
-                return d;
+            if (d.getName() != null){
+                if (d.getName().equals(fileNameClicked)){
+                    return d;
+                }
+            }else {
+                Toast.makeText(context, "文件不存在", Toast.LENGTH_SHORT).show();
             }
         }
         return null;
@@ -164,7 +168,7 @@ public class FileToOperate {
 
 
     //根据position删除对应的数据源并刷新适配器
-    public static void deleteFile(File file, DocumentFile documentFile, List<LogFile> loglist, int position, MyRecycleViewAdapter madapter, boolean isNeedUseDoc, Context context){
+    public static void deleteFile(File file, DocumentFile documentFile, List<MyFile> loglist, int position, MyRecycleViewAdapter madapter, boolean isNeedUseDoc, Context context){
         if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
             if (documentFile != null && documentFile.exists()) {
                 boolean isSuccessDeleteFile = documentFile.delete();         //删除文件
@@ -207,26 +211,42 @@ public class FileToOperate {
     }
 
     //通过QQ-“发送我的电脑”分享（发送）文件
-    public static void shareFile(File selectedFile, DocumentFile documentFile, Context context) {
+    public static void shareFile(File selectedFile, DocumentFile documentFile, boolean isNeeduseDoc, Context context) {
+        //先检查是否已经安装了QQ
         if (isInstallQQ(context)){
-//            if (selectedFile.exists()){
-            if (documentFile.exists()){
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
-                //适配7.0版本以上的Android系统,需要使用内容提供器
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (Build.VERSION.SDK_INT >= 30){
+            //Android11及以上的系统要用documentFile的Uri才能访问data下的文件，分享功能同理
+            if (Build.VERSION.SDK_INT >= 30 && isNeeduseDoc){
+                if (documentFile != null){
+                    //判断要分享的文件是否存在
+                    if (documentFile.exists()){
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
                         intent.putExtra(Intent.EXTRA_STREAM, documentFile.getUri());
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        context.startActivity(intent);
                     }else {
-                        intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
-                    }intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }else {
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(selectedFile));
+                        Toast.makeText(context, "文件不存在", Toast.LENGTH_LONG).show();
+                    }
                 }
-                context.startActivity(intent);
             }else {
-                Toast.makeText(context, "文件不存在", Toast.LENGTH_LONG).show();
+                if (selectedFile != null){
+                    if (selectedFile.exists()){
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.qfileJumpActivity");//通过QQ传给我的电脑
+                        //适配7.0版本以上的Android系统,需要使用内容提供器
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.kuntliu.loghelper.fileprovider", selectedFile));
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }else {
+                            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(selectedFile));
+                        }
+                        context.startActivity(intent);
+                    }else {
+                        Toast.makeText(context, "文件不存在", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         }else {
             Toast.makeText(context, "未安装QQ", Toast.LENGTH_LONG).show();

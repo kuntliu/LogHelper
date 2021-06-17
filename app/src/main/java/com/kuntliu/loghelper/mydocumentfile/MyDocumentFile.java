@@ -1,23 +1,18 @@
 package com.kuntliu.loghelper.mydocumentfile;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.text.format.Time;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.kuntliu.loghelper.FileToOperate;
-import com.kuntliu.loghelper.LogFile;
+import com.kuntliu.loghelper.MyFile;
 import com.kuntliu.loghelper.R;
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
@@ -33,9 +28,9 @@ import static android.content.ContentValues.TAG;
 public class MyDocumentFile {
 
 
-    public static List<LogFile> getDocumentFileList(DocumentFile[] documentFileArr, boolean isNeedUseDoc, Context context) {
-        long start_time = System.currentTimeMillis();
-        List<LogFile> fileList = new ArrayList<>();
+    public static List<MyFile> getDocumentFileList(DocumentFile[] documentFileArr, boolean isNeedUseDoc, Context context) {
+//        long start_time = System.currentTimeMillis();
+        List<MyFile> fileList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc) {
             if (documentFileArr != null) {
                 for (DocumentFile df : documentFileArr) {
@@ -49,8 +44,8 @@ public class MyDocumentFile {
                                 apk_version = "";
                             }
                         }
-                        LogFile log = new LogFile(getDocumentFileDrawable(df, context), documentFileName, df.length(), df.lastModified(), apk_version);
-                        fileList.add(log);
+                        MyFile myFile = new MyFile(getDocumentFileDrawable(df, context), documentFileName, df.length(), df.lastModified(), apk_version);
+                        fileList.add(myFile);
                         Log.d(TAG, "getDocumentFileList: "+fileList);
                     }
                 }
@@ -58,8 +53,8 @@ public class MyDocumentFile {
                 fileList = new ArrayListSort().fileSort(fileList, MyPreferences.getSharePreferencesSortData("sort_setting", context)[0], MyPreferences.getSharePreferencesSortData("sort_setting", context)[1]);
             }
         }
-        long end_time = System.currentTimeMillis();
-        Log.d(TAG, "getDocumentFileList: dotime "+(end_time-start_time));
+//        long end_time = System.currentTimeMillis();
+//        Log.d(TAG, "getDocumentFileList: dotime "+(end_time-start_time));
         return fileList;
     }
 
@@ -75,7 +70,7 @@ public class MyDocumentFile {
     }
 
     public static String[] getDatadirItemPath(String path){
-//        Log.d(TAG, "getItemPath: "+ Arrays.toString(path.replace("/storage/emulated/0/", "").split(File.separator)));
+        Log.d(TAG, "getItemPath: "+ Arrays.toString(path.replace("/storage/emulated/0/Android/data/", "").split(File.separator)));
         return path.replace("/storage/emulated/0/Android/data/", "").split(File.separator);
     }
 
@@ -85,21 +80,29 @@ public class MyDocumentFile {
         long start_time = System.currentTimeMillis();
         Log.d(TAG, "getdestDocumentFileArr:path " + Arrays.toString(path));
         for (String s : path) {
+            Log.d(TAG, "getdestDocumentFileArr: ForString" +s);
             documentFile = getItemDirDocumentFile(documentFile, s);
         }
-        for (DocumentFile h: documentFile.listFiles()){
-            Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
+        if (documentFile != null){
+            for (DocumentFile h: documentFile.listFiles()){
+                Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
+            }
+            long end_time = System.currentTimeMillis();
+            Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
+            return documentFile.listFiles();
         }
-        long end_time = System.currentTimeMillis();
-        Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
-        return documentFile.listFiles();
+        return null;
     }
 
     public static DocumentFile getItemDirDocumentFile(DocumentFile documentFile, String itemDirName){
-        for (DocumentFile d : documentFile.listFiles()){
-            if (d.isDirectory() && d.getName().equals(itemDirName)){
-                return d;
+        try {
+            for (DocumentFile d : documentFile.listFiles()){
+                if (d.isDirectory() && d.getName().equals(itemDirName)){
+                    return d;
+                }
             }
+        }catch(NullPointerException e){
+            e.printStackTrace();
         }
         return null;
     }

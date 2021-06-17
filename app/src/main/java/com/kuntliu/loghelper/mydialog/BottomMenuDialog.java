@@ -13,7 +13,7 @@ import android.widget.TextView;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.kuntliu.loghelper.FileToOperate;
-import com.kuntliu.loghelper.LogFile;
+import com.kuntliu.loghelper.MyFile;
 import com.kuntliu.loghelper.R;
 import com.kuntliu.loghelper.Transform;
 import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
@@ -25,7 +25,7 @@ import java.util.List;
 public class BottomMenuDialog {
     PopupWindow pw;
 
-    public void showBottomMenu(final File file, final DocumentFile documentFile, final boolean isNeedUseDoc, final List<LogFile> list, final Context context, final MyRecycleViewAdapter apater, final int position , final TextView tv){
+    public void showBottomMenu(final File file, final DocumentFile documentFile, final boolean isNeedUseDoc, final List<MyFile> list, final Context context, final MyRecycleViewAdapter apater, final int position , final TextView tv){
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_bottom_menu, null);
         Button btn_sent = view.findViewById(R.id.btn_sent);
         Button btn_delete = view.findViewById(R.id.btn_delete);
@@ -34,7 +34,7 @@ public class BottomMenuDialog {
         btn_sent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FileToOperate.shareFile(file, documentFile, context);
+                FileToOperate.shareFile(file, documentFile, isNeedUseDoc, context);
                 pw.dismiss();
             }
         });
@@ -71,12 +71,5 @@ public class BottomMenuDialog {
         pw.setAnimationStyle(R.style.Dialog_Anim);
         pw.showAtLocation(LayoutInflater.from(context).inflate(R.layout.activity_main,null), Gravity.BOTTOM, 0 ,0 );
 
-        pw.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-            }
-        });
     }
-
-
 }
