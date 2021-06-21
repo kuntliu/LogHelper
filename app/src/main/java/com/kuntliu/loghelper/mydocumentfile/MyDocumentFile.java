@@ -1,10 +1,14 @@
 package com.kuntliu.loghelper.mydocumentfile;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -15,6 +19,7 @@ import com.kuntliu.loghelper.FileToOperate;
 import com.kuntliu.loghelper.MyFile;
 import com.kuntliu.loghelper.R;
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
+import com.kuntliu.loghelper.mypermission.PermissionManager;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
@@ -24,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.MODE_PRIVATE;
 
 public class MyDocumentFile {
 
@@ -80,12 +86,12 @@ public class MyDocumentFile {
         long start_time = System.currentTimeMillis();
         Log.d(TAG, "getdestDocumentFileArr:path " + Arrays.toString(path));
         for (String s : path) {
-            Log.d(TAG, "getdestDocumentFileArr: ForString" +s);
+            Log.d(TAG, "getdestDocumentFileArr: ForString " +s);
             documentFile = getItemDirDocumentFile(documentFile, s);
         }
         if (documentFile != null){
             for (DocumentFile h: documentFile.listFiles()){
-                Log.d(TAG, "getdestpathDocument: logFileList： "+h.getName());
+                Log.d(TAG, "getdestpathDocument: logFileList: "+h.getName());
             }
             long end_time = System.currentTimeMillis();
             Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
@@ -95,27 +101,49 @@ public class MyDocumentFile {
     }
 
     public static DocumentFile getItemDirDocumentFile(DocumentFile documentFile, String itemDirName){
-        try {
-            for (DocumentFile d : documentFile.listFiles()){
-                if (d.isDirectory() && d.getName().equals(itemDirName)){
+        if (documentFile != null) {
+            for (DocumentFile d : documentFile.listFiles()) {
+                if (d.isDirectory() && d.getName().equals(itemDirName)) {
                     return d;
                 }
             }
-        }catch(NullPointerException e){
-            e.printStackTrace();
         }
         return null;
     }
 
     //转换至uriTree的路径
-    public static DocumentFile getDataDirDocumentFile(Context context, String path) {
-        long start_time = System.currentTimeMillis();
-        if (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
+    public static DocumentFile getDataDirDocumentFile(Context context) {
+        SharedPreferences sp = context.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
+        String uriTree = sp.getString("dataUriTree", "");
+        if (!TextUtils.isEmpty(uriTree)){
+            long start_time = System.currentTimeMillis();
+//        if (path.endsWith("/")) {
+//            path = path.substring(0, path.length() - 1);
+//        }
+//        String path2 = path.replace("/storage/emulated/0/Android/data", "").replace("/", "%2F");
+//        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A");
+//        Log.d(TAG, "getDataDirDoucmentFile: path2 "+path2);
+            SharedPreferences sharedPreferences = context.getSharedPreferences("DirPermission", MODE_PRIVATE);
+            String uri_str = sharedPreferences.getString("dataUriTree", "");
+            DocumentFile dataDocumentFile = DocumentFile.fromTreeUri(context, Uri.parse(uri_str));
+            long end_time = System.currentTimeMillis();
+            Log.d(TAG, "getDataDirDocumentFile: dotime "+(end_time-start_time));
+            Log.d(TAG, "getDataDirDocumentFile: isSuccGetDataDocumentFile" + dataDocumentFile);
+            return dataDocumentFile;
+        }else {
+            PermissionManager.showDataPermissionTips((Activity)context);
+            return null;
         }
-        String path2 = path.replace("/storage/emulated/0/Android/data", "").replace("/", "%2F");
-        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A");
-        Log.d(TAG, "getDataDirDoucmentFile: path2 "+path2);
+    }
+
+    public static DocumentFile getObbDirDocumentFile(Context context) {
+        long start_time = System.currentTimeMillis();
+//        if (path.endsWith("/")) {
+//            path = path.substring(0, path.length() - 1);
+//        }
+//        String path2 = path.replace("/storage/emulated/0/Android/data", "").replace("/", "%2F");
+        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fobb/document/primary%3A");
+//        Log.d(TAG, "getDataDirDoucmentFile: path2 "+path2);
         DocumentFile dataDocumentFile = DocumentFile.fromTreeUri(context, uri);
         long end_time = System.currentTimeMillis();
         Log.d(TAG, "getDataDirDocumentFile: dotime "+(end_time-start_time));

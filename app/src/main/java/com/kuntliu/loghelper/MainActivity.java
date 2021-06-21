@@ -16,6 +16,7 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,9 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final ArrayList<String> myTab_defalut = new ArrayList<>();
     private final ArrayList<String> myPath_defalut = new ArrayList<>();
-
     private final List<TabFragment> tabFragmentList = new ArrayList<>();
-
 
     TabLayout tab_version;
     ViewPager viewPager;
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
             //获得权限了之后去初始化数据
             if (isGetNormalPermission){
                 if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()){
-
                     Log.d(TAG, "run: isGetDataPermission "+ Environment.isExternalStorageManager());
                     //Android11如果还没授予data权限，先显示授权data的提示框
                     PermissionManager.showDataPermissionTips(MainActivity.this);
@@ -89,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 //            }
 //        });
-
 
 //          已弃用Spinner，改用TabLayout
 //          整体的实现逻辑：首次启动将写入tab和对应path配置，保存在本地，非首次启动就去读取已保存的配置，根据tab的position去获取对应的path显示该路径下的文件
@@ -184,8 +181,9 @@ public class MainActivity extends AppCompatActivity {
                 //拿到全部全限后就开始初始化数据
                 if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()){
                     PermissionManager.showDataPermissionTips(MainActivity.this);
+                }else {
+                    initData();
                 }
-                initData();
             }
         }
     }
@@ -217,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    //权限申请的结果回调
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Uri uri;
@@ -227,6 +225,13 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_FOR_DIR && (uri = data.getData()) != null) {
             getContentResolver().takePersistableUriPermission(uri, data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
                     | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));//关键是这里，这个就是保存这个目录的访问权限
+            SharedPreferences sharedPreferences = getSharedPreferences("DirPermission", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("dataUriTree", uri.toString());
+            editor.apply();
+//            if (!TextUtils.isEmpty(sharedPreferences.getString("dataUriTree", ""))){
+//                initData();
+//            }
         }
     }
 }

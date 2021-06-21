@@ -84,7 +84,21 @@ public class PermissionManager {
         }
     }
 
-
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static void toRequestObbPermission(Activity context, int REQUEST_CODE_FOR_DIR) {
+        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fobb");
+        Log.d("startForRoot", "startForRoot:uri "+uri);
+        DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        if (documentFile != null){
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentFile.getUri());
+            context.startActivityForResult(intent, REQUEST_CODE_FOR_DIR);
+        }
+    }
 
     public static void showDialogAndGotoSetting(final Context context){
         if (alertDialog == null) {
@@ -132,11 +146,12 @@ public class PermissionManager {
                 PermissionManager.getDataPermission(context);
             }
         });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (dialog != null){
                     dialog.dismiss();
+                    System.exit(0);
                 }
             }
         });

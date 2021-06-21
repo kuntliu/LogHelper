@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -51,6 +52,7 @@ public class TabFragment extends Fragment {
     boolean isSdCardRoot = false;
     private MyRecycleViewAdapter adapter;
     Context context;
+    int REQUEST_CODE_FOR_DIR = 1002;
 
     static TabFragment newInstance(int tabPosition) {
         Bundle args = new Bundle();
@@ -102,6 +104,8 @@ public class TabFragment extends Fragment {
         }
         filterCondition = MyPreferences.getSharePreferencesStringData("show_type", "show_all", context);
         isNeedUseDoc = MyDocumentFile.checkIsNeedDocument(path);
+
+        dataDirDocumentFile = MyDocumentFile.getDataDirDocumentFile(context);
     }
 
     //开始加载对应页签内的数据
@@ -111,7 +115,6 @@ public class TabFragment extends Fragment {
             @Override
             public void run() {
 
-                dataDirDocumentFile = MyDocumentFile.getDataDirDocumentFile(context, path);
                 if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
                     Log.d(TAG, "onStart: doDocumentFileMethod");
                     if (dataDirDocumentFile != null){
@@ -145,7 +148,9 @@ public class TabFragment extends Fragment {
                                     selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                                     if (selectedFile.getName().endsWith(".obb")){
                                         ObbFile obbFile = new ObbFile();
-                                        obbFile.copyObbFile(selectedFile, selectedDocFile, fileList, position, context, adapter);
+                                        Log.d(TAG, "onItemClick: ddddd"+selectedDocFile);
+
+                                        obbFile.copyObbFile(selectedFile, fileList, position, context, adapter);
                                     }
                                 }
                                 Log.d(TAG, "OnStar:selectedFile "+selectedFile);
@@ -182,9 +187,12 @@ public class TabFragment extends Fragment {
         }).start();
     }
 
+
+
+
     //每个Tab的刷新功能
     private void toRefresh(){
-        if (isNeedUseDoc && documentFileArr == null){
+        if (isNeedUseDoc && documentFileArr == null && !Environment.isExternalStorageManager()){
             PermissionManager.showDataPermissionTips((Activity) context);
         }
         fileList.clear();
