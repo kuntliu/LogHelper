@@ -52,7 +52,6 @@ public class TabFragment extends Fragment {
     boolean isSdCardRoot = false;
     private MyRecycleViewAdapter adapter;
     Context context;
-    int REQUEST_CODE_FOR_DIR = 1002;
 
     static TabFragment newInstance(int tabPosition) {
         Bundle args = new Bundle();
@@ -114,11 +113,10 @@ public class TabFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
                     Log.d(TAG, "onStart: doDocumentFileMethod");
                     if (dataDirDocumentFile != null){
-                        documentFileArr = MyDocumentFile.getdestDocumentFileArr(dataDirDocumentFile, MyDocumentFile.getDatadirItemPath(path));
+                        documentFileArr = MyDocumentFile.getdestDocumentFileArr(dataDirDocumentFile, path, context);
                     }
                     fileList = MyDocumentFile.getDocumentFileList(documentFileArr, isNeedUseDoc, context);
                 }else{
@@ -147,10 +145,13 @@ public class TabFragment extends Fragment {
                                 }else {
                                     selectedFile = FileToOperate.searchSelectedFile(fileArr, fileList.get(position).getFile_name());
                                     if (selectedFile.getName().endsWith(".obb")){
-                                        ObbFile obbFile = new ObbFile();
-                                        Log.d(TAG, "onItemClick: ddddd"+selectedDocFile);
-
-                                        obbFile.copyObbFile(selectedFile, fileList, position, context, adapter);
+                                        if (Build.VERSION.SDK_INT >= 30 && !context.getPackageManager().canRequestPackageInstalls()){
+                                            PermissionManager.showReqInstallPermissionTips(context);
+                                        }else {
+                                            ObbFile obbFile = new ObbFile();
+                                            Log.d(TAG, "onItemClick: selectedDocFile"+selectedDocFile);
+                                            obbFile.copyObbFile(selectedFile, fileList, position, context, adapter);
+                                        }
                                     }
                                 }
                                 Log.d(TAG, "OnStar:selectedFile "+selectedFile);
@@ -197,10 +198,10 @@ public class TabFragment extends Fragment {
         }
         fileList.clear();
         path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
-        Log.d(TAG, "toRefresh: Refreshpath "+path);
+        Log.d(TAG, "toRefresh: RefreshPath "+path);
         if (Build.VERSION.SDK_INT >= 30 && isNeedUseDoc){
             Log.d(TAG, "onStart: doDocumentFileMethod");
-            documentFileArr = MyDocumentFile.getdestDocumentFileArr(dataDirDocumentFile, MyDocumentFile.getDatadirItemPath(path));
+            documentFileArr = MyDocumentFile.getdestDocumentFileArr(dataDirDocumentFile, path, context);
             fileList.addAll(MyDocumentFile.getDocumentFileList(documentFileArr, isNeedUseDoc, context));
         }else{
             Log.d(TAG, "onStart: doFileMethod");

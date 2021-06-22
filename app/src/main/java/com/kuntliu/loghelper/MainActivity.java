@@ -44,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
     FragmentAdapter adapter;
 
     static int PERMISSION_CODE = 1000;
-    int REQUEST_CODE_FOR_DIR = 1002;
+    int REQUEST_CODE_FOR_DATA_DIR = 1001;
+    int REQUEST_CODE_FOR_OBB_DIR = 1002;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -222,16 +223,31 @@ public class MainActivity extends AppCompatActivity {
         if (data == null) {
             return;
         }
-        if (requestCode == REQUEST_CODE_FOR_DIR && (uri = data.getData()) != null) {
+        //请求data目录授权的结果回调
+        if (requestCode == REQUEST_CODE_FOR_DATA_DIR && (uri = data.getData()) != null) {
             getContentResolver().takePersistableUriPermission(uri, data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
                     | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));//关键是这里，这个就是保存这个目录的访问权限
             SharedPreferences sharedPreferences = getSharedPreferences("DirPermission", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("dataUriTree", uri.toString());
             editor.apply();
-//            if (!TextUtils.isEmpty(sharedPreferences.getString("dataUriTree", ""))){
-//                initData();
-//            }
+            if (!TextUtils.isEmpty(sharedPreferences.getString("dataUriTree", ""))){
+                Log.d(TAG, "onActivityResult: data");
+                initData();
+            }
+        }
+        //请求obb目录授权的结果回调
+        if (requestCode == REQUEST_CODE_FOR_OBB_DIR && (uri = data.getData()) != null) {
+            getContentResolver().takePersistableUriPermission(uri, data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));//关键是这里，这个就是保存这个目录的访问权限
+            SharedPreferences sharedPreferences = getSharedPreferences("DirPermission", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("obbUriTree", uri.toString());
+            editor.apply();
+            if (!TextUtils.isEmpty(sharedPreferences.getString("obbUriTree", ""))){
+                Log.d(TAG, "onActivityResult: obb");
+                initData();
+            }
         }
     }
 }

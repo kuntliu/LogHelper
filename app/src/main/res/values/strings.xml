@@ -38,6 +38,5 @@
 
     <!--  obb目录的正则表达式  -->
     <string name="obb_re">(com).\\w+(.+(?=.obb))</string>
-    <string name="android_eleven_limit_text">由于Android11系统的限制的，无法访问其他应用data目录</string>
 
 </resources>

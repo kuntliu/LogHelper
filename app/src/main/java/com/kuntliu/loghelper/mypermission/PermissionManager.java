@@ -34,7 +34,8 @@ public class PermissionManager {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE};    //需要申请的权限
     static List<String> permissions_rejected = new ArrayList<>();//保存未授予权限
     static int PERMISSION_CODE = 1000;
-    static int REQUEST_CODE_FOR_DIR = 1002;
+    static int REQUEST_CODE_FOR_DATA_DIR = 1001;
+    static int REQUEST_CODE_FOR_OBB_DIR = 1002;
 
 
     //申请常规的读写权限，Android11的data权限除外
@@ -63,10 +64,19 @@ public class PermissionManager {
             Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
             context.startActivity(intent);
             Toast.makeText(context, "点击下方的按钮进行授权data目录的访问", Toast.LENGTH_LONG).show();
-            toRequestDataPermission(context, REQUEST_CODE_FOR_DIR);
+            toRequestDataPermission(context, REQUEST_CODE_FOR_DATA_DIR);
         }
     }
 
+    public static void getObbPermission(Activity context){
+        if (Build.VERSION.SDK_INT >= 30){
+            Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+            context.startActivity(intent);
+            Toast.makeText(context, "点击下方的按钮进行授权data目录的访问", Toast.LENGTH_LONG).show();
+            toRequestObbPermission(context, REQUEST_CODE_FOR_OBB_DIR);
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static void toRequestDataPermission(Activity context, int REQUEST_CODE_FOR_DIR) {
@@ -80,7 +90,7 @@ public class PermissionManager {
                 | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
         if (documentFile != null){
             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentFile.getUri());
-            context.startActivityForResult(intent, REQUEST_CODE_FOR_DIR);
+            context.startActivityForResult(intent, REQUEST_CODE_FOR_DATA_DIR);
         }
     }
 
@@ -96,7 +106,7 @@ public class PermissionManager {
                 | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
         if (documentFile != null){
             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentFile.getUri());
-            context.startActivityForResult(intent, REQUEST_CODE_FOR_DIR);
+            context.startActivityForResult(intent, REQUEST_CODE_FOR_OBB_DIR);
         }
     }
 
@@ -157,11 +167,63 @@ public class PermissionManager {
         });
         //dialog的实例化必须等待builder设置完之后
         android.app.AlertDialog dialog = builder.create();
-        dialog.setMessage("由于Android 11及以上的系统的沙盒存储机制，需要手动授权data目录的访问才能继续data目录的访问");
+        dialog.setMessage("由于Android 11及以上的系统的分区存储机制，需要手动授权data目录的访问才能继续data目录的访问");
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
         dialog.show();
     }
 
+    public static void showObbPermissionTips(final Activity context){
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+        builder.setPositiveButton("去授权", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                PermissionManager.getObbPermission(context);
+            }
+        });
+        builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (dialog != null){
+                    dialog.dismiss();
+                    System.exit(0);
+                }
+            }
+        });
+        //dialog的实例化必须等待builder设置完之后
+        android.app.AlertDialog dialog = builder.create();
+        dialog.setMessage("由于Android 11及以上的系统的分区存储机制，需要手动授权data目录的访问才能继续data目录的访问");
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.show();
+    }
+
+    public static void showReqInstallPermissionTips(final Context context){
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+        builder.setPositiveButton("去授权", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Uri uri = Uri.parse("package:"+ context.getPackageName());
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, uri);
+                context.startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (dialog != null){
+                    dialog.dismiss();
+                }
+            }
+        });
+        android.app.AlertDialog dialog = builder.create();
+        dialog.setMessage("由于Android 11及以上的系统的分区存储机制，obb目录受限，需要授权安装权限后才能继续对obb文件的操作");
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.show();
+    }
 }
 

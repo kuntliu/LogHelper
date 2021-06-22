@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -66,9 +67,11 @@ public class MyDocumentFile {
 
     public static boolean checkIsNeedDocument(String path){
         boolean isNeedUseDocument = false;
-        String path2 = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Android/data/";
-        Log.d(TAG, "checkIsNeedDocument: path2 "+path2);
-        if (path.startsWith(path2) && Build.VERSION.SDK_INT >= 30){
+        String path_contain_data = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Android/data/";
+        String path_contain_obb = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Android/obb/";
+        Log.d(TAG, "checkIsNeedDocument: path_contain_data "+path_contain_data);
+        Log.d(TAG, "checkIsNeedDocument: path_contain_obb "+path_contain_obb);
+        if (path.startsWith(path_contain_data) || path.startsWith(path_contain_obb) && Build.VERSION.SDK_INT >= 30){
             isNeedUseDocument = true;
         }
         Log.d(TAG, "checkIsNeedDocument: isNeedUseDoc "+isNeedUseDocument);
@@ -82,21 +85,41 @@ public class MyDocumentFile {
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static DocumentFile[] getdestDocumentFileArr(DocumentFile documentFile, String[] path) {
+    public static DocumentFile[] getdestDocumentFileArr(DocumentFile documentFile, String path, Context context) {
         long start_time = System.currentTimeMillis();
-        Log.d(TAG, "getdestDocumentFileArr:path " + Arrays.toString(path));
-        for (String s : path) {
-            Log.d(TAG, "getdestDocumentFileArr: ForString " +s);
+        Log.d(TAG, "getdestDocumentFileArr:path " + path);
+        String[] pathArr = new String[0];
+        if (path.startsWith("/storage/emulated/0/Android/data/")){
+            pathArr = path.replace("/storage/emulated/0/Android/data/", "").split(File.separator);
+            if (pathArr[0].equals("")) {
+                documentFile = getDataDirDocumentFile(context);
+                if (documentFile != null) {
+                    return documentFile.listFiles();
+                }
+            }
+        }else if (path.startsWith("/storage/emulated/0/Android/obb/")){
+            pathArr = path.replace("/storage/emulated/0/Android/obb/", "").split(File.separator);
+                if (pathArr[0].equals("")) {
+                    documentFile = getObbDirDocumentFile(context);
+                    if (documentFile != null) {
+                        return documentFile.listFiles();
+                    }
+                }
+        }
+        //通过循环递归去寻找目标子目录的documentFile
+        for (String s : pathArr) {
+            Log.d(TAG, "getdestDocumentFileArr: ForString " + s);
             documentFile = getItemDirDocumentFile(documentFile, s);
         }
-        if (documentFile != null){
-            for (DocumentFile h: documentFile.listFiles()){
-                Log.d(TAG, "getdestpathDocument: logFileList: "+h.getName());
+        if (documentFile != null) {
+            for (DocumentFile h : documentFile.listFiles()) {
+                Log.d(TAG, "getdestpathDocument: FileList: " + h.getName());
             }
             long end_time = System.currentTimeMillis();
-            Log.d(TAG, "getdestDocumentFileArr: dotime "+(end_time-start_time));
+            Log.d(TAG, "getdestDocumentFileArr: DoTime " + (end_time - start_time));
             return documentFile.listFiles();
         }
+        //特殊处理如果传入的path仅仅是data或obb目录的时候，就直接获取data或obb目录的documentFile，而无需继续遍历寻找目标子目录的documentFile
         return null;
     }
 
@@ -111,11 +134,11 @@ public class MyDocumentFile {
         return null;
     }
 
-    //转换至uriTree的路径
+
     public static DocumentFile getDataDirDocumentFile(Context context) {
         SharedPreferences sp = context.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
-        String uriTree = sp.getString("dataUriTree", "");
-        if (!TextUtils.isEmpty(uriTree)){
+        String uri_str = sp.getString("dataUriTree", "");
+        if (!TextUtils.isEmpty(uri_str)){
             long start_time = System.currentTimeMillis();
 //        if (path.endsWith("/")) {
 //            path = path.substring(0, path.length() - 1);
@@ -123,31 +146,40 @@ public class MyDocumentFile {
 //        String path2 = path.replace("/storage/emulated/0/Android/data", "").replace("/", "%2F");
 //        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A");
 //        Log.d(TAG, "getDataDirDoucmentFile: path2 "+path2);
-            SharedPreferences sharedPreferences = context.getSharedPreferences("DirPermission", MODE_PRIVATE);
-            String uri_str = sharedPreferences.getString("dataUriTree", "");
             DocumentFile dataDocumentFile = DocumentFile.fromTreeUri(context, Uri.parse(uri_str));
             long end_time = System.currentTimeMillis();
             Log.d(TAG, "getDataDirDocumentFile: dotime "+(end_time-start_time));
             Log.d(TAG, "getDataDirDocumentFile: isSuccGetDataDocumentFile" + dataDocumentFile);
             return dataDocumentFile;
         }else {
-            PermissionManager.showDataPermissionTips((Activity)context);
+            if (Build.VERSION.SDK_INT >= 30){
+                PermissionManager.showDataPermissionTips((Activity)context);
+            }
             return null;
         }
     }
 
+    //增加一个方法去判断是否需要获得data/obb的权限放在主线程调用，然后从getObb和Data中移除这部分代码
+
     public static DocumentFile getObbDirDocumentFile(Context context) {
-        long start_time = System.currentTimeMillis();
+        SharedPreferences sp = context.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
+        String uri_str = sp.getString("obbUriTree", "");
+        if (!TextUtils.isEmpty(uri_str)){
 //        if (path.endsWith("/")) {
 //            path = path.substring(0, path.length() - 1);
 //        }
 //        String path2 = path.replace("/storage/emulated/0/Android/data", "").replace("/", "%2F");
-        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fobb/document/primary%3A");
+//        Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3A");
 //        Log.d(TAG, "getDataDirDoucmentFile: path2 "+path2);
-        DocumentFile dataDocumentFile = DocumentFile.fromTreeUri(context, uri);
-        long end_time = System.currentTimeMillis();
-        Log.d(TAG, "getDataDirDocumentFile: dotime "+(end_time-start_time));
-        return dataDocumentFile;
+            DocumentFile obbDocumentFile = DocumentFile.fromTreeUri(context, Uri.parse(uri_str));
+            Log.d(TAG, "getObbDirDocumentFile: isSuccGetObbDocumentFile" + obbDocumentFile);
+            return obbDocumentFile;
+        }else {
+            if (Build.VERSION.SDK_INT >= 30){
+                PermissionManager.showObbPermissionTips((Activity)context);
+            }
+            return null;
+        }
     }
 
     //判断文件类型并且返回对应的文件icon资源

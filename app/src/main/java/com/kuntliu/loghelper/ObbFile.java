@@ -3,11 +3,13 @@ package com.kuntliu.loghelper;
 
 
 import android.content.Context;
+import android.media.audiofx.BassBoost;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -20,6 +22,7 @@ import com.kuntliu.loghelper.myadapter.MyRecycleViewAdapter;
 import com.kuntliu.loghelper.mydialog.CopyProgressBarDialog;
 import com.kuntliu.loghelper.mydialog.MyConfirmCopyDialog;
 import com.kuntliu.loghelper.mydocumentfile.MyDocumentFile;
+import com.kuntliu.loghelper.mypermission.PermissionManager;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
@@ -51,8 +54,6 @@ public class ObbFile {
         Log.d(TAG, "copyObbFile: "+copyFileDestPath);
         if (!copyFileDestPath.equals("")) {
             final File destFile = new File(copyFileDestPath + selectedObbFile.getName());  //完整的目标文件对象
-
-
 
             Log.d(TAG, "destFile: "+destFile.getName());
 
@@ -96,7 +97,7 @@ public class ObbFile {
                                             final Path sourcePath = selectedObbFile.toPath();
                                             Path destPath = destFile.toPath();
                                             try {
-//                                      测试时发现move方法在部分机器不会生效，更稳妥的方法是使用copy()
+//                                              测试时发现move方法在部分机器不会生效，更稳妥的方法是使用copy()
                                                 Path targrtPath_copy = Files.copy(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
                                                 Log.d(TAG, "Files.copy: targrtPath " + targrtPath_copy);
                                                 Log.d(TAG, "Files.copy: destPath " + destPath);
