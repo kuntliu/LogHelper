@@ -2,11 +2,13 @@ package com.kuntliu.loghelper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,6 +83,7 @@ public class TabFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
         prePareTab();
         loadingTabData();
     }
@@ -103,8 +106,14 @@ public class TabFragment extends Fragment {
         }
         filterCondition = MyPreferences.getSharePreferencesStringData("show_type", "show_all", context);
         isNeedUseDoc = MyDocumentFile.checkIsNeedDocument(path);
-
         dataDirDocumentFile = MyDocumentFile.getDataDirDocumentFile(context);
+
+        SharedPreferences sp = context.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
+        String obb_uri_str = sp.getString("obbUriTree", "");
+        String path_contain_obb = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android/obb/";
+        if (isNeedUseDoc && TextUtils.isEmpty(obb_uri_str) && path.startsWith(path_contain_obb)){
+            PermissionManager.showObbPermissionTips((Activity)context);
+        }
     }
 
     //开始加载对应页签内的数据

@@ -9,7 +9,11 @@ import java.util.List;
 public class ArrayListSort {
 
     public List<MyFile> fileSort(List<MyFile> fileList, int sortByWhat, int sortType){
-
+        //sortByWhat == 1   按照文件时间排序
+        //sortByWhat == 2   按照文件名称排序
+        //sortByWhat == 3   按照文件大小排序
+        //sortType == 0     倒序
+        //sortType == 1     顺序
         if (sortByWhat == 1 && sortType == 0){
             //按照文件时间排序,新->旧
             Collections.sort(fileList, new Comparator<MyFile>() {

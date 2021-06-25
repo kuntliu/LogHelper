@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private final ArrayList<String> myPath_defalut = new ArrayList<>();
     private final List<TabFragment> tabFragmentList = new ArrayList<>();
 
+    ArrayList<String> myTabsFromPreferences;
     TabLayout tab_version;
     ViewPager viewPager;
     FragmentAdapter adapter;
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         tabFragmentList.clear();
-        ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", MainActivity.this);
+        myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", MainActivity.this);
         Log.d("MainActivity", "onRestart: "+myTabsFromPreferences);
         for (int i=0; i<myTabsFromPreferences.size(); i++ ){
             tabFragmentList.add(TabFragment.newInstance(i));
@@ -148,11 +149,22 @@ public class MainActivity extends AppCompatActivity {
             for (int i=0; i<myTab_defalut.size(); i++ ){
                 tabFragmentList.add(TabFragment.newInstance( i));
             }
+
+            //因为首次启动应用，SharePreferenceSize为0，因此需要设置好默认的tab之后再重新根据SharePreferenceSize的大小重新设置缓存页签的数量
+            viewPager.setOffscreenPageLimit(MyPreferences.SharePreferenceSize(MainActivity.this));
+
             //第一次启动应用使用默认的Tab目录
             adapter = new FragmentAdapter(getSupportFragmentManager(), myTab_defalut, tabFragmentList);
         }else {
             //非第一次启动应用就读取配置中的Tab目录和对应的Path
-            ArrayList<String> myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
+            if (myTabsFromPreferences != null){
+                myTabsFromPreferences.clear();
+
+            }
+            if (tabFragmentList != null){
+                tabFragmentList.clear();
+            }
+            myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
 //            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
 
             for (int i=0; i<myTabsFromPreferences.size(); i++ ){

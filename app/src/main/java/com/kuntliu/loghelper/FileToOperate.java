@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
@@ -258,7 +260,7 @@ public class FileToOperate {
 
     //通过apk的路径获取apk安装包的图标
     public static Drawable getApkIcon(String path, Context context){
-        Drawable icon = null;
+        Drawable icon = AppCompatResources.getDrawable(context, R.mipmap.apk_install_package_round);
         PackageManager pm = context.getPackageManager();
         PackageInfo pi = pm.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
 //        Log.d("getFileDrawable", "getFileDrawable: "+path);

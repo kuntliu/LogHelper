@@ -63,7 +63,7 @@ public class PermissionManager {
             Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
             Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
             context.startActivity(intent);
-            Toast.makeText(context, "点击下方的按钮进行授权data目录的访问", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "点击下方的按钮进行授权Data目录的访问", Toast.LENGTH_LONG).show();
             toRequestDataPermission(context, REQUEST_CODE_FOR_DATA_DIR);
         }
     }
@@ -73,13 +73,13 @@ public class PermissionManager {
             Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
             Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
             context.startActivity(intent);
-            Toast.makeText(context, "点击下方的按钮进行授权data目录的访问", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "点击下方的按钮进行授权obb目录的访问", Toast.LENGTH_LONG).show();
             toRequestObbPermission(context, REQUEST_CODE_FOR_OBB_DIR);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static void toRequestDataPermission(Activity context, int REQUEST_CODE_FOR_DIR) {
+    public static void toRequestDataPermission(Activity context, int REQUEST_CODE_FOR_DATA_DIR) {
         Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata");
         Log.d("startForRoot", "startForRoot:uri "+uri);
         DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
@@ -95,7 +95,7 @@ public class PermissionManager {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static void toRequestObbPermission(Activity context, int REQUEST_CODE_FOR_DIR) {
+    public static void toRequestObbPermission(Activity context, int REQUEST_CODE_FOR_OBB_DIR) {
         Uri uri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fobb");
         Log.d("startForRoot", "startForRoot:uri "+uri);
         DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
@@ -193,7 +193,7 @@ public class PermissionManager {
         });
         //dialog的实例化必须等待builder设置完之后
         android.app.AlertDialog dialog = builder.create();
-        dialog.setMessage("由于Android 11及以上的系统的分区存储机制，需要手动授权data目录的访问才能继续data目录的访问");
+        dialog.setMessage("检测到您已设置obb目录，由于Android 11及以上的系统的分区存储机制，需要手动授权obb目录的访问才能继续obb目录的访问");
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
         dialog.show();
