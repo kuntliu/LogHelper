@@ -1,14 +1,11 @@
 package com.kuntliu.loghelper.mydocumentfile;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,17 +17,12 @@ import com.kuntliu.loghelper.FileToOperate;
 import com.kuntliu.loghelper.MyFile;
 import com.kuntliu.loghelper.R;
 import com.kuntliu.loghelper.arraylistsort.ArrayListSort;
-import com.kuntliu.loghelper.mypermission.PermissionManager;
 import com.kuntliu.loghelper.mypreferences.MyPreferences;
 
 import java.io.File;
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 import static android.content.ContentValues.TAG;
-import static android.content.Context.MODE_PRIVATE;
 
 public class MyDocumentFile {
 
@@ -78,11 +70,6 @@ public class MyDocumentFile {
         return isNeedUseDocument;
     }
 
-    public static String[] getDatadirItemPath(String path){
-        Log.d(TAG, "getItemPath: "+ Arrays.toString(path.replace("/storage/emulated/0/Android/data/", "").split(File.separator)));
-        return path.replace("/storage/emulated/0/Android/data/", "").split(File.separator);
-    }
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static DocumentFile[] getdestDocumentFileArr(DocumentFile documentFile, String path, Context context) {
@@ -100,12 +87,13 @@ public class MyDocumentFile {
             }
         }else if (path.startsWith("/storage/emulated/0/Android/obb/")){
             pathArr = path.replace("/storage/emulated/0/Android/obb/", "").split(File.separator);
-                if (pathArr[0].equals("")) {
-                    documentFile = getObbDirDocumentFile(context);
-                    if (documentFile != null) {
-                        return documentFile.listFiles();
-                    }
+            //默认情况下传入的documentFile是data目录的，如果判断到路径是obb目录，那么需要将obb目录切换为obb的documentFile
+            documentFile = getObbDirDocumentFile(context);
+            if (pathArr[0].equals("")) {
+                if (documentFile != null) {
+                    return documentFile.listFiles();
                 }
+            }
         }
         //通过循环递归去寻找目标子目录的documentFile
         for (String s : pathArr) {

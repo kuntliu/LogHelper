@@ -67,7 +67,6 @@ public class FileToOperate {
         if (!MyDocumentFile.checkIsNeedDocument(path)){
             if (getFileArr(path) != null){
                 for (File f : arrFiles) {
-//                Log.d("FileList", f.toString());
                     if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
                         //判断如果文件是apk就获取版本号
                         String apk_version = "";
@@ -97,7 +96,7 @@ public class FileToOperate {
     }
 
     //根据list和file[]正确判断当前文件列表状态
-    public static void tvSwitch(String path, List<MyFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, boolean isNeedUseDoc, TextView tv){
+    public static void tvSwitch(List<MyFile> list, File[] arrFiles, DocumentFile[] documentFilesArr, boolean isNeedUseDoc, TextView tv){
         if (!isNeedUseDoc){
             if (list.size() == 0){
                 tv.setVisibility(View.VISIBLE);
@@ -283,7 +282,6 @@ public class FileToOperate {
         }
         return version;
     }
-
 
     //识别并安装apk文件
     public static void installAPK(File file, DocumentFile documentFile, boolean isNeeduseDoc, Context context){

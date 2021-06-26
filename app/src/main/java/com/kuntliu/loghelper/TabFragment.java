@@ -140,7 +140,7 @@ public class TabFragment extends Fragment {
                         adapter = new MyRecycleViewAdapter(fileList, context);
                         recyclerView.setAdapter(adapter);
                         //根据fileList判断，显示对应的提示
-                        FileToOperate.tvSwitch(path, fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);
+                        FileToOperate.tvSwitch(fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);
 
                         adapter.setOnItemClickListener(new MyRecycleViewAdapter.OnItemClickListener() {
                             @Override
@@ -202,8 +202,10 @@ public class TabFragment extends Fragment {
 
     //每个Tab的刷新功能
     private void toRefresh(){
-        if (isNeedUseDoc && documentFileArr == null && !Environment.isExternalStorageManager()){
-            PermissionManager.showDataPermissionTips((Activity) context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (isNeedUseDoc && documentFileArr == null && !Environment.isExternalStorageManager()){
+                PermissionManager.showDataPermissionTips((Activity) context);
+            }
         }
         fileList.clear();
         path = MyPreferences.getSharePreferencesListData("myPaths", context).get(tabPosition);
@@ -218,6 +220,6 @@ public class TabFragment extends Fragment {
             fileList.addAll(FileToOperate.getFileList(path, fileArr, context, filterCondition, isSdCardRoot));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
         }
         adapter.notifyDataSetChanged();
-        FileToOperate.tvSwitch(path, fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);
+        FileToOperate.tvSwitch(fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);
     }
 }
