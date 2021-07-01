@@ -71,8 +71,8 @@ public class ObbFile {
                     }
                     @Override
                     public void clickMove() {
-                        CopyProgressBarDialog.showCircleProgressBar(context);   //显示耗时的转菊花效果
                         if (getFreespace() - 300 * 1024 * 1024 > selectedObbFile.length()) {
+                            CopyProgressBarDialog.showCircleProgressBar(context);   //显示耗时的转菊花效果
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {

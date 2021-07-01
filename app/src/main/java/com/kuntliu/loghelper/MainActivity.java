@@ -1,7 +1,9 @@
 package com.kuntliu.loghelper;
 
+
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriPermission;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -55,15 +57,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        tab_version.setupWithViewPager(viewPager,false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             boolean isGetNormalPermission = PermissionManager.getNormalPermission(MainActivity.this);
             //获得权限了之后去初始化数据
             if (isGetNormalPermission){
-                if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()){
+                List<UriPermission> uriPermissionList = getContentResolver().getPersistedUriPermissions();
+                if (Build.VERSION.SDK_INT >= 30 && uriPermissionList.isEmpty()){
                     Log.d(TAG, "run: isGetDataPermission "+ Environment.isExternalStorageManager());
-                    //Android11如果还没授予data权限，先显示授权data的提示框
                     PermissionManager.showDataPermissionTips(MainActivity.this);
-                }else {
+                }else if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()) {
+                    PermissionManager.showAllFilePermissionTips(MainActivity.this);
+                } else {
                     //主线程初始化view，新开子线程去初始化数据
                     new Thread(new Runnable() {
                         @Override
@@ -74,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        tab_version.setupWithViewPager(viewPager,false);
 
 
 
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         tabFragmentList.clear();
         myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", MainActivity.this);
         Log.d("MainActivity", "onRestart: "+myTabsFromPreferences);
-        for (int i=0; i<myTabsFromPreferences.size(); i++ ){
+        for (int i=0; i<myTabsFromPreferences.size(); i++){
             tabFragmentList.add(TabFragment.newInstance(i));
         }
         adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
@@ -159,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
             //非第一次启动应用就读取配置中的Tab目录和对应的Path
             if (myTabsFromPreferences != null){
                 myTabsFromPreferences.clear();
-
             }
             if (tabFragmentList != null){
                 tabFragmentList.clear();
@@ -167,8 +170,10 @@ public class MainActivity extends AppCompatActivity {
             myTabsFromPreferences = MyPreferences.getSharePreferencesListData("myTabs", this);
 //            ArrayList<String> myPathsFromPreferences = MyPreferences.getSharePreferencesListData("myPaths", this);
 
-            for (int i=0; i<myTabsFromPreferences.size(); i++ ){
-                tabFragmentList.add(TabFragment.newInstance(i));
+            if (tabFragmentList != null){
+                for (int i=0; i<myTabsFromPreferences.size(); i++ ){
+                    tabFragmentList.add(TabFragment.newInstance(i));
+                }
             }
             adapter = new FragmentAdapter(getSupportFragmentManager(), myTabsFromPreferences, tabFragmentList);
         }
@@ -218,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
-            Toast.makeText(MainActivity.this, "Current Version:1.2 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Current Version:1.2.2 \n Developed by v_kuntliu", Toast.LENGTH_LONG).show();
             return true;
         }else if(id == R.id.action_setting){
             Intent intent = new Intent(this, SettingsActivity.class);

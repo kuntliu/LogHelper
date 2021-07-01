@@ -111,6 +111,8 @@ public class TabFragment extends Fragment {
         SharedPreferences sp = context.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
         String obb_uri_str = sp.getString("obbUriTree", "");
         String path_contain_obb = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android/obb/";
+
+        //检查是否有设置有obb的目录，如果有设置的话就提示去获取obb目录的权限
         if (isNeedUseDoc && TextUtils.isEmpty(obb_uri_str) && path.startsWith(path_contain_obb)){
             PermissionManager.showObbPermissionTips((Activity)context);
         }
@@ -131,7 +133,7 @@ public class TabFragment extends Fragment {
                 }else{
                     Log.d(TAG, "onStart: doFileMethod");
                     fileArr = FileToOperate.getFileArr(path);
-                    fileList = FileToOperate.getFileList(path, fileArr, getContext(), filterCondition, isSdCardRoot);
+                    fileList = FileToOperate.getFileList(path, fileArr, context, filterCondition, isSdCardRoot, isNeedUseDoc);
                 }
                 //完成数据加载去通知ui线程进行更新界面
                 handler.post(new Runnable() {
@@ -202,6 +204,7 @@ public class TabFragment extends Fragment {
 
     //每个Tab的刷新功能
     private void toRefresh(){
+        //写的一个保护，如果某些操作导致应用失去了访问所有文件权限，就弹出授权提示
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (isNeedUseDoc && documentFileArr == null && !Environment.isExternalStorageManager()){
                 PermissionManager.showDataPermissionTips((Activity) context);
@@ -217,7 +220,7 @@ public class TabFragment extends Fragment {
         }else{
             Log.d(TAG, "onStart: doFileMethod");
             fileArr = FileToOperate.getFileArr(path);
-            fileList.addAll(FileToOperate.getFileList(path, fileArr, context, filterCondition, isSdCardRoot));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
+            fileList.addAll(FileToOperate.getFileList(path, fileArr, context, filterCondition, isSdCardRoot, isNeedUseDoc));  //notifyDataSetChanged要生效的话，就必须对fileList进行操作，重新赋值是不行的
         }
         adapter.notifyDataSetChanged();
         FileToOperate.tvSwitch(fileList, fileArr, documentFileArr, isNeedUseDoc, tv_empty_tips);

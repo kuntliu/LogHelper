@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.kuntliu.loghelper.BuildConfig;
+import com.kuntliu.loghelper.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class PermissionManager {
             Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
             Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
             context.startActivity(intent);
-            Toast.makeText(context, "点击下方的按钮进行授权Data目录的访问", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "点击下方的按钮进行授权data目录的访问", Toast.LENGTH_LONG).show();
             toRequestDataPermission(context, REQUEST_CODE_FOR_DATA_DIR);
         }
     }
@@ -194,6 +195,35 @@ public class PermissionManager {
         //dialog的实例化必须等待builder设置完之后
         android.app.AlertDialog dialog = builder.create();
         dialog.setMessage("检测到您已设置obb目录，由于Android 11及以上的系统的分区存储机制，需要手动授权obb目录的访问才能继续obb目录的访问");
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.show();
+    }
+
+    public static void showAllFilePermissionTips(final Context context){
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+        builder.setPositiveButton("去允许", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                Toast.makeText(context, "点击开关以获取访问所有文件权限", Toast.LENGTH_LONG).show();
+                context.startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (dialog != null){
+                    dialog.dismiss();
+                    System.exit(0);
+                }
+            }
+        });
+        //dialog的实例化必须等待builder设置完之后
+        android.app.AlertDialog dialog = builder.create();
+        dialog.setMessage("检测到未获取访问所有文件权限，需要允许后才能访问文件的访问哦");
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
         dialog.show();

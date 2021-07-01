@@ -63,8 +63,10 @@ public class MyDocumentFile {
         Log.d(TAG, "checkIsNeedDocument: path "+path);
         Log.d(TAG, "checkIsNeedDocument: path_contain_data "+path_contain_data);
         Log.d(TAG, "checkIsNeedDocument: path_contain_obb "+path_contain_obb);
-        if (path.startsWith(path_contain_data) || path.startsWith(path_contain_obb) && Build.VERSION.SDK_INT >= 30){
-            isNeedUseDocument = true;
+        if (Build.VERSION.SDK_INT >= 30){
+            if (path.startsWith(path_contain_data) || path.startsWith(path_contain_obb)){
+                isNeedUseDocument = true;
+            }
         }
         Log.d(TAG, "checkIsNeedDocument: isNeedUseDoc "+isNeedUseDocument);
         return isNeedUseDocument;
@@ -97,13 +99,13 @@ public class MyDocumentFile {
         }
         //通过循环递归去寻找目标子目录的documentFile
         for (String s : pathArr) {
-            Log.d(TAG, "getdestDocumentFileArr: ForString " + s);
+//            Log.d(TAG, "getdestDocumentFileArr: ForString " + s);
             documentFile = getItemDirDocumentFile(documentFile, s);
         }
         if (documentFile != null) {
-            for (DocumentFile h : documentFile.listFiles()) {
-                Log.d(TAG, "getdestpathDocument: FileList: " + h.getName());
-            }
+//            for (DocumentFile h : documentFile.listFiles()) {
+//                Log.d(TAG, "getdestpathDocument: FileList: " + h.getName());
+//            }
             long end_time = System.currentTimeMillis();
             Log.d(TAG, "getdestDocumentFileArr: DoTime " + (end_time - start_time));
             return documentFile.listFiles();

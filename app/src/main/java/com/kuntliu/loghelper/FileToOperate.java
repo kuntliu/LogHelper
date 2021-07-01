@@ -61,10 +61,10 @@ public class FileToOperate {
     }
 
     //获取文件列表，数据形式为list
-    public static List<MyFile> getFileList(String path, File[] arrFiles, Context context, String filterConditon, Boolean isSdCardroot)  {
+    public static List<MyFile> getFileList(String path, File[] arrFiles, Context context, String filterConditon, Boolean isSdCardroot, boolean isNeedUseDoc)  {
         List<MyFile> fileList = new ArrayList<>();   //初始化数据
         //判断path目录是否存在
-        if (!MyDocumentFile.checkIsNeedDocument(path)){
+        if (!isNeedUseDoc){
             if (getFileArr(path) != null){
                 for (File f : arrFiles) {
                     if (f.isFile() && !f.getName().startsWith(".")) {    //过滤：“.”开头的隐藏文件和path目录下的文件夹
@@ -142,14 +142,15 @@ public class FileToOperate {
         Log.d(TAG, "searchSelectedDocFile: fileNameClicked " +fileNameClicked);
         for (DocumentFile d : DocumentFileArr){
             Log.d(TAG, "searchSelectedDocFile: for_times" );
-            if (d.getName() != null){
-                if (d.getName().equals(fileNameClicked)){
+            if (d.getName() != null) {
+                if (d.getName().equals(fileNameClicked)) {
                     return d;
                 }
-            }else {
-                Log.d(TAG, "searchSelectedDocFile: d.getName "+ d.getName());
-                Toast.makeText(context, "文件不存在", Toast.LENGTH_SHORT).show();
             }
+//            }else {
+//                Log.d(TAG, "searchSelectedDocFile: d.getName "+ d.getName());
+//                Toast.makeText(context, "文件不存在", Toast.LENGTH_SHORT).show();
+//            }
         }
         return null;
     }
@@ -253,7 +254,7 @@ public class FileToOperate {
                 }
             }
         }else {
-            Toast.makeText(context, "未安装QQ", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "未安装QQ或检查【读取应用列表】权限是否被受限", Toast.LENGTH_LONG).show();
         }
     }
 
